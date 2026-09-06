@@ -4,15 +4,42 @@ import { Shield, Bell, Lock, Sparkles, LogOut, ChevronRight } from 'lucide-react
 import PageWrapper from '@/components/layout/PageWrapper';
 import { useAuth } from '@/contexts/AuthContext';
 
+interface NotificationSettings {
+  morningRitual: boolean;
+  eveningAbhyanga: boolean;
+  seasonalTransitions: boolean;
+}
+
+const DEFAULT_NOTIFICATIONS: NotificationSettings = {
+  morningRitual: true,
+  eveningAbhyanga: true,
+  seasonalTransitions: true,
+};
+
 export default function SettingsPage() {
   const navigate = useNavigate();
   const { signOut } = useAuth();
 
-  const [notifications, setNotifications] = useState({
-    morningRitual: true,
-    eveningAbhyanga: true,
-    seasonalTransitions: true,
+  const [notifications, setNotifications] = useState<NotificationSettings>(() => {
+    try {
+      const raw = localStorage.getItem('aayurface_notification_settings');
+      return raw ? (JSON.parse(raw) as NotificationSettings) : DEFAULT_NOTIFICATIONS;
+    } catch {
+      return DEFAULT_NOTIFICATIONS;
+    }
   });
+
+  const updateNotification = (key: keyof NotificationSettings, val: boolean) => {
+    setNotifications((prev: NotificationSettings) => {
+      const next: NotificationSettings = { ...prev, [key]: val };
+      try {
+        localStorage.setItem('aayurface_notification_settings', JSON.stringify(next));
+      } catch {
+        // Ignore storage error
+      }
+      return next;
+    });
+  };
 
   const handleLogout = async () => {
     await signOut();
@@ -77,7 +104,7 @@ export default function SettingsPage() {
                 <input
                   type="checkbox"
                   checked={notifications.morningRitual}
-                  onChange={(e) => setNotifications((p) => ({ ...p, morningRitual: e.target.checked }))}
+                  onChange={(e) => updateNotification('morningRitual', e.target.checked)}
                   className="w-5 h-5 accent-brand-primary rounded cursor-pointer"
                 />
               </label>
@@ -90,7 +117,7 @@ export default function SettingsPage() {
                 <input
                   type="checkbox"
                   checked={notifications.eveningAbhyanga}
-                  onChange={(e) => setNotifications((p) => ({ ...p, eveningAbhyanga: e.target.checked }))}
+                  onChange={(e) => updateNotification('eveningAbhyanga', e.target.checked)}
                   className="w-5 h-5 accent-brand-primary rounded cursor-pointer"
                 />
               </label>
@@ -103,7 +130,7 @@ export default function SettingsPage() {
                 <input
                   type="checkbox"
                   checked={notifications.seasonalTransitions}
-                  onChange={(e) => setNotifications((p) => ({ ...p, seasonalTransitions: e.target.checked }))}
+                  onChange={(e) => updateNotification('seasonalTransitions', e.target.checked)}
                   className="w-5 h-5 accent-brand-primary rounded cursor-pointer"
                 />
               </label>

@@ -99,6 +99,11 @@ export default function HomePage() {
 
   const completedCount = rituals.filter((r) => r.completed).length;
 
+  const userDoshaLabel = user?.dosha 
+    ? `${user.dosha.charAt(0).toUpperCase() + user.dosha.slice(1)} Constitution`
+    : (user?.skin_type ? `${user.skin_type.charAt(0).toUpperCase() + user.skin_type.slice(1)} Profile` : 'Constitutional Balance');
+  const userDoshaVariant = (user?.dosha as any) || (user?.skin_type as any) || 'default';
+
   return (
     <PageWrapper>
       <motion.div 
@@ -124,10 +129,10 @@ export default function HomePage() {
             </div>
 
             <div className="flex items-center gap-3">
-              <SkinBadge label="Vata-Pitta Profile" variant="vata" size="sm" />
+              <SkinBadge label={userDoshaLabel} variant={userDoshaVariant} size="sm" />
               <div className="flex items-center gap-1.5 text-caption text-text-secondary bg-background-surface px-3 py-1 rounded-full border border-border-default shadow-xs">
                 <Flame className="w-3.5 h-3.5 text-brand-accent" />
-                <span className="font-semibold text-text-primary">5-Day</span> Rhythm
+                <span className="font-semibold text-text-primary">{completedCount > 0 ? `${completedCount} Active` : 'Daily'}</span> Rhythm
               </div>
             </div>
           </div>
@@ -177,7 +182,7 @@ export default function HomePage() {
                 onClick={() => navigate('/results/demo-scan')}
                 className="inline-flex items-center gap-1.5 text-body-md font-medium text-text-secondary hover:text-brand-primary transition-colors py-3 px-2 cursor-pointer group"
               >
-                View Sample Insights
+                View Sample Insights (Reference)
                 <ChevronRight className="w-4 h-4 text-text-tertiary group-hover:text-brand-primary group-hover:translate-x-0.5 transition-transform" />
               </button>
             </div>

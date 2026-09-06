@@ -1,7 +1,10 @@
 import { motion } from 'framer-motion';
 import { Sparkles, Calendar, Flame, Compass } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import PageWrapper from '@/components/layout/PageWrapper';
 import SkinBadge from '@/components/common/SkinBadge';
+import { useAuth } from '@/contexts/AuthContext';
+import { getUserAssessments } from '@/lib/assessmentStore';
 
 const reflections = [
   {
@@ -31,6 +34,14 @@ const reflections = [
 ];
 
 export default function ProgressPage() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const userAssessments = user?.id ? getUserAssessments(user.id) : [];
+
+  const dominantDosha = user?.dosha 
+    ? `${user.dosha.charAt(0).toUpperCase() + user.dosha.slice(1)} Pacification`
+    : 'Pitta Pacification';
+
   return (
     <PageWrapper>
       <div className="space-y-8 max-w-4xl mx-auto w-full pb-16 font-body">
@@ -65,22 +76,32 @@ export default function ProgressPage() {
 
         {/* Milestone Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="p-5 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-1">
+          <div 
+            onClick={() => navigate('/routine')}
+            className="p-5 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-1 hover:border-brand-primary/40 transition-colors cursor-pointer"
+          >
             <div className="flex items-center gap-2 text-text-tertiary text-caption font-medium">
               <Flame className="w-4 h-4 text-brand-accent" />
               Ritual Streak
             </div>
-            <p className="font-display text-2xl font-semibold text-text-primary">5 Consecutive Days</p>
+            <p className="font-display text-2xl font-semibold text-text-primary">Daily Practice</p>
             <p className="text-caption text-text-secondary">Consistent morning & evening dinacharya</p>
           </div>
 
-          <div className="p-5 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-1">
+          <div 
+            onClick={() => navigate('/history')}
+            className="p-5 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-1 hover:border-brand-primary/40 transition-colors cursor-pointer"
+          >
             <div className="flex items-center gap-2 text-text-tertiary text-caption font-medium">
               <Calendar className="w-4 h-4 text-brand-primary" />
               Observations Logged
             </div>
-            <p className="font-display text-2xl font-semibold text-text-primary">3 Assessments</p>
-            <p className="text-caption text-text-secondary">Across Shishira and Hemanta seasons</p>
+            <p className="font-display text-2xl font-semibold text-text-primary">
+              {userAssessments.length} {userAssessments.length === 1 ? 'Observation' : 'Observations'}
+            </p>
+            <p className="text-caption text-text-secondary">
+              {userAssessments.length > 0 ? 'Recorded in personal history' : 'Ready for initial observation'}
+            </p>
           </div>
 
           <div className="p-5 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-1">
@@ -88,7 +109,7 @@ export default function ProgressPage() {
               <Compass className="w-4 h-4 text-emerald-700" />
               Dominant Focus
             </div>
-            <p className="font-display text-2xl font-semibold text-text-primary">Pitta Pacification</p>
+            <p className="font-display text-2xl font-semibold text-text-primary">{dominantDosha}</p>
             <p className="text-caption text-text-secondary">Cooling botanicals & hydration</p>
           </div>
         </div>

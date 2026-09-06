@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-06T05:55:02.023Z",
+  "timestamp": "2026-09-06T08:03:02.515Z",
   "status": "PASS",
   "summary": "12 / 12 tests passed",
   "testResults": [
@@ -79,7 +79,7 @@
       "id": "TEST-10",
       "name": "New User Registration -> Direct /dashboard Entry & Session Creation",
       "expected": "Registration redirects directly to /dashboard with Account B active session",
-      "actual": "URL=http://localhost:5173/dashboard, sessionUser=Bhavna Patel, sessionEmail=bhavna.patel.1788674081336@example.com",
+      "actual": "URL=http://localhost:5173/dashboard, sessionUser=Bhavna Patel, sessionEmail=bhavna.patel.1788681762009@example.com",
       "status": "PASS",
       "details": "Registration directly establishes authenticated context and routes to dashboard"
     },
@@ -87,9 +87,9 @@
       "id": "TEST-11",
       "name": "Multi-User Assessment Lifecycle Non-Regression & Isolation",
       "expected": "Assessment A != Assessment B, cross-account access blocked, history isolated, demo-scan isolated",
-      "actual": "idA=3cd993b9-de5f-4e56-b5bb-b8848f2e3713, idB=103f97eb-0ae9-4bfa-aa5d-ce2592cd3643, crossAccessBlocked=true, historyIsolated=true, demoIsolated=true",
+      "actual": "idA=41b38d14-03e9-4235-bbd2-7d8f0c35df90, idB=39eb26b9-baf6-4815-a0dd-5078973956e3, crossAccessBlocked=true, historyIsolated=true, demoIsolated=true",
       "status": "PASS",
-      "details": "Account A ID: 3cd993b9-de5f-4e56-b5bb-b8848f2e3713, Account B ID: 103f97eb-0ae9-4bfa-aa5d-ce2592cd3643"
+      "details": "Account A ID: 41b38d14-03e9-4235-bbd2-7d8f0c35df90, Account B ID: 39eb26b9-baf6-4815-a0dd-5078973956e3"
     },
     {
       "id": "TEST-12",

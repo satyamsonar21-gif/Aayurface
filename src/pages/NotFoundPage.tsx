@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Home, Compass } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const NotFoundPage = () => {
+  const { isAuthenticated } = useAuth();
+
   return (
     <div className="min-h-screen bg-background-primary flex flex-col items-center justify-center p-6 text-center font-body text-text-primary">
       <motion.div
@@ -27,15 +30,23 @@ const NotFoundPage = () => {
           It appears you have wandered outside charted constitutional territory. The requested page is unavailable.
         </p>
         
-        <motion.div whileTap={{ scale: 0.98 }}>
+        <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
           <Link 
-            to="/home" 
-            className="inline-flex items-center gap-2 bg-brand-primary text-text-inverse px-7 py-3.5 rounded-md text-body-md font-body font-medium hover:bg-brand-primary-hover transition-all shadow-sm"
+            to={isAuthenticated ? "/dashboard" : "/"} 
+            className="inline-flex items-center justify-center gap-2 bg-brand-primary text-text-inverse px-6 py-3 rounded-md text-body-md font-body font-medium hover:bg-brand-primary-hover transition-all shadow-sm"
           >
             <Home size={16} />
-            Return to Dashboard
+            <span>{isAuthenticated ? "Return to Dashboard" : "Return to Home"}</span>
           </Link>
-        </motion.div>
+          {!isAuthenticated && (
+            <Link 
+              to="/signin" 
+              className="inline-flex items-center justify-center gap-2 border border-border-default bg-background-surface hover:bg-background-subtle text-text-primary px-6 py-3 rounded-md text-body-md font-body font-medium transition-colors"
+            >
+              Sign In
+            </Link>
+          )}
+        </div>
       </motion.div>
     </div>
   );

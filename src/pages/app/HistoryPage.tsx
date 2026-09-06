@@ -144,26 +144,35 @@ export default function HistoryPage() {
             })}
           </div>
         ) : (
-          /* Empty State for user with no assessments */
-          <div className="p-10 rounded-lg bg-background-surface border border-border-default text-center space-y-4 max-w-lg mx-auto my-6">
-            <div className="w-14 h-14 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center mx-auto">
-              <Camera className="w-6 h-6" />
+          /* Luxury Editorial Empty State for user with no observations */
+          <div className="p-8 sm:p-12 rounded-lg bg-background-surface border border-border-default text-center space-y-6 max-w-xl mx-auto my-6 shadow-sm">
+            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-border-default mx-auto bg-background-subtle shadow-xs">
+              <img 
+                src="/images/1.jpg" 
+                alt="Ayurvedic botanical herbs" 
+                className="w-full h-full object-cover opacity-85"
+              />
             </div>
-            <div className="space-y-1">
-              <h2 className="font-display text-xl font-semibold text-text-primary">
-                No Observations Recorded Yet
+            <div className="space-y-2">
+              <span className="text-caption uppercase tracking-wider font-semibold text-brand-accent">
+                BEGINNING YOUR JOURNAL
+              </span>
+              <h2 className="font-display text-2xl sm:text-3xl font-semibold text-text-primary">
+                Your first scan creates the beginning of your skin journey.
               </h2>
-              <p className="text-body-md text-text-secondary">
-                You haven't performed any facial skin wellness observations on this account yet.
+              <p className="text-body-md text-text-secondary leading-relaxed max-w-md mx-auto">
+                Ayurvedic observation tracks subtle shifts in hydration, thermal redness, and cellular vitality across changing seasonal rhythms.
               </p>
             </div>
-            <button
-              onClick={() => navigate('/scan')}
-              className="inline-flex items-center gap-2 bg-brand-primary text-text-inverse px-6 py-2.5 rounded-md font-body font-medium hover:bg-brand-primary-hover transition-colors shadow-sm cursor-pointer"
-            >
-              <Camera className="w-4 h-4" />
-              Capture Your First Observation
-            </button>
+            <div className="pt-2">
+              <button
+                onClick={() => navigate('/scan')}
+                className="inline-flex items-center gap-2.5 bg-brand-primary text-text-inverse px-7 py-3 rounded-md font-body font-semibold text-body-md hover:bg-brand-primary-hover transition-all shadow-sm cursor-pointer"
+              >
+                <Camera className="w-4 h-4 text-brand-accent" />
+                Start Your First Observation
+              </button>
+            </div>
           </div>
         )}
 

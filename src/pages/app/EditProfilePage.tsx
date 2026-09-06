@@ -9,7 +9,8 @@ export default function EditProfilePage() {
   const navigate = useNavigate();
   const { user, updateProfile } = useAuth();
 
-  const [name, setName] = useState(user?.full_name || 'Namrata Sen');
+  const initialName = user?.full_name?.trim() || (user?.email ? user.email.split('@')[0] : '');
+  const [name, setName] = useState(initialName);
   const [skinType, setSkinType] = useState<SkinType>(user?.skin_type || 'dry');
   const [isSaving, setIsSaving] = useState(false);
 
@@ -25,7 +26,7 @@ export default function EditProfilePage() {
     setIsSaving(true);
     try {
       await updateProfile({
-        full_name: name,
+        full_name: name.trim() || initialName,
         skin_type: skinType,
       });
       navigate('/profile');
@@ -35,6 +36,9 @@ export default function EditProfilePage() {
       setIsSaving(false);
     }
   };
+
+  const displayName = name.trim() || initialName || 'AayurFace Member';
+  const displayInitial = displayName.charAt(0).toUpperCase() || 'A';
 
   return (
     <PageWrapper>
@@ -70,11 +74,11 @@ export default function EditProfilePage() {
           {/* User Avatar Initial Banner */}
           <div className="flex items-center gap-4 p-4 rounded-lg bg-background-surface border border-border-default">
             <div className="w-14 h-14 rounded-full bg-brand-primary text-text-inverse flex items-center justify-center font-display text-2xl font-semibold shadow-sm">
-              {name.charAt(0).toUpperCase()}
+              {displayInitial}
             </div>
             <div>
-              <p className="font-display text-lg font-semibold text-text-primary">{name}</p>
-              <p className="text-caption text-text-tertiary">{user?.email || 'namrata.sen@example.com'}</p>
+              <p className="font-display text-lg font-semibold text-text-primary">{displayName}</p>
+              <p className="text-caption text-text-tertiary">{user?.email || 'member@aayurface.local'}</p>
             </div>
           </div>
 
@@ -88,6 +92,7 @@ export default function EditProfilePage() {
                 type="text" 
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your full name"
                 required
                 className="w-full rounded-md border border-border-default bg-background-surface px-4 py-3 font-body text-body-md text-text-primary focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all shadow-sm"
               />
@@ -103,7 +108,7 @@ export default function EditProfilePage() {
                 </div>
                 <input 
                   type="email" 
-                  value={user?.email || "namrata.sen@example.com"}
+                  value={user?.email || "member@aayurface.local"}
                   disabled
                   className="w-full rounded-md border border-border-default/60 bg-background-subtle/70 pl-10 pr-4 py-3 font-body text-body-md text-text-tertiary cursor-not-allowed"
                 />

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-05T04:51:47.975Z",
+  "timestamp": "2026-09-06T08:03:12.202Z",
   "inputFiles": {
     "image1": {
       "file": "public/images/1.jpg",
@@ -15,8 +15,8 @@
   "tests": {
     "Test_A_and_B_AccountA": {
       "userId": "user-namrata-sen",
-      "navigatedUrl": "http://localhost:5173/results/0316cb8f-71d5-4818-aa46-7eec3aaa166b",
-      "assessmentId": "0316cb8f-71d5-4818-aa46-7eec3aaa166b",
+      "navigatedUrl": "http://localhost:5173/results/cf0e26ee-d28a-4565-bbe9-42556ee3d282",
+      "assessmentId": "cf0e26ee-d28a-4565-bbe9-42556ee3d282",
       "isNotDemoScanUrl": true,
       "previewStateReached": true,
       "hasCapturedImageRendered": true,
@@ -25,14 +25,14 @@
       "pass": true
     },
     "Test_F_BrowserRefresh": {
-      "reloadedUrl": "http://localhost:5173/results/0316cb8f-71d5-4818-aa46-7eec3aaa166b",
+      "reloadedUrl": "http://localhost:5173/results/cf0e26ee-d28a-4565-bbe9-42556ee3d282",
       "stillHasImage": true,
       "notRevertedToNotFound": true,
       "pass": true
     },
     "Test_G_SecondScanUniqueId": {
-      "firstScanId": "0316cb8f-71d5-4818-aa46-7eec3aaa166b",
-      "secondScanId": "92a1d1df-3754-4378-be4c-0ca6e0f0409b",
+      "firstScanId": "cf0e26ee-d28a-4565-bbe9-42556ee3d282",
+      "secondScanId": "05a90dea-b129-43e0-8508-c218af991c96",
       "idsAreDistinct": true,
       "pass": true
     },
@@ -47,16 +47,16 @@
       "pass": true
     },
     "Test_A_and_B_AccountB": {
-      "userId": "85fe4b4b-d25a-4482-b94d-80f98ed367f6",
-      "navigatedUrl": "http://localhost:5173/results/fa6ed519-16f7-488a-b3aa-9803a310a3c8",
-      "assessmentId": "fa6ed519-16f7-488a-b3aa-9803a310a3c8",
+      "userId": "ad6115d5-622d-4b66-a7d4-e82c524ddb26",
+      "navigatedUrl": "http://localhost:5173/results/2d87d426-ca49-4606-aedc-87b98e8894d7",
+      "assessmentId": "2d87d426-ca49-4606-aedc-87b98e8894d7",
       "distinctFromAccountAIds": true,
       "hasCapturedImageRendered": true,
       "isNotDemoScanUrl": true,
       "pass": true
     },
     "Test_C_CrossAccountProtection": {
-      "targetUrl": "http://localhost:5173/results/0316cb8f-71d5-4818-aa46-7eec3aaa166b",
+      "targetUrl": "http://localhost:5173/results/cf0e26ee-d28a-4565-bbe9-42556ee3d282",
       "accessDeniedAndNotFoundRendered": true,
       "noImageLeaked": true,
       "pass": true

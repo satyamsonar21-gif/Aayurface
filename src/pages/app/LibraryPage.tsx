@@ -137,6 +137,65 @@ export default function LibraryPage() {
           </div>
         </div>
 
+        {/* Featured Botanical Spotlight (Editorial Hero) */}
+        {!searchQuery && !activeConcern && activeTab === 'all' && (
+          <div 
+            onClick={() => navigate(`/library/${MOCK_REMEDIES[0].slug}`)}
+            className="p-6 sm:p-8 rounded-lg bg-background-surface border border-border-default shadow-sm hover:border-brand-primary/40 transition-all cursor-pointer grid grid-cols-1 lg:grid-cols-12 gap-6 items-center group"
+          >
+            <div className="lg:col-span-7 space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-semibold text-brand-accent uppercase tracking-wider font-body">
+                  FEATURED BOTANICAL SPOTLIGHT
+                </span>
+                <span className="text-border-default">•</span>
+                <span className="text-caption text-text-tertiary">Classical Formulation</span>
+              </div>
+              <h2 className="font-display text-2xl sm:text-3xl font-semibold text-text-primary group-hover:text-brand-primary transition-colors">
+                {MOCK_REMEDIES[0].name}
+              </h2>
+              <p className="text-body-md text-text-secondary leading-relaxed font-normal">
+                {MOCK_REMEDIES[0].description}
+              </p>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {MOCK_REMEDIES[0].ingredients.slice(0, 4).map((ing, i) => (
+                  <span key={i} className="text-caption font-body bg-background-subtle text-text-secondary px-2.5 py-1 rounded-sm border border-border-default/60">
+                    {ing.name}
+                  </span>
+                ))}
+              </div>
+              <div className="pt-2 flex items-center gap-1.5 text-caption font-semibold text-brand-primary group-hover:text-brand-primary-hover">
+                <span>View Full Formulation & Preparation Ritual</span>
+                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              </div>
+            </div>
+
+            <div className="lg:col-span-5">
+              <div className="rounded-lg overflow-hidden border border-border-default bg-background-subtle aspect-4/3 relative">
+                <img 
+                  src="/images/auth-bg.jpg" 
+                  alt="Ayurvedic herbs and oils" 
+                  className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500" 
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+                <span className="absolute bottom-2 left-3 text-white text-caption font-display italic">
+                  Classical Dravyaguna Formulation
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Remedies Section Header */}
+        <div className="flex items-center justify-between pt-2">
+          <h2 className="font-display text-xl sm:text-2xl font-semibold text-text-primary">
+            {activeTab === 'saved' ? 'Your Saved Formulations' : 'Indexed Herbal Remedies'}
+          </h2>
+          <span className="text-caption text-text-tertiary">
+            Showing {filtered.length} {filtered.length === 1 ? 'formulation' : 'formulations'}
+          </span>
+        </div>
+
         {/* Remedies Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filtered.length > 0 ? (

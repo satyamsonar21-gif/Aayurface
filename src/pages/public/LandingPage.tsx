@@ -806,8 +806,8 @@ export default function LandingPage() {
                 <h4 className="font-display text-base font-semibold text-[#1A1F1C]">Trust &amp; Safety</h4>
                 <ul className="space-y-2 text-xs text-[#5C6660]">
                   <li><a href="#safety" className="hover:text-[#1E3A2F] transition-colors">Non-Diagnostic Boundary</a></li>
-                  <li><Link to="/privacy" className="hover:text-[#1E3A2F] transition-colors">Privacy Principles</Link></li>
-                  <li><Link to="/terms" className="hover:text-[#1E3A2F] transition-colors">Terms of Service</Link></li>
+                  <li><a href="#safety" className="hover:text-[#1E3A2F] transition-colors">Privacy Principles</a></li>
+                  <li><a href="#safety" className="hover:text-[#1E3A2F] transition-colors">Terms of Service</a></li>
                   <li><a href="#contact" className="hover:text-[#1E3A2F] transition-colors">Inquiries</a></li>
                 </ul>
               </div>
