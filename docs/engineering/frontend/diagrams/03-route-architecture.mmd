@@ -1,0 +1,32 @@
+flowchart LR
+    subgraph Public["Public Zone (PublicLayout)"]
+        P1["/ (Landing)"]
+        P2["/about, /safety, /privacy"]
+        P3["/login, /signup"]
+    end
+
+    subgraph Onboarding["Onboarding Zone (OnboardingLayout)"]
+        O1["/onboarding"]
+        O2["/onboarding/consent"]
+        O3["/onboarding/intake"]
+    end
+
+    subgraph App["App Shell Zone (AppLayout)"]
+        A1["/dashboard"]
+        A2["/routine"]
+        A3["/history"]
+        A4["/progress"]
+        A5["/voice"]
+        A6["/profile, /settings"]
+    end
+
+    subgraph Capture["Focus Zone (FullscreenLayout)"]
+        C1["/analyze/capture"]
+        C2["/analyze/processing"]
+        C3["/analyze/results/:id"]
+    end
+
+    Public -->|Login Success| Onboarding
+    Onboarding -->|FSM Complete| App
+    App -->|Start Scan| Capture
+    Capture -->|View Results| App

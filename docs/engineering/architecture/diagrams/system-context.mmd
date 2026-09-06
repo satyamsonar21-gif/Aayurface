@@ -1,0 +1,31 @@
+C4Context
+    title System Context Diagram (C4 Level 1) — AayurFace Platform
+
+    Person(consumer, "Consumer User", "Individual seeking Ayurvedic wellness and skin intelligence.")
+    Person(admin, "System Administrator", "Operations personnel managing knowledge base, safety rules, and platform health.")
+    Person(annotator, "Expert Annotator", "Ayurvedic practitioner labeling reference datasets (Research Phase).")
+
+    System_Boundary(aayurface_boundary, "AayurFace Platform Boundary") {
+        System(aayurface_spa, "AayurFace Web Application", "React 19/Vite SPA running locally in user browser with MediaPipe quality gateway.")
+        System(aayurface_backend, "Serverless Compute & Intelligence", "Supabase Edge Functions orchestrating CV extraction, fusion, RAG, and safety.")
+        SystemDb(aayurface_db, "PostgreSQL & Vector Store", "Persistent relational store with Row-Level Security (RLS) and pgvector embeddings.")
+        SystemDb(aayurface_storage, "Private Object Storage", "Zero-public-access S3-compatible storage for encrypted biometric captures and reports.")
+    }
+
+    System_Ext(supabase_auth, "Supabase Auth Service", "Identity provider managing bcrypt authentication, OAuth PKCE, and JWT issuing.")
+    System_Ext(openai_api, "OpenAI Intelligence APIs", "Cloud AI services providing GPT-4o reasoning and text-embedding-3-small embeddings.")
+    System_Ext(browser_apis, "Browser Media Devices & Speech", "Client hardware APIs: WebRTC MediaDevices, WebAssembly, Web Speech API.")
+
+    Rel(consumer, aayurface_spa, "Navigates, answers questionnaires, captures face, views insights", "HTTPS / WSS")
+    Rel(admin, aayurface_spa, "Manages corpus, reviews system telemetry", "HTTPS")
+    Rel(annotator, aayurface_spa, "Labels consensus datasets", "HTTPS")
+
+    Rel(aayurface_spa, browser_apis, "Accesses camera stream, processes landmarks, synthesizes audio", "Internal Browser API")
+    Rel(aayurface_spa, supabase_auth, "Transmits credentials, receives signed JWTs", "HTTPS / TLS 1.3")
+    Rel(aayurface_spa, aayurface_storage, "Uploads quality-approved capture via signed URL", "HTTPS / Signed PUT")
+    Rel(aayurface_spa, aayurface_backend, "Submits questionnaires, requests analysis, queries chat", "HTTPS / JWT Bearer")
+    Rel(aayurface_spa, aayurface_db, "Subscribes to analysis progress events via Realtime", "WSS / Change Data Capture")
+
+    Rel(aayurface_backend, aayurface_db, "Queries profile, stores snapshot, performs vector search", "PostgreSQL Protocol")
+    Rel(aayurface_backend, aayurface_storage, "Retrieves capture via signed URL, stores generated PDF", "S3 API / Signed URL")
+    Rel(aayurface_backend, openai_api, "Generates embeddings and constrained XAI completions", "HTTPS / Secret Bearer")

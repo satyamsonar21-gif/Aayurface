@@ -1,0 +1,32 @@
+sequenceDiagram
+    autonumber
+    actor User as Consumer User
+    participant App as React SPA
+    participant Auth as Supabase Auth (bcrypt)
+    participant Edge as Supabase Edge Functions
+    participant DB as PostgreSQL (RLS)
+
+    User->>App: Submits email & password on /auth/login
+    App->>Auth: signInWithPassword({ email, password })
+    Auth->>Auth: Verifies bcrypt password hash (work factor >= 10)
+    Auth-->>App: Issues JWT Access Token (TTL: 60m) & Refresh Token
+    Note over App: Stores JWT in memory / secure state
+
+    User->>App: Requests protected analysis history (/history)
+    App->>Edge: GET /api/v1/analysis/history (Bearer JWT)
+    Edge->>Auth: getUser(jwt) -> verifies signature
+    Auth-->>Edge: Returns verified user claims (auth.uid = usr_123)
+    
+    Edge->>DB: SELECT * FROM scan_results (Scoped with auth.uid context)
+    Note over DB: PostgreSQL kernel checks RLS:<br/>USING (auth.uid() = user_id)
+    DB-->>Edge: Returns User's isolated rows only
+    Edge-->>App: 200 OK (Paginated history payload)
+    App->>User: Renders history timeline
+
+    alt Malicious Cross-Tenant Tampering Attempt
+        User->>App: Manages to forge request for other user's scanId
+        App->>Edge: GET /api/v1/analysis/:otherUserScanId (Bearer JWT)
+        Edge->>DB: Query for scanId under caller's auth.uid()
+        DB-->>Edge: 0 rows returned (RLS blocked)
+        Edge-->>App: 404 Not Found (Zero disclosure)
+    end

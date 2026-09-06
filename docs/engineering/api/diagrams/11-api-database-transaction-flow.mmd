@@ -1,0 +1,13 @@
+sequenceDiagram
+    autonumber
+    participant Worker as AI Worker
+    participant PG as PostgreSQL Database (ACID Transaction)
+
+    Worker->>PG: BEGIN TRANSACTION (ISOLATION LEVEL READ COMMITTED)
+    Worker->>PG: INSERT INTO scan_results (id, user_id, dominant_dosha, confidence)
+    Worker->>PG: INSERT INTO visual_observations (scan_id, observables_array)
+    Worker->>PG: INSERT INTO multimodal_fusions (scan_id, agreement_index, weights)
+    Worker->>PG: INSERT INTO recommendation_items (scan_id, chunk_id, title)
+    Worker->>PG: UPDATE analysis_jobs SET status = 'COMPLETED', completed_at = NOW()
+    Worker->>PG: COMMIT TRANSACTION
+    Note over Worker,PG: Guaranteed atomic persistence; zero partial analysis states

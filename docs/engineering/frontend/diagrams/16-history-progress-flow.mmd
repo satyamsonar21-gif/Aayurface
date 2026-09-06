@@ -1,0 +1,16 @@
+flowchart LR
+    subgraph History["Scan History (/history)"]
+        Feed["Keyset Cursor Infinite Card Stream"]
+        Detail["Detail Drawer (Doshic Balance Snapshot)"]
+    end
+
+    subgraph Progress["Longitudinal Progress (/progress)"]
+        Interval["30 / 60 / 90-Day Selector"]
+        Delta["Observed Trajectory Deltas (Warmth, Melanin, Texture)"]
+        Consistency["Routine Consistency Rate (e.g. 86.7%)"]
+    end
+
+    Feed --> Detail
+    Detail --> Progress
+    Interval --> Delta
+    Delta --> Consistency

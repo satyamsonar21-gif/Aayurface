@@ -1,0 +1,28 @@
+flowchart LR
+    subgraph ClientRAM["Volatile Client Browser Environment"]
+        WebRTC["Continuous Camera Stream (Canvas)"] --> MediaPipeWasm["MediaPipe FaceMesh (Wasm In-Memory)\nCheck Pose, Lighting, Blur, Centering"]
+        MediaPipeWasm --> QualityPass{"Quality Gate PASS?"}
+        QualityPass -->|No| DiscardFrame["Discard Frame Immediately from RAM"]
+        QualityPass -->|Yes| FreezeFrame["Freeze Single Target Frame in RAM"]
+        FreezeFrame --> StripEXIF["Canvas Redraw: Strip 100% EXIF & Compress JPEG"]
+    end
+
+    subgraph ObjectStorage["TARGET: Private Object Storage Architecture"]
+        StripEXIF -->|Direct PUT via Signed URL (Proposed 15m TTL)| S3Bucket["TARGET Bucket: `facial-captures`\nKey: `{userId}/{captureId}.jpg`\nServer-Side AES-256 Encryption"]
+    end
+
+    subgraph ServerlessWorker["TARGET: Deno Edge Feature Extractor"]
+        S3Bucket -->|Ephemeral Signed GET (Proposed 60s TTL)| WorkerMemory["Load Raw Bytes in Memory\n(Zero Disk Writes)"]
+        WorkerMemory --> ComputeFeatures["Compute Numerical Observables:\n• CIELAB a*, b* (Erythema/Warmth)\n• GLCM Texture (Contrast/Homogeneity)\n• Melanin Uniformity Index"]
+    end
+
+    subgraph RelationalDB["TARGET: PostgreSQL Relational Database (Kernel RLS — Requires Implementation)"]
+        ComputeFeatures --> InsertVisual["INSERT INTO visual_observations\n(Numerical Floats Only; No Raw Pixels)"]
+        InsertVisual --> DecoupledState[("scan_results Row\nDecoupled from Raw Pixels")]
+    end
+
+    subgraph RetentionPurge["Biometric Purge Subsystem (DEC-004)"]
+        DecoupledState --> PurgePolicy{"DEC-004 Policy"}
+        PurgePolicy -->|Option A: Immediate Purge| S3Delete["Issue S3 DeleteObject API Call\nRaw Biometric Erased Post-Extraction"]
+        PurgePolicy -->|Option B: Rolling 30 Days| S3Lifecycle["S3 Automated Lifecycle Rule:\nHard Delete Object after 30 Days"]
+    end

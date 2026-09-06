@@ -1,136 +1,280 @@
-import { useNavigate } from 'react-router-dom';
+import { useMemo } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Bookmark, Shield, Search, ArrowRight, MessageCircle } from 'lucide-react';
-import TopBar from '@/components/layout/TopBar';
+import { Shield, Search, ArrowRight, MessageSquare, ChevronLeft, Sparkles, Calendar, Info } from 'lucide-react';
 import PageWrapper from '@/components/layout/PageWrapper';
-import AyurCard from '@/components/common/AyurCard';
 import SkinBadge from '@/components/common/SkinBadge';
 import SafetyNotice from '@/components/common/SafetyNotice';
-import { MOCK_SCAN_RESULT } from '@/lib/mockData';
+import { useAuth } from '@/contexts/AuthContext';
+import { getAssessmentById } from '@/lib/assessmentStore';
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] as const } }
+};
 
 export default function ResultsPage() {
   const navigate = useNavigate();
-  const scan = MOCK_SCAN_RESULT;
+  const { scanId } = useParams();
+  const { user } = useAuth();
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
-  };
+  const isDemo = scanId === 'demo-scan';
+
+  // Load assessment strictly scoped to authenticated user (or isolated sample if demo-scan)
+  const assessment = useMemo(() => {
+    if (isDemo) {
+      return getAssessmentById('sample-system', 'demo-scan');
+    }
+    if (!user?.id || !scanId) {
+      return null;
+    }
+    return getAssessmentById(user.id, scanId);
+  }, [user?.id, scanId, isDemo]);
+
+  // Non-disclosing access-denied / not-found state
+  if (!assessment) {
+    return (
+      <PageWrapper>
+        <div className="max-w-xl mx-auto py-20 px-4 text-center space-y-6 font-body">
+          <div className="w-16 h-16 rounded-full bg-background-subtle border border-border-default flex items-center justify-center mx-auto text-text-tertiary">
+            <Shield size={28} />
+          </div>
+          <div className="space-y-2">
+            <h1 className="font-display text-2xl sm:text-3xl font-semibold text-text-primary">
+              Observation Record Not Found
+            </h1>
+            <p className="text-body-md text-text-secondary">
+              The requested facial wellness observation does not exist or is not accessible from your current account.
+            </p>
+          </div>
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="w-full sm:w-auto bg-brand-primary text-text-inverse px-6 py-2.5 rounded-md font-medium text-body-md hover:bg-brand-primary-hover transition-colors cursor-pointer"
+            >
+              Return to Dashboard
+            </button>
+            <button
+              onClick={() => navigate('/scan')}
+              className="w-full sm:w-auto bg-background-surface border border-border-default text-text-primary px-6 py-2.5 rounded-md font-medium text-body-md hover:bg-background-subtle transition-colors cursor-pointer"
+            >
+              Start New Observation
+            </button>
+          </div>
+        </div>
+      </PageWrapper>
+    );
+  }
+
+  const formattedDate = new Date(assessment.createdAt).toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
 
   return (
-    <div className="min-h-screen bg-cream flex flex-col">
-      <TopBar 
-        title="Your Skin Report 🌿" 
-        onBack={() => navigate('/home')} 
-      />
-      
-      <PageWrapper className="pt-20 pb-24 space-y-6">
-        <div className="flex flex-col items-center justify-center py-4">
-          <div className="w-24 h-24 bg-leaf-soft rounded-full flex items-center justify-center shadow-inner mb-4 overflow-hidden border-2 border-white shadow-card">
-            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200&h=200" alt="Scan thumbnail" className="w-full h-full object-cover opacity-80" />
+    <PageWrapper>
+      <div className="space-y-8 max-w-4xl mx-auto w-full pb-16 font-body">
+        
+        {/* Navigation Breadcrumb */}
+        <div className="flex items-center justify-between pb-3 border-b border-border-default">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="inline-flex items-center gap-1.5 text-caption font-semibold text-text-secondary hover:text-brand-primary transition-colors cursor-pointer"
+          >
+            <ChevronLeft size={16} />
+            Back to Dashboard
+          </button>
+          
+          <div className="flex items-center gap-2">
+            <span className="text-caption text-text-tertiary font-mono">
+              ID: {assessment.id.slice(0, 8)}...
+            </span>
+            {isDemo && (
+              <span className="text-[11px] font-semibold text-amber-900 bg-amber-100 px-2 py-0.5 rounded border border-amber-200">
+                Sample Reference
+              </span>
+            )}
           </div>
-          <p className="text-sm text-charcoal-light">Analyzed today</p>
         </div>
 
-        <motion.div variants={itemVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-          <AyurCard accent="herbal" className="p-6">
-            <h2 className="font-playfair text-lg text-charcoal font-semibold mb-4 flex items-center gap-2">
-              <span className="text-xl">🌿</span> Skin Summary
-            </h2>
-            <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
-              <div className="flex-1">
-                <p className="font-playfair text-xl text-charcoal mb-4">{scan.summary}</p>
-                <div className="flex flex-wrap gap-2">
-                  {scan.skin_types.map((concern, idx) => (
-                    <SkinBadge key={idx} label={concern as any} />
-                  ))}
+        {/* Demo Isolation Banner (Only visible on /results/demo-scan) */}
+        {isDemo && (
+          <div className="p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3">
+            <Info className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+            <div className="space-y-1 text-sm">
+              <strong className="font-semibold block">Sample Demonstration Insight</strong>
+              <p className="text-amber-800">
+                This is a static demonstration entry provided for illustrative design review. It does not reflect a live facial capture.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Results Header Card with Real Captured Image */}
+        <motion.div variants={itemVariants} initial="hidden" animate="visible">
+          <div className="p-6 sm:p-8 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-6">
+            
+            {/* Top Tagline */}
+            <div className="flex items-center gap-2">
+              <span className="text-caption font-semibold uppercase tracking-wider text-brand-accent flex items-center gap-1">
+                <Sparkles size={12} />
+                Facial Wellness Observation
+              </span>
+              <span className="text-border-default">•</span>
+              <span className="text-caption font-medium text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                Observation Recorded
+              </span>
+            </div>
+
+            {/* Split Header: Captured Image + Metadata */}
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 pt-1">
+              <div className="relative w-32 h-32 sm:w-36 sm:h-36 rounded-lg overflow-hidden border border-border-default bg-background-subtle shrink-0 shadow-xs">
+                <img
+                  src={assessment.capturedImage}
+                  alt="Captured skin observation frame"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute bottom-1 right-1 bg-black/60 backdrop-blur-xs text-white text-[10px] px-1.5 py-0.5 rounded font-mono">
+                  {isDemo ? 'Sample' : 'Live Frame'}
                 </div>
               </div>
-              <div className="relative w-20 h-20 flex-shrink-0 mx-auto md:mx-0">
-                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="40" fill="none" className="stroke-warmgray" strokeWidth="8" />
-                  <circle cx="50" cy="50" r="40" fill="none" className="stroke-herbal" strokeWidth="8" strokeDasharray="251.2" strokeDashoffset={251.2 * 0.3} />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center flex-col">
-                  <span className="text-xs font-medium text-charcoal">Mild</span>
+
+              <div className="space-y-3 flex-1 text-center sm:text-left">
+                <h1 className="font-display text-2xl sm:text-3xl font-semibold text-text-primary leading-tight">
+                  {assessment.summary}
+                </h1>
+
+                <div className="flex flex-wrap gap-2 justify-center sm:justify-start pt-1">
+                  {assessment.skinTypes.map((concern, idx) => (
+                    <SkinBadge key={idx} label={concern as any} size="sm" />
+                  ))}
+                  <SkinBadge label={assessment.doshaTendency.primary} variant="pitta" size="sm" />
                 </div>
+
+                <p className="text-caption text-text-tertiary flex items-center justify-center sm:justify-start gap-1.5">
+                  <Calendar size={13} />
+                  Recorded on {formattedDate}
+                </p>
               </div>
             </div>
-          </AyurCard>
+
+            {/* Observed Dosha Balance Card */}
+            <div className="p-4 rounded-lg bg-background-primary/80 border border-border-default space-y-1">
+              <span className="text-caption uppercase tracking-wider font-semibold text-brand-primary">
+                Observed Dosha Tendency
+              </span>
+              <p className="font-display text-lg font-semibold text-text-primary">
+                {assessment.doshaTendency.primary}
+              </p>
+              <p className="text-caption text-text-secondary">
+                {assessment.doshaTendency.description}
+              </p>
+            </div>
+
+          </div>
         </motion.div>
 
-        <motion.div variants={itemVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-          <AyurCard accent="turmeric" className="p-6">
-            <h2 className="font-playfair text-lg text-charcoal font-semibold mb-4 flex items-center gap-2">
-              <Search className="w-5 h-5 text-turmeric" /> Possible Causes
+        {/* Observable Root Causes */}
+        <motion.div variants={itemVariants} initial="hidden" animate="visible">
+          <div className="p-6 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-4">
+            <h2 className="font-display text-xl font-semibold text-text-primary flex items-center gap-2">
+              <Search className="w-5 h-5 text-brand-accent" />
+              Observable Factors & Doshic Etiology
             </h2>
-            <ul className="space-y-3">
-              {scan.causes.map((cause, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span className="text-xl flex-shrink-0">{cause.icon}</span>
-                  <span className="text-charcoal/90 text-sm leading-relaxed">{cause.text}</span>
-                </li>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+              {assessment.causes.map((cause, i) => (
+                <div key={i} className="p-4 rounded-md bg-background-primary/70 border border-border-default space-y-1.5">
+                  <span className="text-2xl">{cause.icon}</span>
+                  <p className="font-body text-body-md text-text-primary font-medium leading-snug">
+                    {cause.text}
+                  </p>
+                </div>
               ))}
-            </ul>
-          </AyurCard>
+            </div>
+          </div>
         </motion.div>
 
-        <motion.div variants={itemVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-          <AyurCard accent="herbal" className="p-6">
-            <h2 className="font-playfair text-lg text-charcoal font-semibold mb-4 flex items-center gap-2">
-              <span className="text-xl">🌿</span> Natural Remedies
-            </h2>
+        {/* Tailored Botanical Regimens */}
+        <motion.div variants={itemVariants} initial="hidden" animate="visible">
+          <div className="p-6 sm:p-8 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-6">
+            <div>
+              <h2 className="font-display text-2xl font-semibold text-text-primary">
+                Baseline Botanical Regimens
+              </h2>
+              <p className="text-body-md text-text-secondary">
+                Grounded topical Lepas and cooling herbal applications
+              </p>
+            </div>
+
             <div className="space-y-4">
-              {scan.remedies.map((remedy, idx) => (
-                <div key={idx} className="bg-leaf-soft rounded-card p-4 relative">
-                  <button className="absolute top-4 right-4 p-1.5 bg-white/50 rounded-full hover:bg-white transition-colors">
-                    <Bookmark className="w-4 h-4 text-herbal" />
-                  </button>
-                  <h3 className="font-playfair font-semibold text-charcoal mb-2 pr-8">{remedy.name}</h3>
-                  <div className="space-y-2 text-sm text-charcoal/80">
-                    <p><span className="font-medium">What:</span> {remedy.what_to_use}</p>
-                    <p><span className="font-medium">How:</span> {remedy.how_to_apply}</p>
-                    <div className="inline-block px-2 py-1 bg-white/60 rounded-md text-xs font-medium text-herbal mt-1">
+              {assessment.remedies.map((remedy, idx) => (
+                <div key={idx} className="p-5 rounded-lg bg-background-primary border border-border-default space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="font-display text-xl font-semibold text-text-primary">
+                      {remedy.name}
+                    </h3>
+                    <span className="text-caption font-semibold font-body text-brand-primary bg-background-surface px-2.5 py-1 rounded-md border border-border-default shrink-0">
                       {remedy.how_often}
-                    </div>
+                    </span>
+                  </div>
+
+                  <div className="space-y-2 text-body-md text-text-secondary leading-relaxed font-normal">
+                    <p>
+                      <strong className="text-text-primary font-medium">Ingredients: </strong>
+                      {remedy.what_to_use}
+                    </p>
+                    <p>
+                      <strong className="text-text-primary font-medium">Application Method: </strong>
+                      {Array.isArray(remedy.how_to_apply) ? remedy.how_to_apply.join('. ') : remedy.how_to_apply}
+                    </p>
                   </div>
                 </div>
               ))}
             </div>
-          </AyurCard>
+          </div>
         </motion.div>
 
-        <motion.div variants={itemVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-          <AyurCard accent="warmgray" className="p-6">
-            <h2 className="font-playfair text-lg text-charcoal font-semibold mb-4 flex items-center gap-2">
-              <Shield className="w-5 h-5 text-charcoal-light" /> Prevent & Protect
+        {/* Prevent & Protect Guidelines */}
+        <motion.div variants={itemVariants} initial="hidden" animate="visible">
+          <div className="p-6 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-4">
+            <h2 className="font-display text-xl font-semibold text-text-primary flex items-center gap-2">
+              <Shield className="w-5 h-5 text-brand-primary" />
+              Lifestyle & Environmental Precautions
             </h2>
-            <ul className="space-y-3">
-              {scan.prevention_tips.map((tip, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span className="text-xl flex-shrink-0">{tip.icon}</span>
-                  <span className="text-charcoal/90 text-sm leading-relaxed">{tip.text}</span>
-                </li>
+            <div className="space-y-3">
+              {assessment.preventionTips.map((tip, i) => (
+                <div key={i} className="flex items-start gap-3 p-3 rounded-md bg-background-primary/50 border border-border-default/60">
+                  <span className="text-xl shrink-0">{tip.icon}</span>
+                  <p className="font-body text-body-md text-text-primary leading-relaxed font-normal">
+                    {tip.text}
+                  </p>
+                </div>
               ))}
-            </ul>
-          </AyurCard>
+            </div>
+          </div>
         </motion.div>
 
-        <motion.div variants={itemVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-          <SafetyNotice message="Always do a patch test 24 hours before full application." />
+        {/* Safety Disclaimer Notice */}
+        <motion.div variants={itemVariants} initial="hidden" animate="visible">
+          <SafetyNotice message="Always conduct a 24-hour skin patch test behind the ear before applying any herbal formulation. Discontinue use if irritation occurs. Observations are client-side wellness recordings and do not constitute medical diagnosis." />
         </motion.div>
 
-        <motion.div variants={itemVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+        {/* Bottom CTA to Chat */}
+        <motion.div variants={itemVariants} initial="hidden" animate="visible">
           <button 
             onClick={() => navigate('/chat')}
-            className="w-full bg-herbal text-white rounded-button py-4 font-medium shadow-md hover:bg-herbal-dark transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-brand-primary text-text-inverse rounded-md py-4 font-body font-medium text-body-md shadow-sm hover:bg-brand-primary-hover transition-all flex items-center justify-center gap-2.5 cursor-pointer"
           >
-            <MessageCircle className="w-5 h-5" />
-            Ask the Ayurvedic Guide
+            <MessageSquare className="w-5 h-5" />
+            Discuss This Analysis with Ayurvedic Guide
             <ArrowRight className="w-4 h-4 ml-1" />
           </button>
         </motion.div>
-      </PageWrapper>
-    </div>
+
+      </div>
+    </PageWrapper>
   );
 }

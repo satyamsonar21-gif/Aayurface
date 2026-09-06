@@ -1,0 +1,28 @@
+sequenceDiagram
+    autonumber
+    actor Client as Web/Mobile Client
+    participant GW as Edge Gateway
+    participant Auth as JWT Auth & RBAC
+    participant Zod as Zod Schema Validator
+    participant Idem as Idempotency Gate
+    participant Svc as Domain Service
+    participant DB as PostgreSQL (Kernel RLS)
+
+    Client->>GW: HTTP Request + Bearer JWT + X-Request-ID
+    GW->>Auth: Verify RS256 Signature & Extract auth.uid()
+    alt Invalid/Expired Token
+        Auth-->>Client: 401 Unauthorized (AUTH_TOKEN_INVALID)
+    end
+    Auth->>Zod: Validate Request Headers & Body
+    alt Schema Validation Fails
+        Zod-->>Client: 422 Unprocessable Entity (Field Errors)
+    end
+    Zod->>Idem: Check Idempotency-Key
+    alt In-Flight / Cached Duplicate
+        Idem-->>Client: Cached Response / 409 Conflict
+    end
+    Idem->>Svc: Execute Domain Logic (Injected auth.uid)
+    Svc->>DB: Relational Transaction (WHERE user_id = auth.uid)
+    DB-->>Svc: Query/Mutation Result
+    Svc-->>GW: Domain Result Object
+    GW-->>Client: HTTP 200/201/202 JSON Envelope

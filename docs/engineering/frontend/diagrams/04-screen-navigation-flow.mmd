@@ -1,0 +1,19 @@
+sequenceDiagram
+    autonumber
+    actor User as User
+    participant Router as React Router DOM v7
+    participant AuthGuard as AuthGuard
+    participant OnbGuard as OnboardingGuard
+    participant Screen as DashboardScreen
+
+    User->>Router: Navigate to `/dashboard`
+    Router->>AuthGuard: Evaluate Active Supabase JWT
+    alt No Token / Expired
+        AuthGuard-->>User: Redirect to `/login?redirect=/dashboard`
+    end
+    AuthGuard->>OnbGuard: Evaluate `profiles.onboarding_completed`
+    alt Onboarding Incomplete
+        OnbGuard-->>User: Redirect to `/onboarding` (Resume FSM)
+    end
+    OnbGuard->>Screen: Render `/dashboard` within `AppLayout`
+    Screen-->>User: Render Home Dashboard

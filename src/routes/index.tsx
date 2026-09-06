@@ -5,6 +5,7 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { ProtectedRoute, PublicRoute } from './guards';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 // Lazy-loaded pages
 const LandingPage = lazy(() => import('@/pages/public/LandingPage'));
@@ -20,15 +21,16 @@ const LibraryPage = lazy(() => import('@/pages/app/LibraryPage'));
 const RemedyDetailPage = lazy(() => import('@/pages/app/RemedyDetailPage'));
 const ProfilePage = lazy(() => import('@/pages/app/ProfilePage'));
 const EditProfilePage = lazy(() => import('@/pages/app/EditProfilePage'));
+const HistoryPage = lazy(() => import('@/pages/app/HistoryPage'));
+const RoutinePage = lazy(() => import('@/pages/app/RoutinePage'));
+const ProgressPage = lazy(() => import('@/pages/app/ProgressPage'));
+const SettingsPage = lazy(() => import('@/pages/app/SettingsPage'));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 
 function LoadingFallback() {
   return (
-    <div className="min-h-screen bg-cream flex items-center justify-center">
-      <div className="text-center">
-        <div className="w-12 h-12 border-4 border-herbal border-t-transparent rounded-full animate-spin-slow mx-auto mb-4" />
-        <p className="font-poppins text-charcoal-light text-small">Loading...</p>
-      </div>
+    <div className="min-h-screen bg-background-primary flex items-center justify-center">
+      <LoadingSpinner size="lg" message="Loading Ayurvedic Intelligence..." />
     </div>
   );
 }
@@ -38,14 +40,7 @@ export default function AppRoutes() {
     <Suspense fallback={<LoadingFallback />}>
       <Routes>
         {/* Public routes */}
-        <Route
-          path="/"
-          element={
-            <PublicRoute>
-              <LandingPage />
-            </PublicRoute>
-          }
-        />
+        <Route path="/" element={<LandingPage />} />
         <Route
           path="/register"
           element={
@@ -55,7 +50,23 @@ export default function AppRoutes() {
           }
         />
         <Route
+          path="/signup"
+          element={
+            <PublicRoute>
+              <RegisterPage />
+            </PublicRoute>
+          }
+        />
+        <Route
           path="/login"
+          element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/signin"
           element={
             <PublicRoute>
               <LoginPage />
@@ -91,6 +102,22 @@ export default function AppRoutes() {
           }
         />
         <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/app"
+          element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/scan"
           element={
             <ProtectedRoute>
@@ -115,6 +142,14 @@ export default function AppRoutes() {
           }
         />
         <Route
+          path="/voice"
+          element={
+            <ProtectedRoute>
+              <ChatPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/library"
           element={
             <ProtectedRoute>
@@ -123,10 +158,50 @@ export default function AppRoutes() {
           }
         />
         <Route
-          path="/library/:remedyId"
+          path="/library/:slug"
           element={
             <ProtectedRoute>
               <RemedyDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/remedies"
+          element={
+            <ProtectedRoute>
+              <LibraryPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/remedies/:slug"
+          element={
+            <ProtectedRoute>
+              <RemedyDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/history"
+          element={
+            <ProtectedRoute>
+              <HistoryPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/routine"
+          element={
+            <ProtectedRoute>
+              <RoutinePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/progress"
+          element={
+            <ProtectedRoute>
+              <ProgressPage />
             </ProtectedRoute>
           }
         />
@@ -143,6 +218,14 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute>
               <EditProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <SettingsPage />
             </ProtectedRoute>
           }
         />

@@ -1,0 +1,26 @@
+sequenceDiagram
+    autonumber
+    participant W as AI Worker
+    participant CV as CV Feature Extractor
+    participant F as Multimodal Fusion
+    participant C as Confidence Engine
+    participant R as Classical RAG
+    participant LLM as OpenAI GPT-4o
+    participant S as AI Safety Gate
+
+    W->>CV: Extract Visual Observables (a*, b*, GLCM)
+    CV-->>W: Visual Lakshanas Vector (D_vis)
+    W->>F: Compute Fused Vector: 0.40(D_vis) + 0.35(D_quiz) + 0.25(D_life)
+    F-->>W: Fused Tendency Vector
+    W->>C: Calculate Harmonic Agreement A & Calibrated Confidence
+    C-->>W: Confidence Object (Level, Limitations, Bounds)
+    W->>R: Query pgvector (Cosine >= 0.75, Min 2 Matches)
+    R-->>W: Grounded Classical Verses
+    W->>LLM: Formulate Prompt with Grounded Shlokas & JSON Mode
+    LLM-->>W: Structured JSON Reasoning Payload
+    W->>S: Validate Schema (Zod), Scan Medical Terms (Regex), Verify Citation IDs
+    alt Safety Violation Detected
+        S->>W: Reject Generative Herbs -> Trigger Deterministic Fallback
+    else Passes All Gates
+        S-->>W: Approved 3NF Result Entities
+    end

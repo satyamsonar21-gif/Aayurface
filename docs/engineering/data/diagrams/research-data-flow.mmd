@@ -1,0 +1,39 @@
+flowchart TD
+    subgraph OperationalVault["1. Operational Production Environment"]
+        User["Consumer User Account\n(consents: research_sharing = 'GRANTED')"]
+        ProfileData["profiles: { name, email, phone, age, gender }"]
+        ScanData["scan_results: { visual_observations, dosha_percentages }"]
+    end
+
+    subgraph DeIdentificationPipeline["2. De-Identification & Sanitization Engine"]
+        User --> DeID["Sanitization Processor:\n1. Strip all direct PII (name, email, phone, auth UUID)\n2. Coarsen age into 10-year brackets ('25-34')\n3. Assign cryptographic ephemeral research_uuid\n4. Crop facial image to standardized masked ROIs (cheeks, forehead)"]
+        ProfileData --> DeID
+        ScanData --> DeID
+    end
+
+    subgraph ResearchEnclave["3. Isolated Expert Research Enclave (Post-MVP Target Architecture)"]
+        DeID --> SubjectStore[("research_subjects Table\n{ id: research_uuid, skin_tone_subgroup,\n  age_bracket, masked_roi_storage_paths }")]
+        
+        SubjectStore --> Queue1["Practitioner A Annotation Queue\n(Masked ROIs Only; Double-Blind)"]
+        SubjectStore --> Queue2["Practitioner B Annotation Queue\n(Masked ROIs Only; Double-Blind)"]
+        SubjectStore --> Queue3["Practitioner C Annotation Queue\n(Masked ROIs Only; Double-Blind)"]
+
+        Queue1 --> AnnotationStore[("expert_annotations Table\n{ subject_id, practitioner_id,\n  vata, pitta, kapha, is_locked: TRUE }")]
+        Queue2 --> AnnotationStore
+        Queue3 --> AnnotationStore
+    end
+
+    subgraph ConsensusAdjudication["4. Statistical Consensus & Adjudication"]
+        AnnotationStore --> ComputeKappa["Calculate Inter-Rater Agreement\nFleiss' Kappa (κ) across Practitioners"]
+        
+        KappaCheck -->|Yes: High Agreement| ResolveConsensus["Derive Expert Reference Label:\nMean Doshic Tendency Vector"]
+        ComputeKappa --> KappaCheck{"Kappa κ >= 0.70?"}
+        KappaCheck -->|No: Low Agreement| SeniorAdjudication["Route to Senior Ayurvedic Adjudicator\n(Manual Multi-Party Review)"]
+        
+        ResolveConsensus --> ConsensusStore[("consensus_labels Table\n{ subject_id, kappa_score, consensus_dosha }")]
+        SeniorAdjudication --> ConsensusStore
+    end
+
+    subgraph ModelEvaluation["5. Algorithmic Calibration & Fairness Audit"]
+        ConsensusStore --> BenchmarkAudit["Benchmark ML Vision & Fusion Models:\nEvaluate Accuracy & Equity across Skin-Tone Subgroups\n(PROPOSED / REQUIRES VALIDATION)"]
+    end

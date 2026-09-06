@@ -1,0 +1,47 @@
+C4Container
+    title Container Architecture Diagram (C4 Level 2) — AayurFace Platform
+
+    Person(consumer, "Consumer User", "Uses modern mobile or desktop web browser")
+
+    Container_Boundary(frontend_app, "Client Container (Browser)") {
+        Container(spa, "Single-Page Application", "React 19, TypeScript, Vite, Tailwind CSS", "Renders UI, handles client routing, manages user session, executes local MediaPipe quality gateway")
+        Container(mediapipe_wasm, "MediaPipe WebAssembly Gateway", "Wasm, WebGL", "Executes real-time 468-point face mesh, lighting, blur, and centering checks in browser memory")
+    }
+
+    Container_Boundary(edge_tier, "Serverless Compute Tier (Supabase Edge Functions)") {
+        Container(api_gateway, "Edge API Router & Auth Middleware", "Deno, TypeScript", "Validates JWT tokens, extracts auth.uid(), enforces CORS and rate-limiting")
+        Container(orchestrator_service, "Multimodal Analysis Orchestrator", "Deno, TypeScript", "Coordinates CV extraction, fusion math, RAG retrieval, and AI synthesis")
+        Container(chat_service, "Ayurvedic Conversational Service", "Deno, TypeScript", "Context-aware RAG-grounded chat assistant with safety guardrails")
+        Container(pdf_service, "PDF Wellness Report Generator", "Deno / Client Worker", "Compiles structured analysis reports into downloadable PDF artifacts")
+    }
+
+    Container_Boundary(data_tier, "Data Persistence & Storage Tier (Supabase Managed)") {
+        ContainerDb(postgres_db, "PostgreSQL Relational Store", "Postgres 15+, RLS", "Persists profiles, consents, quiz responses, snapshots, routines, and audit logs")
+        ContainerDb(vector_db, "pgvector Semantic Store", "Postgres pgvector extension", "Stores 1536-dimensional embeddings of curated classical Ayurvedic texts")
+        ContainerDb(object_storage, "Private Object Storage", "S3-compatible bucket", "Houses encrypted biometric facial captures and generated reports with signed access")
+        Container(realtime_engine, "Supabase Realtime Engine", "Elixir / Phoenix CDC", "Streams database row changes and pipeline status events over WebSocket to SPA")
+    }
+
+    System_Ext(supabase_auth_srv, "Supabase Auth", "Bcrypt hashing, JWT generation, OAuth 2.0 PKCE")
+    System_Ext(openai_api_srv, "OpenAI APIs", "GPT-4o generative reasoning and text-embedding-3-small")
+
+    Rel(consumer, spa, "Navigates, views insights, interacts", "HTTPS")
+    Rel(spa, mediapipe_wasm, "Sends live camera frames for evaluation", "Internal Memory Buffer")
+    Rel(spa, supabase_auth_srv, "Authenticates credentials, refreshes tokens", "HTTPS")
+    Rel(spa, object_storage, "Uploads approved capture via signed PUT", "HTTPS / Signed URL")
+    Rel(spa, api_gateway, "Invokes backend endpoints with Bearer JWT", "HTTPS / TLS 1.3")
+    Rel(spa, realtime_engine, "Listens for analysis progress updates", "WSS / Realtime Channel")
+
+    Rel(api_gateway, orchestrator_service, "Dispatches analysis requests", "Internal Dispatch")
+    Rel(api_gateway, chat_service, "Dispatches chat queries", "Internal Dispatch")
+    Rel(api_gateway, pdf_service, "Dispatches report generation", "Internal Dispatch")
+
+    Rel(orchestrator_service, object_storage, "Retrieves capture via signed URL for CV", "HTTPS / Signed GET")
+    Rel(orchestrator_service, postgres_db, "Queries context, stores immutable analysis snapshot", "PostgreSQL Protocol")
+    Rel(orchestrator_service, vector_db, "Performs top-k cosine similarity search", "pgvector Cosine Distance")
+    Rel(orchestrator_service, openai_api_srv, "Generates constrained XAI completions", "HTTPS / API Key")
+    Rel(chat_service, vector_db, "Queries relevant classical knowledge chunks", "pgvector Query")
+    Rel(chat_service, openai_api_srv, "Synthesizes grounded conversational response", "HTTPS / API Key")
+    Rel(pdf_service, postgres_db, "Reads analysis snapshot by ID", "PostgreSQL Protocol")
+    Rel(pdf_service, object_storage, "Writes generated PDF artifact", "S3 API")
+    Rel(postgres_db, realtime_engine, "Triggers CDC events on analysis state change", "Logical Replication")

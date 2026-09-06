@@ -1,0 +1,33 @@
+flowchart TD
+    subgraph UntrustedInputs["Untrusted Input Sources"]
+        UserText["User Input Strings\n(Skin Concerns, Chat Messages)"]
+        UserVector["User Lifestyle Context"]
+        RetrievedVerse["Retrieved RAG Verse Text"]
+    end
+
+    subgraph DefenseSanitizer["1. Pre-Inference Defense & Fencing"]
+        UserText --> InjectionSanitizer["Injection Sanitizer & Delimiter Fencer\n(Escape XML/Markdown Tags, Strip System Directives)"]
+        RetrievedVerse --> VerseTrustCheck["Verify Knowledge Chunk Signature & Status"]
+    end
+
+    subgraph LLMEnclave["2. Constrained Model Ingestion"]
+        SystemPrompt["Immutable Developer System Instructions\n('You are Ayu; You NEVER diagnose or prescribe...')"]
+        InjectionSanitizer --> PackagedPrompt["Fenced Multi-Part Prompt Payload\n<user_input>...</user_input>\n<classical_context>...</classical_context>"]
+        SystemPrompt --> PackagedPrompt
+        VerseTrustCheck --> PackagedPrompt
+        PackagedPrompt --> GPT4o["OpenAI GPT-4o API\n(Pinned Version, JSON Mode Enforced)"]
+    end
+
+    subgraph PostInferenceDefense["3. Post-Inference Validation & Privilege Firewall"]
+        GPT4o --> RawJSON["Raw Model Output JSON"]
+        RawJSON --> ZodSchemaValidator["Zod Schema & Non-Diagnostic Guardrail Validator"]
+        
+        ZodSchemaValidator --> SchemaCheck{"Valid JSON & All Fields Present?"}
+        SchemaCheck -->|No| FailClosed["Trigger Fail-Closed Handler\nReturn Safe Generic Ayurvedic Notice"]
+        
+        SchemaCheck -->|Yes| SafetyScan{"Contains Prohibited Medical Claims\n(Cure, Diagnose, Prescribe)?"}
+        SafetyScan -->|Yes: Safety Violation| ScrubOrReject["Scrub Violation or Reject Output\nLog Security Event: AI_SAFETY_TRIPPED"]
+        
+        SafetyScan -->|No: Safe Output| PrivilegeFirewall["Privilege Firewall Gate\nAI is physically barred from DB writes/auth changes"]
+        PrivilegeFirewall --> FinalOutput["Structured, Safe Result Rendered to Client"]
+    end

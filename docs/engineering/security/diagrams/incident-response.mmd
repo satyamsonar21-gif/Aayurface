@@ -1,0 +1,19 @@
+flowchart TD
+    Detect["1. DETECTION\nAutomated Alert / WAF Spike / Internal Anomaly"] --> Triage["2. TRIAGE & SEVERITY CLASSIFICATION"]
+
+    Triage --> P0{"Severity P0 (Critical)?\n(Key Leak, Mass Image Exposure, BOLA)"}
+    Triage --> P1{"Severity P1 (High)?\n(Admin Escalation, Large AI Abuse)"}
+    Triage --> P2{"Severity P2/P3 (Medium/Low)?\n(Single Anomaly, Rate Limit Spike)"}
+
+    P0 -->|Yes| P0Action["EMERGENCY CONTAINMENT:\n1. Revoke Service Keys / Tokens\n2. Block Offending CIDRs at WAF\n3. Rotate Storage Signing Keys\n4. Mobilize Incident Response Team"]
+    P1 -->|Yes| P1Action["HIGH-PRIORITY CONTAINMENT:\n1. Lock Suspicious Accounts\n2. Disable Compromised Edge Routes\n3. Review Admin Audit Trails"]
+    P2 -->|Yes| P2Action["STANDARD CONTAINMENT:\n1. Throttle Offending IPs\n2. Track Error Patterns"]
+
+    P0Action --> PreserveEvidence["3. EVIDENCE PRESERVATION\nCapture Snapshot Logs, Network Dumps, DB Audit Trails"]
+    P1Action --> PreserveEvidence
+    P2Action --> PreserveEvidence
+
+    PreserveEvidence --> Investigation["4. INVESTIGATION & ROOT-CAUSE ANALYSIS\nIdentify Exploit Vector, Determine Impact Scope"]
+    Investigation --> Eradication["5. ERADICATION & PATCHING\nDeploy Security Patch, Revoke Compromised Sessions"]
+    Eradication --> Recovery["6. SERVICE RECOVERY & VALIDATION\nRestore Operations, Verify Security Invariants"]
+    Recovery --> Postmortem["7. POSTMORTEM & AUDIT\nBlameless Postmortem, Update Threat Models, Legal Briefing"]

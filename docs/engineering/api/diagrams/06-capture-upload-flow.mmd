@@ -1,0 +1,14 @@
+sequenceDiagram
+    autonumber
+    actor Client as Client App (Wasm)
+    participant GW as Edge Gateway
+    participant S3 as Private S3 Bucket (AES-256)
+
+    Client->>Client: Extract Landmarks & Quality Check (Wasm)
+    Client->>Client: Redraw to Canvas (EXIF Metadata Stripped)
+    Client->>GW: POST /api/v1/captures/upload-url (captureId, size, type)
+    GW->>GW: Verify auth.uid() & Active Biometric Consent
+    GW->>GW: Generate S3 Key: `facial-captures/{auth.uid()}/{captureId}.jpg`
+    GW-->>Client: 201 Created (HMAC Signed PUT URL, 15m TTL)
+    Client->>S3: PUT /facial-captures/... (Binary JPEG, Content-Type: image/jpeg)
+    S3-->>Client: 200 OK (ETag Verified)

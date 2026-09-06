@@ -1,0 +1,29 @@
+flowchart TD
+    subgraph Worklist["Certified Practitioner Worklist"]
+        P1["Practitioner A Assessment"]
+        P2["Practitioner B Assessment"]
+        P3["Practitioner C Assessment"]
+    end
+
+    subgraph Enclave["Isolated Research Schema (research.*)"]
+        Post["POST /api/v1/research/annotations"]
+        Lock["Immediate Lock (is_locked = TRUE)"]
+        Store[("research.expert_annotations")]
+    end
+
+    subgraph Consensus["Statistical Consensus Engine"]
+        Kappa["Calculate Fleiss' Kappa (κ)"]
+        Gate{"Inter-Rater κ >= 0.70?"}
+        ConsensusLabel["Compute Mean Vector -> Expert Reference Label"]
+        Adjudicate["Escalate to Senior Ayurvedic Adjudicator"]
+    end
+
+    P1 --> Post
+    P2 --> Post
+    P3 --> Post
+    Post --> Lock
+    Lock --> Store
+    Store --> Kappa
+    Kappa --> Gate
+    Gate -- Yes --> ConsensusLabel
+    Gate -- No --> Adjudicate

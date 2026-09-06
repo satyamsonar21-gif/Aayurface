@@ -1,0 +1,23 @@
+stateDiagram-v2
+    [*] --> QUEUED: Client initiates analysis\n(INSERT INTO analysis_jobs)
+
+    QUEUED --> VALIDATING: Worker picks up job\n(FOR UPDATE SKIP LOCKED)
+    QUEUED --> EXPIRED: Execution deadline breached\n(created_at > 5 minutes ago)
+
+    VALIDATING --> PROCESSING: Input validations pass\n(Single frame, valid quiz/lifestyle)
+    VALIDATING --> FAILED: Validation check fails\n(Unusable image, missing inputs)
+
+    PROCESSING --> COMPLETED: Orchestration succeeds\n(scan_results persisted)
+    PROCESSING --> RETRYING: Transient network/OpenAI error\n(attempt_count < 3)
+    PROCESSING --> FAILED: Hard error or attempt_count >= 3\n(Model rejection, DB constraint)
+
+    RETRYING --> QUEUED: Backoff timer expires\n(Exponential backoff: 2s, 4s, 8s)
+
+    QUEUED --> CANCELLED: User cancels or deletes account
+    VALIDATING --> CANCELLED: User initiates account erasure
+    PROCESSING --> CANCELLED: User initiates account erasure
+
+    COMPLETED --> [*]: Terminal state
+    FAILED --> [*]: Terminal state
+    EXPIRED --> [*]: Terminal state
+    CANCELLED --> [*]: Terminal state

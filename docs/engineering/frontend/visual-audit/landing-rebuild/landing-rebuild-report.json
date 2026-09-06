@@ -1,0 +1,30 @@
+{
+  "timestamp": "2026-09-04T13:27:30.100Z",
+  "consoleErrors": [],
+  "capturedScreenshots": [
+    "landing-1280x720-01-hero.png",
+    "landing-1280x720-02-second-section.png",
+    "landing-1280x720-03-journey.png",
+    "landing-1280x720-04-methodology.png",
+    "landing-1280x720-05-ayurveda.png",
+    "landing-1280x720-06-cta-footer.png",
+    "landing-1280x720-fullpage.png",
+    "landing-1440x900-hero.png",
+    "landing-1440x900-fullpage.png",
+    "landing-768x1024-hero.png",
+    "landing-768x1024-fullpage.png",
+    "landing-375x812-hero.png",
+    "landing-375x812-menu-open.png",
+    "landing-375x812-fullpage.png",
+    "landing-390x844-hero.png",
+    "landing-390x844-fullpage.png"
+  ],
+  "linkVerifications": {},
+  "viewportsTested": [
+    "desktop-1280x720",
+    "desktop-1440x900",
+    "tablet-768x1024",
+    "mobile-375x812",
+    "mobile-390x844"
+  ]
+}

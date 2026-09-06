@@ -13,6 +13,23 @@ const SESSION_KEY = 'aayurface_session';
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+export interface StoredUser extends User {
+  password?: string;
+}
+
+export const DEMO_USER: StoredUser = {
+  id: 'user-namrata-sen',
+  email: 'namrata.sen@example.com',
+  full_name: 'Namrata Sen',
+  avatar_url: null,
+  skin_type: 'combination',
+  dosha: 'vata',
+  onboarding_completed: true,
+  created_at: '2026-01-15T00:00:00.000Z',
+  updated_at: '2026-01-15T00:00:00.000Z',
+  password: 'Ayur@123',
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true); // initially true while we check local storage
@@ -31,12 +48,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const getStoredUsers = (): User[] => {
+  const getStoredUsers = (): StoredUser[] => {
     const users = localStorage.getItem(USERS_KEY);
-    return users ? JSON.parse(users) : [];
+    if (users) {
+      try {
+        return JSON.parse(users);
+      } catch {
+        return [DEMO_USER];
+      }
+    }
+    // Seed default registered account in stored users so a valid account exists for login testing
+    localStorage.setItem(USERS_KEY, JSON.stringify([DEMO_USER]));
+    return [DEMO_USER];
   };
 
-  const saveStoredUsers = (users: User[]) => {
+  const saveStoredUsers = (users: StoredUser[]) => {
     localStorage.setItem(USERS_KEY, JSON.stringify(users));
   };
 
@@ -49,18 +75,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(userObj);
   };
 
-  const signUp = useCallback(async (email: string, _password: string, fullName: string) => {
-    setIsLoading(true);
+  const signUp = useCallback(async (email: string, password: string, fullName: string) => {
     await delay(300);
     
     const users = getStoredUsers();
     const existingUser = users.find(u => u.email === email);
     if (existingUser) {
-      setIsLoading(false);
       throw new Error("User with this email already exists.");
     }
 
-    const newUser: User = {
+    const newUser: StoredUser = {
       id: crypto.randomUUID ? crypto.randomUUID() : `user-${Date.now()}`,
       email,
       full_name: fullName,
@@ -70,33 +94,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       onboarding_completed: false,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
+      password,
     };
 
     users.push(newUser);
     saveStoredUsers(users);
-    saveSession(newUser);
     
-    setIsLoading(false);
+    // Save session without password property
+    const { password: _, ...sessionUser } = newUser;
+    saveSession(sessionUser);
   }, []);
 
-  const signIn = useCallback(async (email: string, _password: string) => {
-    setIsLoading(true);
+  const signIn = useCallback(async (email: string, password: string) => {
     await delay(300);
     
     const users = getStoredUsers();
     const existingUser = users.find(u => u.email === email);
     
     if (!existingUser) {
-      setIsLoading(false);
       throw new Error("Invalid email or password.");
     }
 
-    saveSession(existingUser);
-    setIsLoading(false);
+    const expectedPassword = existingUser.password || (existingUser.email === DEMO_USER.email ? 'Ayur@123' : undefined);
+    if (!expectedPassword || expectedPassword !== password) {
+      throw new Error("Invalid email or password.");
+    }
+
+    const { password: _, ...sessionUser } = existingUser;
+    saveSession(sessionUser);
   }, []);
 
   const signInWithGoogle = useCallback(async () => {
-    setIsLoading(true);
     await delay(300);
     
     const email = 'google.user@gmail.com';
@@ -120,14 +148,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     saveSession(existingUser);
-    setIsLoading(false);
   }, []);
 
   const signOut = useCallback(async () => {
-    setIsLoading(true);
-    await delay(300);
     saveSession(null);
-    setIsLoading(false);
   }, []);
 
   const resetPassword = useCallback(async (_email: string) => {

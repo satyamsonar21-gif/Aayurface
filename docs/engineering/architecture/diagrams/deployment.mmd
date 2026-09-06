@@ -1,0 +1,43 @@
+flowchart TB
+    subgraph Environments["Multi-Stage Cloud Environments"]
+        direction TB
+        subgraph Local["Local Development Environment"]
+            L_Vite["Vite Dev Server (localhost:5173)"]
+            L_Supa["Supabase Local CLI (Docker Container)"]
+            L_Vitest["Headless Vitest Suites"]
+        end
+
+        subgraph Staging["Staging / Preview Environment"]
+            S_Vercel["Vercel Preview Deployments (PR Branch URLs)"]
+            S_Supa["Supabase Staging Project (Isolated Database)"]
+            S_E2E["Automated Integration & Smoke Tests"]
+        end
+
+        subgraph Production["Production Environment"]
+            P_Vercel["Vercel Production CDN (aayurface.app)"]
+            P_Edge["Supabase Production Edge Functions (Deno)"]
+            P_DB[("Production PostgreSQL 15+ & pgvector")]
+            P_Store[("Private S3 Storage (facial-captures)")]
+            P_OpenAI["OpenAI Enterprise API (Dedicated Project)"]
+        end
+    end
+
+    subgraph Pipeline["Automated CI/CD Pipeline (GitHub Actions)"]
+        G_PR["git push / PR to main"]
+        G_CI["CI Workflow: Lint + tsc + Vitest + Vite Build"]
+        G_DeployStage["Deploy to Staging"]
+        G_Gate{"Automated Tests PASS\n& Lead Sign-off"}
+        G_DeployProd["Deploy to Production"]
+    end
+
+    G_PR --> G_CI
+    G_CI --> G_DeployStage
+    G_DeployStage --> S_Vercel
+    G_DeployStage --> S_Supa
+    S_Vercel --> G_Gate
+    G_Gate -->|Approved| G_DeployProd
+    G_DeployProd --> P_Vercel
+    G_DeployProd --> P_Edge
+    P_Edge --> P_DB
+    P_Edge --> P_Store
+    P_Edge --> P_OpenAI

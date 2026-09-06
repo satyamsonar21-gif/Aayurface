@@ -1,0 +1,85 @@
+{
+  "timestamp": "2026-09-05T04:51:47.975Z",
+  "inputFiles": {
+    "image1": {
+      "file": "public/images/1.jpg",
+      "size": 32341,
+      "hash": "41e41b3cbcedacba1f739c6166826d8aaf257eb29ce3f88c32c58848921c3f52"
+    },
+    "image2": {
+      "file": "public/images/2.jpg",
+      "size": 168688,
+      "hash": "02c78ed99617742ba23f290f4b0ec41f4d5081e7cef5f0defb489a4fa5073590"
+    }
+  },
+  "tests": {
+    "Test_A_and_B_AccountA": {
+      "userId": "user-namrata-sen",
+      "navigatedUrl": "http://localhost:5173/results/0316cb8f-71d5-4818-aa46-7eec3aaa166b",
+      "assessmentId": "0316cb8f-71d5-4818-aa46-7eec3aaa166b",
+      "isNotDemoScanUrl": true,
+      "previewStateReached": true,
+      "hasCapturedImageRendered": true,
+      "imgSrcLength": 43147,
+      "isDemoBadgeAbsent": true,
+      "pass": true
+    },
+    "Test_F_BrowserRefresh": {
+      "reloadedUrl": "http://localhost:5173/results/0316cb8f-71d5-4818-aa46-7eec3aaa166b",
+      "stillHasImage": true,
+      "notRevertedToNotFound": true,
+      "pass": true
+    },
+    "Test_G_SecondScanUniqueId": {
+      "firstScanId": "0316cb8f-71d5-4818-aa46-7eec3aaa166b",
+      "secondScanId": "92a1d1df-3754-4378-be4c-0ca6e0f0409b",
+      "idsAreDistinct": true,
+      "pass": true
+    },
+    "Test_D_History_AccountA": {
+      "recordedCountMatch": true,
+      "thumbnailCount": 2,
+      "pass": true
+    },
+    "Test_E_Logout_Isolation": {
+      "sessionCleared": true,
+      "currentUrl": "http://localhost:5173/",
+      "pass": true
+    },
+    "Test_A_and_B_AccountB": {
+      "userId": "85fe4b4b-d25a-4482-b94d-80f98ed367f6",
+      "navigatedUrl": "http://localhost:5173/results/fa6ed519-16f7-488a-b3aa-9803a310a3c8",
+      "assessmentId": "fa6ed519-16f7-488a-b3aa-9803a310a3c8",
+      "distinctFromAccountAIds": true,
+      "hasCapturedImageRendered": true,
+      "isNotDemoScanUrl": true,
+      "pass": true
+    },
+    "Test_C_CrossAccountProtection": {
+      "targetUrl": "http://localhost:5173/results/0316cb8f-71d5-4818-aa46-7eec3aaa166b",
+      "accessDeniedAndNotFoundRendered": true,
+      "noImageLeaked": true,
+      "pass": true
+    },
+    "Test_D_History_Isolation_AccountB": {
+      "recordedCountMatch": true,
+      "thumbnailCountIsOne": true,
+      "noAccountADataPresent": true,
+      "pass": true
+    },
+    "Test_H_DemoScanIsolation": {
+      "hasSampleBadge": true,
+      "hasSampleBanner": true,
+      "hasDemoWarning": true,
+      "pass": true
+    },
+    "Test_I_NegativeTests": {
+      "nonExistentIdNotFound": true,
+      "malformedIdNotFound": true,
+      "unauthenticatedRedirectedToSignIn": true,
+      "redirectUrl": "http://localhost:5173/signin",
+      "pass": true
+    }
+  },
+  "overallStatus": "PASS"
+}

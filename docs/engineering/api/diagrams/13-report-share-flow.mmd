@@ -1,0 +1,22 @@
+sequenceDiagram
+    autonumber
+    actor Owner as Authenticated User
+    participant GW as Edge Gateway
+    participant DB as PostgreSQL Database
+    actor Public as Public Anonymous Recipient
+
+    Owner->>GW: POST /api/v1/shares (analysisId, expiresInDays: 30)
+    GW->>GW: Generate 256-bit Random Token
+    GW->>DB: INSERT INTO shared_reports (token_hash, analysis_id, expires_at)
+    GW-->>Owner: 201 Created (publicToken, shareUrl)
+
+    Public->>GW: GET /api/v1/shares/shr_256bit_token
+    GW->>GW: Compute SHA256(token)
+    GW->>DB: SELECT * FROM shared_reports WHERE token_hash = :hash AND NOT is_revoked
+    DB-->>GW: Share Record & Joined Result
+    GW->>GW: Redact 100% PII (Name, Email, Face Images Dropped)
+    GW-->>Public: 200 OK (Redacted Assessment Data)
+
+    Owner->>GW: DELETE /api/v1/shares/:id
+    GW->>DB: UPDATE shared_reports SET is_revoked = TRUE WHERE user_id = auth.uid()
+    GW-->>Owner: 204 No Content (Instant Revocation)

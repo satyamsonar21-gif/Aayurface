@@ -1,0 +1,23 @@
+sequenceDiagram
+    autonumber
+    participant App as Edge Function / Application Client
+    participant Postgres as PostgreSQL Engine (Kernel)
+    participant Table as Physical Table: scan_results
+
+    Note over App,Table: RLS Execution Flow (Kernel Multi-Tenancy)
+
+    App->>Postgres: Establish Connection with JWT Context<br/>SET LOCAL request.jwt.claim.sub = 'user-uuid-123'
+    App->>Postgres: SELECT * FROM scan_results WHERE id = 'scan-uuid-999';
+
+    Postgres->>Postgres: Inspect Table RLS Status (ENABLE ROW LEVEL SECURITY)
+    Postgres->>Postgres: Evaluate Policy: "Users can read own scans"<br/>USING (auth.uid() = user_id)
+
+    alt user_id matches 'user-uuid-123'
+        Postgres->>Table: Fetch Row Data
+        Table-->>Postgres: Row Found
+        Postgres-->>App: Return 1 Row { id: 'scan-uuid-999', ... }
+    else user_id does NOT match (Attempted Cross-Tenant Read)
+        Postgres->>Table: Query Filter Evaluates to FALSE
+        Postgres-->>App: Return 0 Rows (Empty Result Set)
+        Note over Postgres,App: Engine physically conceals record; zero cross-tenant leakage
+    end

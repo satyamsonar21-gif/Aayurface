@@ -1,0 +1,5 @@
+flowchart TD
+    Viewport["Viewport Media Query"] --> Check{"Screen Width?"}
+    Check -- "< 768px (Mobile)" --> Mob["BottomNav (5 Touch Tabs) + 1-Col Stream + Fullscreen Camera"]
+    Check -- "768px - 1023px (Tablet)" --> Tab["TopBar + Rail Nav + 2-Col Grid + Centered Card Camera"]
+    Check -- ">= 1024px (Desktop)" --> Desk["Persistent 260px Sidebar + 3-Col Grid + Centered Card Camera"]

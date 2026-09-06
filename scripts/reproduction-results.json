@@ -1,0 +1,114 @@
+{
+  "imageA": {
+    "file": "public/images/1.jpg",
+    "sizeBytes": 32341,
+    "hashSha256": "41e41b3cbcedacba1f739c6166826d8aaf257eb29ce3f88c32c58848921c3f52"
+  },
+  "imageB": {
+    "file": "public/images/2.jpg",
+    "sizeBytes": 168688,
+    "hashSha256": "02c78ed99617742ba23f290f4b0ec41f4d5081e7cef5f0defb489a4fa5073590"
+  },
+  "accountA": {
+    "userId": "user-namrata-sen",
+    "userEmail": "namrata.sen@example.com",
+    "inputUploaded": "public/images/1.jpg",
+    "inputHash": "41e41b3cbcedacba1f739c6166826d8aaf257eb29ce3f88c32c58848921c3f52",
+    "previewStateReached": true,
+    "capturedDataUrlHash": null,
+    "continueClicked": true,
+    "networkRequestsOnContinue": [
+      {
+        "url": "http://localhost:5173/vite.svg",
+        "method": "GET"
+      }
+    ],
+    "navigatedUrl": "http://localhost:5173/results/demo-scan",
+    "resultData": {
+      "heading": "Oily Skin with Mild Acne",
+      "scanIdLabel": "Ayurvedic Seeker",
+      "badges": [
+        "Aayurface",
+        "Oily Skin with Mild Acne",
+        "45%",
+        "35%",
+        "20%",
+        "Observable Factors & Doshic Etiology",
+        "Personalized Botanical Regimens",
+        "Neem Face Wash",
+        "Aloe Vera Moisturizer",
+        "Turmeric Spot Treatment",
+        "Lifestyle & Environmental Precautions"
+      ],
+      "hasOilyAcne": true,
+      "hasPitta45": true,
+      "hasNeem": true,
+      "localStorageKeys": [
+        "aayurface_users",
+        "aayurface_session"
+      ]
+    }
+  },
+  "accountB": {
+    "userId": "3748dcec-d5ba-4642-9752-b2169daf8634",
+    "userEmail": "userb@example.com",
+    "inputUploaded": "public/images/2.jpg",
+    "inputHash": "02c78ed99617742ba23f290f4b0ec41f4d5081e7cef5f0defb489a4fa5073590",
+    "previewStateReached": true,
+    "capturedDataUrlHash": null,
+    "continueClicked": true,
+    "networkRequestsOnContinue": [
+      {
+        "url": "http://localhost:5173/vite.svg",
+        "method": "GET"
+      }
+    ],
+    "navigatedUrl": "http://localhost:5173/results/demo-scan",
+    "resultData": {
+      "heading": "Oily Skin with Mild Acne",
+      "scanIdLabel": "Ayurvedic Seeker",
+      "badges": [
+        "Aayurface",
+        "Oily Skin with Mild Acne",
+        "45%",
+        "35%",
+        "20%",
+        "Observable Factors & Doshic Etiology",
+        "Personalized Botanical Regimens",
+        "Neem Face Wash",
+        "Aloe Vera Moisturizer",
+        "Turmeric Spot Treatment",
+        "Lifestyle & Environmental Precautions"
+      ],
+      "hasOilyAcne": true,
+      "hasPitta45": true,
+      "hasNeem": true,
+      "localStorageKeys": [
+        "aayurface_users",
+        "aayurface_session"
+      ]
+    }
+  },
+  "comparison": {
+    "differentUsers": true,
+    "differentUserIds": {
+      "userA": "user-namrata-sen",
+      "userB": "3748dcec-d5ba-4642-9752-b2169daf8634"
+    },
+    "differentInputHashes": true,
+    "differentCapturedFrameHashes": false,
+    "sameDestinationUrl": true,
+    "destinationUrl": "http://localhost:5173/results/demo-scan",
+    "sameHeading": true,
+    "headingValue": "Oily Skin with Mild Acne",
+    "sameScanIdLabel": true,
+    "scanIdLabelValue": "Ayurvedic Seeker",
+    "sameDoshaPitta": true,
+    "sameRemedyNeem": true,
+    "networkRequestsSentOnContinueCount": {
+      "accountA": 1,
+      "accountB": 1
+    },
+    "bugReproduced": true
+  }
+}

@@ -1,0 +1,35 @@
+flowchart LR
+    subgraph Current["1. Current Prototype State"]
+        C_Build["Build Fails (TS2769)\nVitest Types"]
+        C_Auth["Mock localStorage Auth\n(Ignores Passwords)"]
+        C_DB["7 Basic Tables\n(No pgvector, No RLS)"]
+        C_Cap["Mock 3s Timer Scan\n(No Quality Gateway)"]
+        C_AI["Unauthenticated Edge Func\nDirect GPT-4o Vision"]
+    end
+
+    subgraph Transition["2. Phased Transition Milestones"]
+        T_M1["M01: Build Fix & Typecheck"]
+        T_M2["M02: Module Reorganization"]
+        T_M3["M03: Supabase Auth & JWT"]
+        T_M4["M04: DB Schema & 100% RLS"]
+        T_M5["M05: Consent Engine"]
+        T_M6["M06: Onboarding & Quiz"]
+        T_M7["M07: MediaPipe Gateway"]
+        T_M8["M08: Private Signed Storage"]
+        T_M9["M09: Serverless CV Extraction"]
+        T_M10["M10: Classical pgvector RAG"]
+        T_M11["M11: Configurable Fusion"]
+        T_M12["M12: XAI & Safety Filters"]
+        T_M13["M13: Daily Routine History"]
+    end
+
+    subgraph Target["3. Production Target Architecture"]
+        P_Client["Hardened React 19/Vite SPA\nMediaPipe Quality Gateway"]
+        P_Edge["Stateless Deno Edge Functions\nStrict CORS & Rate Limiting"]
+        P_DB[("PostgreSQL 15+ with pgvector\nRow-Level Security on 100% Tables")]
+        P_Store[("Private Zero-Read S3 Bucket\n15m HMAC-Signed URLs")]
+        P_AI["Model-Agnostic Grounded RAG\nCalibrated Fusion & XAI"]
+    end
+
+    Current --> Transition
+    Transition --> Target

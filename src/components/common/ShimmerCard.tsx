@@ -11,7 +11,7 @@ const ShimmerCard: React.FC<ShimmerCardProps> = ({ height = 'h-32', width = 'w-f
   return (
     <div
       className={cn(
-        'bg-warmgray rounded-card animate-shimmer',
+        'bg-background-subtle rounded-lg shimmer-bg border border-border-default/50',
         height,
         width,
         className

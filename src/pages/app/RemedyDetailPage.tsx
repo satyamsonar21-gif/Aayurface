@@ -1,103 +1,165 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Bookmark, Clock, Leaf } from 'lucide-react';
-import TopBar from '@/components/layout/TopBar';
+import { Bookmark, Clock, ChevronLeft, Sparkles } from 'lucide-react';
 import PageWrapper from '@/components/layout/PageWrapper';
-import AyurCard from '@/components/common/AyurCard';
 import SkinBadge from '@/components/common/SkinBadge';
 import SafetyNotice from '@/components/common/SafetyNotice';
 import { MOCK_REMEDIES } from '@/lib/mockData';
 
 export default function RemedyDetailPage() {
-  const { slug } = useParams();
+  const { remedyId, slug } = useParams();
   const navigate = useNavigate();
+  const param = slug || remedyId;
   
-  const remedy = MOCK_REMEDIES.find(r => r.slug === slug) || MOCK_REMEDIES[0];
+  const remedy = MOCK_REMEDIES.find(r => r.slug === param || r.id === param) || MOCK_REMEDIES[0];
+
+  const [isSaved, setIsSaved] = useState(() => {
+    try {
+      const saved = localStorage.getItem('aayurface_saved_remedies');
+      const list = saved ? JSON.parse(saved) : [];
+      return list.includes(remedy.id);
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleSave = () => {
+    try {
+      const saved = localStorage.getItem('aayurface_saved_remedies');
+      const list: string[] = saved ? JSON.parse(saved) : [];
+      const next = list.includes(remedy.id) ? list.filter(id => id !== remedy.id) : [...list, remedy.id];
+      localStorage.setItem('aayurface_saved_remedies', JSON.stringify(next));
+      setIsSaved(!isSaved);
+    } catch {
+      setIsSaved(!isSaved);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-cream flex flex-col">
-      <TopBar 
-        title="Remedy Detail" 
-        onBack={() => navigate('/library')}
-        rightAction={
-          <button className="p-2 text-charcoal hover:text-herbal transition-colors">
-            <Bookmark className="w-5 h-5" />
+    <PageWrapper>
+      <div className="space-y-8 max-w-3xl mx-auto w-full pb-16 font-body">
+        
+        {/* Navigation Breadcrumbs */}
+        <div className="flex items-center justify-between pb-3 border-b border-border-default">
+          <button
+            onClick={() => navigate('/library')}
+            className="inline-flex items-center gap-1.5 text-caption font-semibold text-text-secondary hover:text-brand-primary transition-colors cursor-pointer"
+          >
+            <ChevronLeft size={16} />
+            Back to Library
           </button>
-        }
-      />
-      
-      <PageWrapper className="pt-20 pb-24 space-y-6">
-        <div className="flex flex-col items-center text-center py-6">
-          <div className="w-24 h-24 bg-leaf-medium rounded-full flex items-center justify-center shadow-inner mb-6">
-            <Leaf className="w-12 h-12 text-herbal" strokeWidth={1.5} />
-          </div>
-          <h1 className="font-playfair text-2xl font-bold text-charcoal mb-3">{remedy.name}</h1>
-          <p className="text-charcoal/80 text-sm mb-4 px-4">{remedy.description}</p>
-          <div className="flex flex-wrap justify-center gap-2">
-            {remedy.skin_concerns.map(c => (
-              <SkinBadge key={c} label={c} />
-            ))}
-          </div>
+
+          <button
+            onClick={toggleSave}
+            className="inline-flex items-center gap-1.5 text-caption font-body font-semibold px-3 py-1.5 rounded-full border border-border-default bg-background-surface hover:bg-background-subtle transition-colors cursor-pointer shadow-sm text-text-primary"
+          >
+            <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-brand-accent text-brand-accent' : 'text-text-tertiary'}`} />
+            {isSaved ? 'Saved in Rituals' : 'Save Formulation'}
+          </button>
         </div>
 
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          <div className="bg-turmeric/20 text-charcoal text-xs font-medium px-4 py-2 rounded-pill flex items-center gap-1.5 whitespace-nowrap">
-            <Clock className="w-3.5 h-3.5" /> Prep: {remedy.preparation_steps.length * 5} mins
-          </div>
-          <div className="bg-leaf-soft text-herbal-dark text-xs font-medium px-4 py-2 rounded-pill flex items-center gap-1.5 whitespace-nowrap">
-            <Leaf className="w-3.5 h-3.5" /> Easy to make
-          </div>
-        </div>
-
-        <AyurCard accent="herbal" className="p-5">
-          <h3 className="font-playfair font-semibold text-lg text-charcoal mb-3">Ingredients</h3>
-          <ul className="space-y-2">
-            {remedy.ingredients.map((ing, i) => (
-              <li key={i} className="flex items-center gap-3 text-sm text-charcoal/90">
-                <div className="w-1.5 h-1.5 rounded-full bg-herbal flex-shrink-0" />
-                <span>{ing.amount} {ing.name}</span>
-              </li>
-            ))}
-          </ul>
-        </AyurCard>
-
-        <AyurCard accent="sandalwood" className="p-5">
-          <h3 className="font-playfair font-semibold text-lg text-charcoal mb-3">Preparation</h3>
-          <div className="space-y-4">
-            {remedy.preparation_steps.map((step, i) => (
-              <div key={i} className="flex gap-3">
-                <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center text-xs font-bold text-charcoal flex-shrink-0 border border-sandalwood shadow-sm">
-                  {i + 1}
-                </div>
-                <p className="text-sm text-charcoal/90 leading-relaxed pt-0.5">{step}</p>
+        {/* Hero Header */}
+        <div className="p-6 sm:p-8 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-4 text-center sm:text-left">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <span className="text-caption font-body font-semibold uppercase tracking-wider text-brand-accent">
+                  Botanical Formulation
+                </span>
               </div>
-            ))}
-          </div>
-        </AyurCard>
+              <h1 className="font-display text-2xl sm:text-3xl font-semibold text-text-primary">
+                {remedy.name}
+              </h1>
+            </div>
 
-        <AyurCard accent="turmeric" className="p-5">
-          <h3 className="font-playfair font-semibold text-lg text-charcoal mb-3">Application</h3>
-          <div className="space-y-4">
-            {remedy.application_steps.map((step, i) => (
-              <div key={i} className="flex gap-3">
-                <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center text-xs font-bold text-charcoal flex-shrink-0 border border-turmeric/30 shadow-sm">
-                  {i + 1}
-                </div>
-                <p className="text-sm text-charcoal/90 leading-relaxed pt-0.5">{step}</p>
-              </div>
-            ))}
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-caption font-medium text-brand-primary bg-background-primary px-3 py-1.5 rounded-full border border-border-default flex items-center gap-1.5">
+                <Clock size={13} />
+                Prep: {remedy.preparation_steps.length * 5} mins
+              </span>
+            </div>
           </div>
-        </AyurCard>
 
-        <AyurCard className="p-5 bg-gradient-to-br from-white to-leaf-soft/50">
-          <h3 className="font-playfair font-semibold text-lg text-charcoal mb-2">Ayurvedic Insight</h3>
-          <p className="text-sm text-charcoal/80 italic leading-relaxed">
-            "{remedy.ayurvedic_insight}"
+          <p className="text-body-md text-text-secondary leading-relaxed font-normal">
+            {remedy.description}
           </p>
-        </AyurCard>
 
-        <SafetyNotice message="Always do a patch test 24 hours before full application." />
+          <div className="flex flex-wrap justify-center sm:justify-start gap-2 pt-1">
+            {remedy.skin_concerns.map(c => (
+              <SkinBadge key={c} label={c} size="sm" />
+            ))}
+          </div>
+        </div>
 
-      </PageWrapper>
-    </div>
+        {/* Ingredients Block */}
+        <div className="p-6 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-4">
+          <h2 className="font-display text-xl font-semibold text-text-primary">
+            Key Botanical Ingredients
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            {remedy.ingredients.map((ing, i) => (
+              <div key={i} className="p-3.5 rounded-md bg-background-primary border border-border-default flex items-center justify-between gap-2">
+                <span className="font-body text-body-md text-text-primary font-medium">{ing.name}</span>
+                <span className="text-caption text-text-secondary font-body bg-background-surface px-2.5 py-0.5 rounded-sm border border-border-default">{ing.amount}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Preparation Steps */}
+        <div className="p-6 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-4">
+          <h2 className="font-display text-xl font-semibold text-text-primary">
+            Preparation Method (Krama)
+          </h2>
+          <div className="space-y-3 pt-1">
+            {remedy.preparation_steps.map((step, i) => (
+              <div key={i} className="flex items-start gap-3.5 p-3 rounded-md bg-background-primary/60 border border-border-default/60">
+                <span className="w-6 h-6 rounded-full bg-brand-primary text-text-inverse flex items-center justify-center text-xs font-semibold shrink-0 mt-0.5">
+                  {i + 1}
+                </span>
+                <p className="font-body text-body-md text-text-primary leading-relaxed font-normal">
+                  {step}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Application Steps */}
+        <div className="p-6 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-4">
+          <h2 className="font-display text-xl font-semibold text-text-primary">
+            Application Ritual (Lepa Vidhi)
+          </h2>
+          <div className="space-y-3 pt-1">
+            {remedy.application_steps.map((step, i) => (
+              <div key={i} className="flex items-start gap-3.5 p-3 rounded-md bg-background-primary/60 border border-border-default/60">
+                <span className="w-6 h-6 rounded-full bg-brand-accent text-brand-primary flex items-center justify-center text-xs font-semibold shrink-0 mt-0.5">
+                  {i + 1}
+                </span>
+                <p className="font-body text-body-md text-text-primary leading-relaxed font-normal">
+                  {step}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Classical Ayurvedic Insight */}
+        <div className="p-6 rounded-lg bg-background-subtle border border-border-default shadow-sm space-y-3">
+          <div className="flex items-center gap-2 text-brand-accent">
+            <Sparkles size={16} />
+            <h3 className="font-display text-lg font-semibold text-text-primary">
+              Classical Shastric Principle
+            </h3>
+          </div>
+          <blockquote className="font-display text-lg text-text-primary italic leading-relaxed pl-3 border-l-2 border-brand-accent">
+            "{remedy.ayurvedic_insight}"
+          </blockquote>
+        </div>
+
+        <SafetyNotice message="Always perform a 24-hour skin patch test on a small area behind the ear before full facial application." />
+
+      </div>
+    </PageWrapper>
   );
 }

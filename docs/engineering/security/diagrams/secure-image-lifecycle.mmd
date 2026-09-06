@@ -1,0 +1,27 @@
+flowchart TD
+    subgraph ClientStage["1. Client Volatile Evaluation (Browser RAM)"]
+        VideoStream["Continuous Camera Stream\n(60 FPS WebRTC Canvas)"] --> WasmMesh["MediaPipe FaceMesh (Wasm)\nEvaluates Pose, Light, Sharpness"]
+        WasmMesh --> QualityCheck{"Gateway Rules Pass?\n(Single Face, Centered, Bright)"}
+        QualityCheck -->|No| DiscardFrame["Discard Frame Immediately from RAM"]
+        QualityCheck -->|Yes| FreezeFrame["Freeze Single Target Frame in RAM"]
+        FreezeFrame --> StripEXIF["Strip All EXIF Metadata & Compress JPEG"]
+    end
+
+    subgraph UploadStage["2. Cryptographic Storage Ingestion"]
+        StripEXIF --> RequestURL["POST /api/v1/captures/upload-url\n(Bearer JWT Authenticated)"]
+        RequestURL --> EdgeGen["Edge Function Generates 15-Minute HMAC Signed PUT URL"]
+        EdgeGen --> UploadS3["Direct Client PUT to Private S3 Bucket\n`facial-captures/{userId}/{uuid}.jpg`"]
+    end
+
+    subgraph ExtractionStage["3. Serverless Biometric Feature Extraction"]
+        UploadS3 --> EdgeExtract["Edge Worker Downloads Frame via Ephemeral Read Token"]
+        EdgeExtract --> ComputeVectors["Compute Numerical VisualObservations:\nCIELAB a*, GLCM Roughness, Melanin Uniformity"]
+        ComputeVectors --> PersistVector["Persist Derived Vector in `scan_results` Table\n(Numerical Data Only)"]
+    end
+
+    subgraph RetentionPurgeStage["4. Biometric Purge Protocol (DEC-004)"]
+        PersistVector --> RetentionPolicy{"DEC-004 Retention Setting"}
+        RetentionPolicy -->|Option A: Immediate Purge| HardDelete["Execute S3 DeleteObject Immediately\nZero Raw Biometric Storage"]
+        RetentionPolicy -->|Option B: Rolling 30 Days| S3Lifecycle["S3 Bucket Lifecycle Rule:\nHard Delete Object after 30 Days"]
+        RetentionPolicy -->|User Deletion Trigger| CascadeDelete["Cascading Account Purge Trigger:\nPermanently Delete within 24 Hours"]
+    end

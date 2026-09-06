@@ -1,0 +1,38 @@
+flowchart LR
+    subgraph Client["Untrusted Client Environment"]
+        User(["Human User"])
+        Browser["Browser DOM / Memory"]
+    end
+
+    subgraph NetworkEdge["Perimeter & Edge Tier"]
+        Edge["Edge Functions Gateway"]
+    end
+
+    subgraph CoreStorage["Persistent Storage Tier"]
+        DB[("PostgreSQL Database")]
+        Storage[("Private S3 Storage")]
+        VectorStore[("pgvector Classical Store")]
+    end
+
+    subgraph ExternalServices["External Enclaves"]
+        AI["OpenAI API"]
+        Observability["Logging & Telemetry Service"]
+    end
+
+    subgraph InternalPersonnel["Restricted Internal Enclaves"]
+        Admin(["System Administrator"])
+        Researcher(["Ayurvedic Researcher"])
+    end
+
+    User -- "TB-01: User Input & Display" --> Browser
+    Browser -- "TB-02: REST API (JWT & TLS)" --> Edge
+    Browser -- "TB-03: Signed S3 Upload" --> Storage
+    Edge -- "TB-04: RLS SQL Connection" --> DB
+    Edge -- "TB-05: S3 Management & Signed URLs" --> Storage
+    Edge -- "TB-06: Outbound Inference Calls" --> AI
+    Edge -- "TB-07: Grounded Verse Retrieval" --> VectorStore
+    Browser -. "TB-08: Untrusted Prompt Injection" .-> Edge
+    Admin -- "TB-09: Privileged Admin Portal" --> Edge
+    Researcher -- "TB-10: De-identified Research Access" --> DB
+    Edge -- "TB-11: Third-Party Dependencies" --> ExternalServices
+    Edge -- "TB-12: Redacted Telemetry Stream" --> Observability

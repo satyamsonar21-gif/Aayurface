@@ -1,0 +1,68 @@
+flowchart TB
+    subgraph ClientLayers["Frontend Layer Architecture (Browser SPA)"]
+        direction TB
+        subgraph Presentation["1. Presentation Layer (Views & Pages)"]
+            P_Home["LandingPage / DashboardPage"]
+            P_Onb["OnboardingWizard (7 Steps)"]
+            P_Cap["CapturePage (Camera Overlay)"]
+            P_Res["ResultsPage (XAI Insight & Routine)"]
+        end
+        subgraph Features["2. Domain Feature Slices (src/features/*)"]
+            F_Auth["auth/ (Forms, Guards)"]
+            F_Onb["onboarding/ (Quiz, Lifestyle)"]
+            F_Cap["capture/ (Gateway, Wasm)"]
+            F_Ana["analysis/ (Result Cards)"]
+            F_Rou["routines/ (Ritual Tracks)"]
+        end
+        subgraph State["3. Application & Server State Layer"]
+            S_Auth["AuthContext (Session)"]
+            S_Query["TanStack React Query Cache"]
+            S_Gate["CaptureGateway FSM"]
+            S_i18n["i18next Locale Store"]
+        end
+        subgraph Shared["4. Shared UI Primitives & Design Tokens"]
+            U_Buttons["Buttons, Inputs, Modals"]
+            U_Tokens["Ayurvedic Heritage Theme (Tailwind)"]
+            U_Aria["Screen Reader Live Regions"]
+        end
+        subgraph InfraClient["5. Client Transport & SDK Wrappers"]
+            C_Api["apiClient (Bearer Injection)"]
+            C_Supa["supabaseClient (Auth & Realtime)"]
+            C_Media["mediaPipeClient (Wasm Worker)"]
+        end
+    end
+
+    subgraph BackendLayers["Edge Tier Layer Architecture (Supabase Functions)"]
+        direction TB
+        subgraph Middleware["1. Transport & Auth Middleware"]
+            M_Cors["CORS Whitelist Guard"]
+            M_Rate["Rate Limiting Middleware"]
+            M_Auth["JWT auth.uid() Derivation"]
+        end
+        subgraph Validation["2. Input Deserialization & Quarantine"]
+            V_Zod["Zod Schema Validator"]
+            V_Quar["Prompt Injection Sanitizer"]
+        end
+        subgraph Services["3. Domain Services Layer"]
+            D_Image["ImageProcessingSvc"]
+            D_Fusion["FusionEngineSvc"]
+            D_Rag["KnowledgeRagSvc"]
+            D_Ai["AiReasoningXaiSvc"]
+        end
+        subgraph Repos["4. Data Access Repositories"]
+            R_Scan["ScanResultRepository"]
+            R_Know["KnowledgeChunkRepository"]
+            R_Stor["StorageAdapter"]
+            R_Oai["OpenAiAdapter"]
+        end
+    end
+
+    Presentation --> Features
+    Features --> State
+    Features --> Shared
+    State --> InfraClient
+    InfraClient -->|HTTPS / JWT| Middleware
+
+    Middleware --> Validation
+    Validation --> Services
+    Services --> Repos

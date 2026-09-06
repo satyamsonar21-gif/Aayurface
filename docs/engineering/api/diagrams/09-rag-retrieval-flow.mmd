@@ -1,0 +1,10 @@
+flowchart TD
+    A["Analysis Imbalance & Lakshanas Context"] --> B["Generate 1536-dim Query Embedding"]
+    B --> C["Execute HNSW Cosine Search in pgvector"]
+    C --> D{"Cosine Similarity >= 0.75?"}
+    D -- No --> E["Discard Sub-Threshold Chunks"]
+    D -- Yes --> F{"Vetted Match Count >= 2?"}
+    F -- No --> G["Trigger Safe Fallback (Static Lifestyle Rules)"]
+    F -- Yes --> H["Wrap Chunks in &lt;classical_evidence&gt; Tags"]
+    H --> I["Inject into Constrained LLM System Prompt"]
+    I --> J["Parse Output & Verify Foreign-Key Citation IDs"]

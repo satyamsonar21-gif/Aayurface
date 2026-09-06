@@ -1,0 +1,17 @@
+sequenceDiagram
+    autonumber
+    actor User as User
+    participant View as AnalysisProcessingScreen
+    participant Poll as useAnalysisStatusQuery (1.5s interval)
+    participant API as GET /api/v1/analyses/:id/status
+    participant Router as React Router
+
+    View->>View: Render Circular Breathing Pulse (Honest Stage 1)
+    loop Polling Loop
+        Poll->>API: GET /api/v1/analyses/:id/status
+        API-->>Poll: 200 OK { stage: 5, stageName: "Harmonizing multimodal signals..." }
+        Poll->>View: Update UI Stage Label (No fake percentages)
+    end
+    API-->>Poll: 200 OK { status: 'COMPLETED', isTerminal: true }
+    Poll->>Router: Navigate to `/analyze/results/:id`
+    Router->>User: Render Results Screen

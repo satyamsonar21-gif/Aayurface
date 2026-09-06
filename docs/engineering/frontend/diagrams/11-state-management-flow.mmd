@@ -1,0 +1,18 @@
+flowchart LR
+    subgraph UIComponent["React 19 Component"]
+        JSX["Render View"]
+    end
+
+    subgraph StateTiers["5 State Tiers"]
+        TanStack["TanStack Query (Server State: Profile, Routines, Scans)"]
+        Zustand["Zustand (Client UI State: Sidebar, Toasts, Modals)"]
+        RHF["React Hook Form (Drafts, Validation)"]
+        WasmState["useCaptureSession (Ephemeral Camera Landmarks)"]
+        AuthCtx["Supabase Auth (JWT Bearer Token)"]
+    end
+
+    JSX <--> TanStack
+    JSX <--> Zustand
+    JSX <--> RHF
+    JSX <--> WasmState
+    JSX <--> AuthCtx

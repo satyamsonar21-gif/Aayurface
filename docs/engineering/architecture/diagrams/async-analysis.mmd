@@ -1,0 +1,23 @@
+stateDiagram-v2
+    [*] --> REQUESTED: User initiates analysis
+    REQUESTED --> VALIDATING: Rate limit & token check
+    VALIDATING --> QUEUED: Validated, job dispatched
+    
+    state ProcessingState {
+        QUEUED --> CV_EXTRACTION: Download image & compute redness/texture
+        CV_EXTRACTION --> FUSION_CALCULATION: Weighted combination of modalities
+        FUSION_CALCULATION --> KNOWLEDGE_RETRIEVAL: Top-5 pgvector classical chunks
+        KNOWLEDGE_RETRIEVAL --> AI_SYNTHESIS: GPT-4o grounded completion
+        AI_SYNTHESIS --> SAFETY_FILTER: Patch test & non-diagnostic checks
+    }
+
+    SAFETY_FILTER --> COMPLETED: Snapshot persisted in scan_results
+    
+    ProcessingState --> FAILED: Hard error / timeout (>45s)
+    ProcessingState --> RETRYING: Transient 5xx / rate-limit backoff
+    RETRYING --> ProcessingState: Retry attempt <= 3
+    RETRYING --> RETRY_EXHAUSTED: Retries exceeded
+
+    FAILED --> [*]
+    RETRY_EXHAUSTED --> [*]
+    COMPLETED --> [*]

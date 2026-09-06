@@ -1,0 +1,38 @@
+sequenceDiagram
+    autonumber
+    actor User as Consumer User
+    participant Browser as Browser SPA / Gateway
+    participant Edge as Supabase Edge Functions
+    participant Storage as Private S3 Storage
+    participant DB as PostgreSQL & pgvector
+    participant OpenAI as OpenAI API (GPT-4o)
+
+    User->>Browser: Opens camera on /analysis/capture
+    Browser->>Browser: Evaluates live frames in RAM (Lighting, Blur, Centering)
+    Note over Browser: All quality checks PASS (Green state)
+    User->>Browser: Clicks "Capture"
+    Browser->>Edge: POST /api/v1/capture/upload-url (Bearer JWT)
+    Edge-->>Browser: Signed S3 Upload URL (TTL: 15m)
+    Browser->>Storage: PUT single encrypted frame
+    Browser->>Edge: POST /api/v1/analysis/orchestrate (storagePath, quizId, lifeId)
+    Edge-->>Browser: 202 Accepted (analysisId, status: QUEUED)
+
+    par Asynchronous Processing
+        Edge->>Storage: GET frame via temporary signed URL
+        Storage-->>Edge: Image buffer
+        Edge->>Edge: Computes CIELAB a* redness, GLCM texture, melanin
+        Edge->>DB: Reads questionnaire & lifestyle vectors
+        DB-->>Edge: V_quiz and V_life
+        Edge->>Edge: Fuses modalities & computes cosine agreement
+        Edge->>DB: Queries pgvector for top-5 classical citations
+        DB-->>Edge: Classical knowledge chunks
+        Edge->>OpenAI: Synthesizes 5-part XAI completion (gpt-4o-2024-08-06)
+        OpenAI-->>Edge: Structured JSON insight
+        Edge->>Edge: Zod schema & safety filter validation
+        Edge->>DB: Stores immutable snapshot in scan_results
+        DB-->>Browser: Realtime CDC notification (COMPLETED)
+    end
+
+    Browser->>DB: GET /api/v1/analysis/:id
+    DB-->>Browser: Full AnalysisResultContract JSON
+    Browser->>User: Renders insight, doshic breakdown, routine, and disclaimer

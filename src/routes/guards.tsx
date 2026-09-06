@@ -2,9 +2,10 @@
 // Aayurface — Route Guards
 // ============================================================
 
+import { type ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import type { ReactNode } from 'react';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -12,36 +13,43 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-cream flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-herbal border-t-transparent rounded-full animate-spin-slow mx-auto mb-4" />
-          <p className="font-poppins text-charcoal-light text-small">Loading...</p>
-        </div>
+      <div className="min-h-screen bg-background-primary flex items-center justify-center">
+        <LoadingSpinner size="lg" message="Loading Ayurvedic Intelligence..." />
       </div>
     );
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    // Strict authentication requirement: redirect to /signin and preserve attempted location
+    return <Navigate to="/signin" state={{ from: location }} replace />;
   }
 
   return <>{children}</>;
 }
 
-export function PublicRoute({ children }: { children: ReactNode }) {
+interface PublicRouteProps {
+  children: ReactNode;
+  restrictAuthenticated?: boolean;
+}
+
+export function PublicRoute({ children, restrictAuthenticated = true }: PublicRouteProps) {
   const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-cream flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-herbal border-t-transparent rounded-full animate-spin-slow mx-auto" />
+      <div className="min-h-screen bg-background-primary flex items-center justify-center">
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
 
-  if (isAuthenticated) {
-    return <Navigate to="/home" replace />;
+  if (isAuthenticated && restrictAuthenticated) {
+    // If user is already authenticated, redirect to destination or default dashboard
+    const from = (location.state as { from?: Location })?.from?.pathname || '/dashboard';
+    return <Navigate to={from} replace />;
   }
 
   return <>{children}</>;
 }
+

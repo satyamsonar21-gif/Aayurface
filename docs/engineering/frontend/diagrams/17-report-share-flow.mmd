@@ -1,0 +1,16 @@
+sequenceDiagram
+    autonumber
+    actor Owner as Authenticated User
+    participant ShareUI as ShareModal
+    participant API as POST /api/v1/shares
+    actor Public as Public Recipient
+    participant PublicUI as PublicShareView
+
+    Owner->>ShareUI: Click "Generate Share Link" (30 Days)
+    ShareUI->>API: HTTP POST /api/v1/shares
+    API-->>ShareUI: 201 Created { publicToken, shareUrl }
+    ShareUI-->>Owner: Displays Copyable 256-Bit Link
+
+    Public->>PublicUI: Open https://aayurface.com/share/shr_...
+    PublicUI->>PublicUI: Load De-Identified Summary (100% PII & Photos Excluded)
+    PublicUI-->>Public: Renders Redacted Ayurvedic Assessment

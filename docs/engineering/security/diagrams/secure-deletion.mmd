@@ -1,0 +1,17 @@
+flowchart TD
+    UserRequest["1. User Submits Deletion Request\n(DELETE /api/v1/profile/account)"] --> AuthStep["2. Re-authenticate User\n(Password or Re-verification Token)"]
+    
+    AuthStep -->|Verified| MarkTombstone["3. Database Transaction Begins:\nMark User Status = 'PENDING_DELETION'\nRevoke All Active Refresh Tokens"]
+    
+    MarkTombstone --> QueueTask["4. Enqueue Asynchronous Purge Job\n(Idempotent Worker Task)"]
+    
+    subgraph PurgeWorker["5. Coordinated Cascading Purge Worker"]
+        QueueTask --> PurgeS3["Step 5A: Hard-Delete Facial Images in S3\nList and Delete `facial-captures/{userId}/*`\nDelete Generated PDF Reports"]
+        PurgeS3 --> PurgeDB["Step 5B: Execute Cascading SQL Deletion\nDELETE FROM profiles WHERE id = userId;\n(Cascades to consents, questionnaire, routines, scan_results)"]
+        PurgeDB --> PurgeCache["Step 5C: Purge Redis/Edge Cache Keys\nInvalidate Any Active Ephemeral Tokens"]
+    end
+
+    PurgeWorker --> VerifyPurge{"Verify Zero Records Remain in S3 & DB?"}
+    VerifyPurge -->|Success| AuditTombstone["6. Log Immutable Anonymous Tombstone\n`{ event: 'ACCOUNT_PURGED', tenant_hash, timestamp }`"]
+    VerifyPurge -->|Failure| RetryPurge["Retry with Exponential Backoff & Alert SRE"]
+    AuditTombstone --> TerminateSession["7. Invalidate Session & Return HTTP 200 to Client"]

@@ -1,0 +1,24 @@
+flowchart TD
+    subgraph Browser["Untrusted Browser Environment"]
+        ClientApp["React 19 SPA Code"]
+        DOMP["DOMPurify Markdown Sanitizer"]
+        AuthStorage["Supabase JWT (Auto-Refreshed in Memory/Storage)"]
+    end
+
+    subgraph SecurityPerimeter["Frontend Security Perimeter"]
+        CSP["Content Security Policy (default-src 'self')"]
+        FrameDeny["X-Frame-Options: DENY (Anti-Clickjacking)"]
+        ZeroSecrets["Zero Server Secrets Invariant (No Service Role / API Keys)"]
+    end
+
+    subgraph EdgeBoundary["Protected Server Boundary"]
+        Gateway["Supabase Edge API Gateway"]
+        RS256["Server-Derived auth.uid() from RS256 JWT"]
+    end
+
+    ClientApp --> DOMP
+    ClientApp --> CSP
+    ClientApp --> FrameDeny
+    ClientApp --> ZeroSecrets
+    ClientApp -->|Bearer RS256 JWT| Gateway
+    Gateway --> RS256

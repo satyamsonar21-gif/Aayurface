@@ -32,6 +32,23 @@ export interface ScanResult {
   created_at: string;
 }
 
+export interface Assessment {
+  id: string;
+  userId: string;
+  capturedImage: string;
+  createdAt: string;
+  isDemo?: boolean;
+  summary: string;
+  skinTypes: string[];
+  doshaTendency: {
+    primary: string;
+    description: string;
+  };
+  causes: ScanCause[];
+  remedies: ScanRemedy[];
+  preventionTips: PreventionTip[];
+}
+
 export interface ScanCause {
   icon: string;
   text: string;

@@ -1,0 +1,40 @@
+flowchart TD
+    subgraph Inputs["1. Normalized Modality Vectors (Sum = 1.0)"]
+        V_vis["Visual Observation Vector\n[V_vata, V_pitta, V_kapha]\n(Derived from CIELAB a*, GLCM, Melanin)"]
+        V_quiz["Constitutional Intake Vector\n[Q_vata, Q_pitta, Q_kapha]\n(Derived from 15-Question Intake)"]
+        V_life["Lifestyle Context Vector\n[L_vata, L_pitta, L_kapha]\n(Derived from Sleep, Stress, Climate)"]
+    end
+
+    subgraph Config["2. Versioned Fusion Configuration"]
+        Weights["fusion_configurations\nWeight Visual: w1 = 0.40 (Hypothesis)\nWeight Quiz: w2 = 0.35 (Hypothesis)\nWeight Lifestyle: w3 = 0.25 (Hypothesis)\nConstraint: w1 + w2 + w3 = 1.0"]
+    end
+
+    subgraph MatrixComputation["3. Weighted Linear Fusion"]
+        V_vis --> Compute["Compute Weighted Doshic Sums:\nV_fused = w1*V_vis + w2*V_quiz + w3*V_life"]
+        V_quiz --> Compute
+        V_life --> Compute
+        Weights --> Compute
+        Compute --> Normalize["Normalize to 100%:\n[Fused_Vata, Fused_Pitta, Fused_Kapha]"]
+    end
+
+    subgraph AgreementEvaluation["4. Inter-Modality Agreement & Uncertainty"]
+        V_vis --> CosinePair["Compute Pairwise Cosine Similarities:\nS(vis, quiz), S(vis, life), S(quiz, life)"]
+        V_quiz --> CosinePair
+        V_life --> CosinePair
+        CosinePair --> HarmonicMean["Calculate Harmonic Agreement Index A:\nA = 3 / (1/S1 + 1/S2 + 1/S3)"]
+        
+        HarmonicMean --> StateCheck{"Agreement State"}
+        StateCheck -->|A >= 0.80| HighState["HIGH_AGREEMENT\n(Strong multi-signal convergence)"]
+        StateCheck -->|0.60 <= A < 0.80| ModState["MODERATE_AGREEMENT\n(Minor modality divergence)"]
+        StateCheck -->|A < 0.60| LowState["LOW_AGREEMENT\n(Modality clash detected)"]
+    end
+
+    subgraph ConfidenceCalibration["5. Calibrated Confidence Determination"]
+        Normalize --> FinalConfidence["Calibrate Confidence C:\nC = C_base * A * Q_capture"]
+        HighState --> FinalConfidence
+        ModState --> FinalConfidence
+        LowState --> CapConfidence["ENFORCE CONFIDENCE CAP:\nC is capped at < 60%\nRender Uncertainty Advisory Banner"]
+    end
+
+    FinalConfidence --> PersistFusion["INSERT INTO multimodal_fusions\n(Persist inputs, fused outputs, agreement, confidence)"]
+    CapConfidence --> PersistFusion

@@ -29,79 +29,90 @@ const ForgotPasswordPage = () => {
     setTimeout(() => {
       setIsLoading(false);
       setIsSuccess(true);
-    }, 1500);
+    }, 1200);
   };
 
   return (
-    <AuthLayout>
-      <div className="flex flex-col w-full max-w-md mx-auto p-6 md:p-8 bg-cream-card rounded-card shadow-card relative z-10 min-h-[400px]">
-        <Link to="/login" className="inline-flex items-center text-charcoal-light hover:text-charcoal transition-colors mb-6 text-small font-medium w-fit">
+    <AuthLayout
+      title={isSuccess ? undefined : "Reset Password"}
+      subtitle={isSuccess ? undefined : "Enter your email to receive a secure password recovery link"}
+    >
+      <div className="w-full">
+        <Link 
+          to="/login" 
+          className="inline-flex items-center text-text-secondary hover:text-text-primary transition-colors mb-6 text-caption font-body font-medium"
+        >
           <ChevronLeft size={16} className="mr-1" />
-          Back
+          Back to Sign In
         </Link>
 
         <AnimatePresence mode="wait">
           {!isSuccess ? (
             <motion.div
               key="form"
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, x: 10 }}
+              transition={{ duration: 0.2 }}
               className="flex flex-col w-full"
             >
-              <h1 className="font-playfair text-title text-charcoal font-semibold mb-2">Reset Your Password</h1>
-              <p className="text-body-md text-charcoal-light mb-8">Enter your email and we'll send you a reset link</p>
-
               <form onSubmit={handleSubmit} className="w-full space-y-4">
-                <div className="space-y-1">
+                <div className="space-y-1.5">
+                  <label className="block text-caption font-body font-medium text-text-secondary uppercase tracking-wider">
+                    Registered Email
+                  </label>
                   <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-charcoal-light/60">
+                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-tertiary">
                       <Mail size={18} />
                     </div>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Email Address"
-                      className="w-full rounded-button border border-warmgray bg-white pl-11 pr-4 py-3 font-poppins text-small focus:border-herbal focus:ring-1 focus:ring-herbal outline-none transition-all placeholder:text-charcoal-light/60 text-charcoal"
+                      placeholder="name@example.com"
+                      className="w-full rounded-md border border-border-default bg-background-surface pl-10 pr-4 py-3 font-body text-body-md text-text-primary placeholder:text-text-tertiary focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all"
                     />
                   </div>
-                  {error && <p className="text-turmeric text-caption pl-1">{error}</p>}
+                  {error && <p className="text-red-700 text-caption font-body pl-0.5">{error}</p>}
                 </div>
 
                 <motion.button
-                  whileTap={{ scale: 0.97 }}
+                  whileTap={{ scale: 0.98 }}
                   disabled={isLoading}
                   type="submit"
-                  className="w-full bg-herbal text-white rounded-button py-3 font-medium text-body-md mt-4 flex justify-center items-center gap-2 hover:bg-opacity-90 transition-all disabled:opacity-70 shadow-sm"
+                  className="w-full bg-brand-primary text-text-inverse rounded-md py-3 font-body font-medium text-body-md mt-6 flex justify-center items-center gap-2 hover:bg-brand-primary-hover transition-all disabled:opacity-60 shadow-sm cursor-pointer"
                 >
-                  {isLoading ? <Loader2 className="animate-spin" size={20} /> : 'Send Reset Link'}
+                  {isLoading ? <Loader2 className="animate-spin" size={18} /> : 'Send Reset Link'}
                 </motion.button>
               </form>
             </motion.div>
           ) : (
             <motion.div
               key="success"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ duration: 0.3 }}
-              className="flex flex-col items-center justify-center text-center w-full py-6"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              transition={{ duration: 0.25 }}
+              className="flex flex-col items-center justify-center text-center w-full py-4 space-y-4"
             >
-              <div className="w-16 h-16 bg-leaf-soft rounded-full flex items-center justify-center text-herbal mb-6">
-                <CheckCircle2 size={32} />
+              <div className="w-14 h-14 bg-emerald-50 text-emerald-800 rounded-full flex items-center justify-center border border-emerald-200">
+                <CheckCircle2 size={28} />
               </div>
-              <h2 className="font-playfair text-title text-charcoal font-semibold mb-3">Check your inbox 📬</h2>
-              <p className="text-body-md text-charcoal-light mb-8 px-4">
-                We've sent a password reset link to <span className="font-medium text-charcoal">{email}</span>
-              </p>
+              
+              <div className="space-y-1.5">
+                <h2 className="font-display text-heading-2 font-semibold text-text-primary">
+                  Check Your Inbox
+                </h2>
+                <p className="text-body-md text-text-secondary font-body max-w-xs mx-auto">
+                  We have dispatched password recovery instructions to <span className="font-semibold text-text-primary">{email}</span>.
+                </p>
+              </div>
               
               <Link 
                 to="/login"
-                className="w-full bg-white border border-warmgray text-charcoal rounded-button py-3 font-medium text-body-md flex justify-center items-center hover:bg-cream transition-colors shadow-sm"
+                className="w-full bg-brand-primary text-text-inverse rounded-md py-3 font-body font-medium text-body-md flex justify-center items-center hover:bg-brand-primary-hover transition-colors shadow-sm mt-4"
               >
-                Back to Sign In
+                Return to Sign In
               </Link>
             </motion.div>
           )}

@@ -1,0 +1,42 @@
+flowchart TD
+    subgraph Ingestion["Administrative Ingestion & Vectorization"]
+        Literature["Classical Ayurvedic Literature\n(Charaka, Sushruta, Bhavaprakasha)"]
+        Chunking["Semantic Chunker\n(400-600 tokens, 50-token overlap)"]
+        EmbedAPI["OpenAI text-embedding-3-small\n(1536 dimensions)"]
+        VectorDB[("pgvector Store\n(knowledge_chunks table)")]
+    end
+
+    subgraph RuntimeQuery["Runtime Contextual Retrieval"]
+        Context["User Fused Dosha Profile\n+ Primary Skin Concerns"]
+        QueryVec["Generate Query Embedding\n(text-embedding-3-small)"]
+        Search["pgvector Cosine Search\nORDER BY embedding <=> query LIMIT 5"]
+        Filter{"Similarity >= 0.75\n& Matches >= 2?"}
+        ValidSources["Top-5 Cited Classical Chunks\n(Title, Chapter, Verse)"]
+        SafeFallback["Trigger Safe Fallback Disclosure\n(Zero Hallucinated Herbs)"]
+    end
+
+    subgraph Generation["Grounded Generative Reasoning"]
+        Sanitize["Quarantine Free-Text Inputs in XML Tags"]
+        Prompt["Constrained XAI Prompt (JSON Schema)"]
+        GPT4o["OpenAI GPT-4o (gpt-4o-2024-08-06)"]
+        Safety["Deterministic Safety & Patch-Test Filter"]
+        FinalPayload["Structured AnalysisResultContract"]
+    end
+
+    Literature --> Chunking
+    Chunking --> EmbedAPI
+    EmbedAPI --> VectorDB
+
+    Context --> QueryVec
+    QueryVec --> Search
+    VectorDB --> Search
+    Search --> Filter
+    Filter -->|Yes| ValidSources
+    Filter -->|No| SafeFallback
+
+    ValidSources --> Sanitize
+    SafeFallback --> Sanitize
+    Sanitize --> Prompt
+    Prompt --> GPT4o
+    GPT4o --> Safety
+    Safety --> FinalPayload

@@ -1,0 +1,15 @@
+sequenceDiagram
+    autonumber
+    actor User as User
+    participant UI as ConsentPanel UI
+    participant Hook as useUpdateConsentMutation
+    participant API as POST /api/v1/consents
+    participant Ledger as consents Table
+
+    User->>UI: Toggle "Facial Biometric Processing" (ON)
+    UI->>Hook: Mutate { scope: 'FACIAL_BIOMETRIC_PROCESSING', status: 'GRANTED' }
+    Hook->>API: HTTP POST /api/v1/consents
+    API->>Ledger: INSERT INTO consents (user_id, scope, status, policy_version)
+    Ledger-->>API: 201 Created
+    API-->>Hook: Return Updated Consent Object
+    Hook->>UI: Show Subtle Green Toast: "Consent Preferences Updated"

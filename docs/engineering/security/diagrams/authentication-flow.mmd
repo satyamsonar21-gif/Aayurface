@@ -1,0 +1,27 @@
+sequenceDiagram
+    autonumber
+    actor User as User Browser SPA
+    participant SupabaseAuth as Supabase Auth Service
+    participant DB as PostgreSQL (auth.users)
+    participant Edge as Edge Function Gateway
+
+    Note over User,Edge: Target Authentication Protocol (ADR-012)
+
+    User->>SupabaseAuth: POST /auth/v1/token (email, password)
+    SupabaseAuth->>DB: Query user by email
+    DB-->>SupabaseAuth: Return user record & bcrypt hash
+    SupabaseAuth->>SupabaseAuth: Verify bcrypt password hash
+    alt Password Valid
+        SupabaseAuth->>SupabaseAuth: Issue RS256 JWT (sub=userId, role=authenticated, exp=1h)
+        SupabaseAuth->>SupabaseAuth: Generate opaque Refresh Token (auto-rotating)
+        SupabaseAuth-->>User: HTTP 200 { access_token, refresh_token, user }
+    else Password Invalid / Rate Limit Exceeded
+        SupabaseAuth-->>User: HTTP 401 / 429 Error (Progressive Delay)
+    end
+
+    Note over User,Edge: Authenticated API Invocation
+    User->>Edge: POST /api/v1/analysis/orchestrate (Header: Bearer <access_token>)
+    Edge->>Edge: Cryptographically verify JWT signature using Supabase Public Key
+    Edge->>Edge: Extract verified auth.uid() claim from JWT payload
+    Edge->>Edge: REJECT any client-supplied body.userId parameter
+    Edge->>Edge: Proceed with analysis orchestration bound strictly to auth.uid()

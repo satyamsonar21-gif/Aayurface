@@ -1,40 +1,39 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Home } from 'lucide-react';
+import { Home, Compass } from 'lucide-react';
 
 const NotFoundPage = () => {
   return (
-    <div className="min-h-screen bg-cream flex flex-col items-center justify-center p-6 text-center font-poppins">
+    <div className="min-h-screen bg-background-primary flex flex-col items-center justify-center p-6 text-center font-body text-text-primary">
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="flex flex-col items-center"
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        className="flex flex-col items-center max-w-md"
       >
-        <div className="mb-8">
-          <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="60" cy="60" r="50" fill="#DDEEDB" opacity="0.5" />
-            <path d="M45 45C30 60 25 80 45 90C65 80 60 60 45 45Z" fill="#4CAF50" opacity="0.8" />
-            <path d="M75 35C85 25 100 30 95 45C90 60 75 55 75 35Z" fill="#4CAF50" opacity="0.6" />
-            <path d="M45 90C45 90 55 60 85 45" stroke="#4CAF50" strokeWidth="3" strokeLinecap="round" />
-          </svg>
+        <div className="w-16 h-16 rounded-full bg-brand-primary text-text-inverse flex items-center justify-center shadow-md mb-6">
+          <Compass size={32} className="text-brand-accent" />
         </div>
         
-        <h1 className="font-playfair text-title md:text-[40px] font-semibold text-charcoal mb-4">
-          Page Not Found 🌿
+        <span className="text-caption font-body font-semibold uppercase tracking-wider text-brand-accent mb-2">
+          404 Navigation Error
+        </span>
+
+        <h1 className="font-display text-3xl sm:text-4xl font-semibold text-text-primary mb-3">
+          Pathway Not Found
         </h1>
         
-        <p className="text-body-md text-charcoal-light mb-8 max-w-sm">
-          It seems you've wandered off the path. The page you're looking for doesn't exist or has been moved.
+        <p className="text-body-md text-text-secondary mb-8 leading-relaxed font-normal">
+          It appears you have wandered outside charted constitutional territory. The requested page is unavailable.
         </p>
         
-        <motion.div whileTap={{ scale: 0.97 }}>
+        <motion.div whileTap={{ scale: 0.98 }}>
           <Link 
             to="/home" 
-            className="inline-flex items-center gap-2 bg-herbal text-white px-8 py-3.5 rounded-button text-body-md font-medium hover:bg-opacity-90 transition-all shadow-md"
+            className="inline-flex items-center gap-2 bg-brand-primary text-text-inverse px-7 py-3.5 rounded-md text-body-md font-body font-medium hover:bg-brand-primary-hover transition-all shadow-sm"
           >
-            <Home size={18} />
-            Return Home
+            <Home size={16} />
+            Return to Dashboard
           </Link>
         </motion.div>
       </motion.div>

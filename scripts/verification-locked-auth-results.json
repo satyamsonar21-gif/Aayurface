@@ -1,0 +1,103 @@
+{
+  "timestamp": "2026-09-06T05:55:02.023Z",
+  "status": "PASS",
+  "summary": "12 / 12 tests passed",
+  "testResults": [
+    {
+      "id": "TEST-01",
+      "name": "Fresh Unauthenticated Visitor -> / (Public Landing)",
+      "expected": "URL is http://localhost:5173/, Landing Page renders, session is null, hero CTAs present",
+      "actual": "URL=http://localhost:5173/, hasHeadline=true, hasSignIn=true, hasStartJourney=true, session=null",
+      "status": "PASS",
+      "details": "Headline: \"Ancient Wisdom.Modern Intelligence.\""
+    },
+    {
+      "id": "TEST-02",
+      "name": "Landing Page Hero CTA -> /signin Navigation",
+      "expected": "URL navigates to http://localhost:5173/signin, Sign In form rendered with \"Welcome Back\"",
+      "actual": "clickedHero=true, URL=http://localhost:5173/signin, heading=\"Welcome Back\", hasInputs=true",
+      "status": "PASS",
+      "details": "Hero CTA \"Start Your Journey\" successfully routed visitor to Sign In page"
+    },
+    {
+      "id": "TEST-03",
+      "name": "Unauthenticated Direct Access to /dashboard -> Protected Route Redirect",
+      "expected": "Direct URL entry to /dashboard redirects to http://localhost:5173/signin with session null",
+      "actual": "URL=http://localhost:5173/signin, session=null",
+      "status": "PASS",
+      "details": "ProtectedRoute cleanly intercepted unauthenticated entry and preserved zero session"
+    },
+    {
+      "id": "TEST-04",
+      "name": "Invalid Sign-In Submission -> Error Feedback",
+      "expected": "Displays error banner, preserves on /signin, no session created",
+      "actual": "URL=http://localhost:5173/signin, errorMsg=\"Invalid email or password. Please check your credentials.\", session=null",
+      "status": "PASS",
+      "details": "Invalid authentication rejected safely"
+    },
+    {
+      "id": "TEST-05",
+      "name": "Valid Authentication -> Authenticated User Dashboard (/dashboard)",
+      "expected": "Redirects to /dashboard with active session for Namrata Sen",
+      "actual": "URL=http://localhost:5173/dashboard, userEmail=namrata.sen@example.com, userName=Namrata Sen, UI Has Name=true",
+      "status": "PASS",
+      "details": "User successfully authenticated and entered personal perspective dashboard"
+    },
+    {
+      "id": "TEST-06",
+      "name": "Authenticated Feature Navigation (/scan and /profile)",
+      "expected": "Authenticated user can access /scan and /profile with personal profile data rendered",
+      "actual": "scanUrl=http://localhost:5173/scan, profileUrl=http://localhost:5173/profile, profileUser=Namrata Sen (namrata.sen@example.com)",
+      "status": "PASS",
+      "details": "Protected modules accessible under authenticated context"
+    },
+    {
+      "id": "TEST-07",
+      "name": "Session Persistence Across Page Reload",
+      "expected": "Active session persists on page reload and remains on /dashboard",
+      "actual": "URL=http://localhost:5173/dashboard, sessionEmail=namrata.sen@example.com",
+      "status": "PASS",
+      "details": "Session state retained cleanly without re-prompting"
+    },
+    {
+      "id": "TEST-08",
+      "name": "Sign Out of Account -> Clears Session & Returns to / (Public Landing)",
+      "expected": "Redirects to http://localhost:5173/ and clears localStorage session completely",
+      "actual": "clickedBtn=true, URL=http://localhost:5173/, session=null",
+      "status": "PASS",
+      "details": "Sign out cleanly purged session and navigated user back to public landing page"
+    },
+    {
+      "id": "TEST-09",
+      "name": "Post-Logout Re-entry Blocked Across All Routes & Browser Back Protected",
+      "expected": "All 10 protected routes redirect to /signin; Browser back cannot access protected views",
+      "actual": "failedRoutes=[], backUrl=http://localhost:5173/signin, backSession=null",
+      "status": "PASS",
+      "details": "Protected routes and back navigation strictly guarded post-logout"
+    },
+    {
+      "id": "TEST-10",
+      "name": "New User Registration -> Direct /dashboard Entry & Session Creation",
+      "expected": "Registration redirects directly to /dashboard with Account B active session",
+      "actual": "URL=http://localhost:5173/dashboard, sessionUser=Bhavna Patel, sessionEmail=bhavna.patel.1788674081336@example.com",
+      "status": "PASS",
+      "details": "Registration directly establishes authenticated context and routes to dashboard"
+    },
+    {
+      "id": "TEST-11",
+      "name": "Multi-User Assessment Lifecycle Non-Regression & Isolation",
+      "expected": "Assessment A != Assessment B, cross-account access blocked, history isolated, demo-scan isolated",
+      "actual": "idA=3cd993b9-de5f-4e56-b5bb-b8848f2e3713, idB=103f97eb-0ae9-4bfa-aa5d-ce2592cd3643, crossAccessBlocked=true, historyIsolated=true, demoIsolated=true",
+      "status": "PASS",
+      "details": "Account A ID: 3cd993b9-de5f-4e56-b5bb-b8848f2e3713, Account B ID: 103f97eb-0ae9-4bfa-aa5d-ce2592cd3643"
+    },
+    {
+      "id": "TEST-12",
+      "name": "Final Sign Out -> Clears Session & Returns to / (Public Landing)",
+      "expected": "Final URL is http://localhost:5173/, session is completely null",
+      "actual": "URL=http://localhost:5173/, session=null",
+      "status": "PASS",
+      "details": "Final state verified: anonymous public visitor on landing page"
+    }
+  ]
+}

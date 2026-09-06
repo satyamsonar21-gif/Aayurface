@@ -1,0 +1,49 @@
+flowchart TD
+    User["User Client (SPA)"] -->|POST /api/v1/analysis/orchestrate| EdgeAPI["Edge Function API Gateway"]
+    
+    subgraph JobOrchestration["Analysis Ingestion & Job Creation"]
+        EdgeAPI --> VerifyAuth["Verify RS256 JWT & Extract auth.uid()"]
+        VerifyAuth --> CheckRateLimit{"Proposed Rate Limit:\n(<= 5/user/hour)"}
+        CheckRateLimit -->|Exceeded| Return429["Return HTTP 429 Too Many Requests"]
+        CheckRateLimit -->|Pass| CreateJob["INSERT INTO analysis_jobs\n(status: 'QUEUED', idempotency_key)"]
+    end
+
+    subgraph FeatureAggregation["Multi-Source Data Fetching"]
+        CreateJob --> FetchVisual["Fetch & Extract VisualObservations\n(from S3 capture object)"]
+        CreateJob --> FetchQuiz["Fetch Latest questionnaire_responses\n(Vata/Pitta/Kapha answers)"]
+        CreateJob --> FetchLifestyle["Fetch Latest lifestyle_contexts\n(Sleep, diet, climate, stress)"]
+    end
+
+    subgraph MultimodalEngine["Multimodal Fusion & Gating"]
+        FetchVisual --> Fusion["Execute Multimodal Fusion Engine:\nCompute Fused Tendencies & Agreement A"]
+        FetchQuiz --> Fusion
+        FetchLifestyle --> Fusion
+        Fusion --> CalibrateConfidence["Calculate Calibrated Confidence C\n(Caps at <60% if Agreement < 0.60)\n(Hypothesis Configuration)"]
+    end
+
+    subgraph RAGKnowledge["Classical Knowledge Retrieval"]
+        Fusion --> EmbedQuery["Vectorize Dominant Imbalance Vector"]
+        EmbedQuery --> CosineSearch["pgvector Cosine Search in knowledge_chunks\nSELECT ... ORDER BY embedding <=> query LIMIT 5"]
+        CosineSearch --> SimilarityGate{"Hypothesis Safety Gate:\nCosine Sim >= 0.75\nAND Matches >= 2?\n(Requires Validation)"}
+        SimilarityGate -->|Pass| ValidVerses["Attach Grounded Verses to Prompt"]
+        SimilarityGate -->|Fail| SafeFallback["Trigger Non-Herb Lifestyle Guidance"]
+    end
+
+    subgraph AISynthesis["Constrained Foundation Inference"]
+        ValidVerses --> FencedPrompt["Construct Delimited Prompt\n<user_input>...</user_input>\n<classical_context>..."]
+        SafeFallback --> FencedPrompt
+        FencedPrompt --> GPT4o["OpenAI GPT-4o API (JSON Mode)"]
+        GPT4o --> ZodValidation["Parse & Validate Output against Zod Schema\nScan for Prohibited Diagnostic Terms"]
+    end
+
+    subgraph TransactionalPersistence["TARGET: ACID Atomic Database Persistence (Requires Implementation)"]
+        ZodValidation --> DBTx["BEGIN TRANSACTION"]
+        DBTx --> InsertScan["INSERT INTO scan_results\n(dominant_dosha, confidence, versions)"]
+        DBTx --> InsertObs["INSERT INTO visual_observations"]
+        DBTx --> InsertFusion["INSERT INTO multimodal_fusions"]
+        DBTx --> InsertRecs["INSERT INTO recommendation_items\n(ritual instructions, grounded citations)"]
+        DBTx --> UpdateJob["UPDATE analysis_jobs SET status = 'COMPLETED'"]
+        UpdateJob --> CommitTx["COMMIT TRANSACTION"]
+    end
+
+    CommitTx --> ReturnResult["Return HTTP 200 OK with Verified Analysis Snapshot"]

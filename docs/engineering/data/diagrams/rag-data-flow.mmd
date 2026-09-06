@@ -1,0 +1,25 @@
+flowchart TD
+    subgraph IngestionPipeline["1. Knowledge Ingestion & Expert Curation"]
+        RawTexts["Classical Ayurvedic Compendiums\n(Charaka, Sushruta, Ashtanga Hridaya, Bhavaprakasha)"] --> DocumentParse["Partition into Sections & Adhyayas\n(knowledge_documents table)"]
+        DocumentParse --> Chunking["Chunking Engine:\n400-600 tokens per chunk\nPreserve Sanskrit shloka + verified translation\n(knowledge_chunks table)"]
+        Chunking --> ExpertReview["Ayurvedic Domain Expert Review:\nVerify botanical safety, dosage, contraindications"]
+        ExpertReview --> AdminApproval["Cryptographic Admin Sign-Off\n(status: 'ACTIVE', version: 'v1.2.0')"]
+        AdminApproval --> GenerateEmbed["Generate Vector Embeddings\n(OpenAI text-embedding-3-small, 1536 dims)"]
+        GenerateEmbed --> StoreVector[("PostgreSQL pgvector Store\nHNSW Index on embedding <=> cosine distance")]
+    end
+
+    subgraph RuntimeRetrieval["2. Grounded Runtime Retrieval Flow"]
+        UserQuery["Analysis Runtime Imbalance\n(e.g., Pitta Warmth + Sensitive Erythema)"] --> VectorizeRuntime["Vectorize Query with text-embedding-3-small"]
+        VectorizeRuntime --> HNSWQuery["Execute Cosine Nearest Neighbor Search:\nSELECT id, source_work, content_english,\n       1 - (embedding <=> query_vector) AS similarity\nFROM knowledge_chunks\nWHERE status = 'ACTIVE'\nORDER BY embedding <=> query_vector LIMIT 5;"]
+        StoreVector --> HNSWQuery
+        HNSWQuery --> ThresholdGate{"Hypothesis Safety Gate:\nCosine Sim >= 0.75\nAND Matches >= 2?\n(Requires Empirical Calibration)"}
+        
+        ThresholdGate -->|No: Low Grounding| SafeFallback["Trigger Safe Fallback:\nSuppress generative herbal formulations;\nServe verified standard lifestyle guidelines"]
+        ThresholdGate -->|Yes: Grounded Hits| ValidatedVerses["Attach Verified Verses to Prompt Payload\n<classical_context>...</classical_context>"]
+    end
+
+    subgraph PromptGrounding["3. LLM Reasoning & Citation Traceability"]
+        ValidatedVerses --> LLM["Constrained Foundation Model (GPT-4o)"]
+        LLM --> OutputValidation["Validate Output Citations against Retrieved Chunk IDs\n(Zero Tolerance for Fabricated Shlokas)"]
+        OutputValidation --> PersistRecs["INSERT INTO recommendation_items\n(Bound to specific knowledge_chunk_id foreign key)"]
+    end

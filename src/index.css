@@ -1,69 +1,134 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Manrope:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 /* ============================================================
-   Aayurface Design Tokens — Tailwind v4 Theme
+   AayurFace Design System — Phase 06 Approved Tokens
+   Tailwind CSS v4 @theme Configuration
+   
+   Aesthetic Ratio: LUXURY 50% / AYURVEDA 30% / EDITORIAL TECH 20%
+   Theme: Light-Only (No Dark Mode)
    ============================================================ */
 
 @theme {
-  /* Colors */
-  --color-herbal: #4CAF50;
-  --color-herbal-light: #81C784;
-  --color-herbal-dark: #388E3C;
-  --color-sandalwood: #F5E6CC;
-  --color-sandalwood-dark: #E8D4B0;
-  --color-turmeric: #E6A817;
-  --color-turmeric-light: #F5C842;
-  --color-cream: #FAF9F6;
-  --color-cream-card: #FFFFFF;
-  --color-leaf-soft: #DDEEDB;
-  --color-leaf-medium: #B8DCBA;
-  --color-charcoal: #2E2E2E;
-  --color-charcoal-light: #5A5A5A;
-  --color-warmgray: #E8E0D5;
-  --color-warmgray-dark: #C8BDB0;
-  --color-amber-soft: #FFF8E1;
-  --color-amber-border: rgba(230, 168, 23, 0.2);
+  /* --------------------------------------------------------
+     TYPOGRAPHY — Dual Font Family Strategy
+     -------------------------------------------------------- */
 
-  /* Font families */
-  --font-playfair: 'Playfair Display', serif;
-  --font-poppins: 'Poppins', sans-serif;
+  /* Editorial Display Serif — Headings, Heroes, Shlokas */
+  --font-display: 'Cormorant Garamond', Georgia, serif;
 
-  /* Font sizes */
-  --text-hero: 36px;
-  --text-hero--line-height: 1.2;
-  --text-hero--letter-spacing: 0.02em;
-  --text-title: 28px;
-  --text-title--line-height: 1.3;
-  --text-title--letter-spacing: 0.01em;
-  --text-subheading: 20px;
-  --text-subheading--line-height: 1.6;
-  --text-section: 18px;
-  --text-section--line-height: 1.6;
-  --text-body-md: 16px;
-  --text-body-md--line-height: 1.7;
-  --text-small: 14px;
-  --text-small--line-height: 1.6;
+  /* Modern Application Sans — Body, UI, Forms, Buttons */
+  --font-body: 'Manrope', system-ui, sans-serif;
+
+  /* --------------------------------------------------------
+     TYPE SCALE — Semantic Text Tokens
+     -------------------------------------------------------- */
+
+  --text-display-hero: 40px;
+  --text-display-hero--line-height: 1.15;
+  --text-display-hero--letter-spacing: -0.02em;
+
+  --text-heading-1: 32px;
+  --text-heading-1--line-height: 1.20;
+  --text-heading-1--letter-spacing: -0.01em;
+
+  --text-heading-2: 24px;
+  --text-heading-2--line-height: 1.30;
+
+  --text-heading-3: 18px;
+  --text-heading-3--line-height: 1.40;
+
+  --text-body-lg: 16px;
+  --text-body-lg--line-height: 1.60;
+
+  --text-body-md: 14px;
+  --text-body-md--line-height: 1.50;
+  --text-body-md--letter-spacing: 0.01em;
+
   --text-caption: 12px;
-  --text-caption--line-height: 1.5;
+  --text-caption--line-height: 1.40;
+  --text-caption--letter-spacing: 0.02em;
 
-  /* Border radius */
-  --radius-card: 16px;
-  --radius-button: 12px;
-  --radius-pill: 999px;
+  --text-label: 14px;
+  --text-label--line-height: 1.00;
+  --text-label--letter-spacing: 0.02em;
 
-  /* Shadows */
-  --shadow-card: 0 4px 20px rgba(76, 175, 80, 0.08);
-  --shadow-card-hover: 0 8px 32px rgba(76, 175, 80, 0.14);
-  --shadow-input: 0 2px 8px rgba(46, 46, 46, 0.06);
+  /* --------------------------------------------------------
+     COLORS — Core Brand & Surface Palette
+     -------------------------------------------------------- */
 
-  /* Animations */
-  --animate-fade-in: fade-in 0.3s ease-out;
-  --animate-slide-up: slide-up 0.4s ease-out;
-  --animate-breathe: breathe 3s ease-in-out infinite;
+  /* Backgrounds */
+  --color-background-primary: #FAF8F5;
+  --color-background-surface: #FFFFFF;
+  --color-background-subtle: #F3EFEA;
+
+  /* Brand */
+  --color-brand-primary: #1E3A2F;
+  --color-brand-primary-hover: #152B23;
+  --color-brand-secondary: #6B8E7D;
+  --color-brand-accent: #C5A059;
+  --color-brand-accent-subtle: rgba(197, 160, 89, 0.12);
+
+  /* Text */
+  --color-text-primary: #1A1F1C;
+  --color-text-secondary: #5C6660;
+  --color-text-tertiary: #8A948E;
+  --color-text-inverse: #FFFFFF;
+
+  /* Borders */
+  --color-border-default: #E6DFD5;
+  --color-border-subtle: #F0EBE4;
+  --color-border-focus: #1E3A2F;
+
+  /* Ayurvedic Dosha Palette (WCAG AA on #FFFFFF) */
+  --color-dosha-vata: #5B7B88;
+  --color-dosha-pitta: #C86D51;
+  --color-dosha-kapha: #5C7C5A;
+
+  /* Status / Feedback Colors */
+  --color-status-success: #2E7D32;
+  --color-status-warning: #D97706;
+  --color-status-error: #C62828;
+  --color-status-info: #1565C0;
+
+  /* Status Subtle Backgrounds */
+  --color-status-success-subtle: rgba(46, 125, 50, 0.08);
+  --color-status-warning-subtle: rgba(217, 119, 6, 0.08);
+  --color-status-error-subtle: rgba(198, 40, 40, 0.08);
+  --color-status-info-subtle: rgba(21, 101, 192, 0.08);
+
+  /* --------------------------------------------------------
+     SPACING — 4px / 8px Base Grid (Tailwind v4 Multiplier)
+     -------------------------------------------------------- */
+
+  --spacing: 0.25rem;
+
+  /* --------------------------------------------------------
+     BORDER RADIUS — Restrained Luxury
+     -------------------------------------------------------- */
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 9999px;
+
+  /* --------------------------------------------------------
+     ELEVATION — Soft Natural Diffusion Shadows
+     -------------------------------------------------------- */
+
+  --shadow-sm: 0 1px 3px rgba(30, 58, 47, 0.04);
+  --shadow-md: 0 4px 16px rgba(30, 58, 47, 0.06);
+  --shadow-lg: 0 8px 30px rgba(30, 58, 47, 0.08);
+  --shadow-focus: 0 0 0 3px rgba(30, 58, 47, 0.25);
+
+  /* --------------------------------------------------------
+     MOTION — Serene & Intentional Animations
+     -------------------------------------------------------- */
+
+  --animate-fade-in: fade-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-up: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-breathe: breathe 3.5s ease-in-out infinite;
   --animate-shimmer: shimmer 1.5s linear infinite;
-  --animate-float: float-anim 6s ease-in-out infinite;
-  --animate-typing: typing-dot 1.4s ease-in-out infinite;
   --animate-spin-slow: spin 3s linear infinite;
 
   @keyframes fade-in {
@@ -72,53 +137,41 @@
   }
 
   @keyframes slide-up {
-    0% { opacity: 0; transform: translateY(20px); }
+    0% { opacity: 0; transform: translateY(16px); }
     100% { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes breathe {
     0%, 100% { transform: scale(1); opacity: 0.8; }
-    50% { transform: scale(1.05); opacity: 1; }
+    50% { transform: scale(1.04); opacity: 1; }
   }
 
   @keyframes shimmer {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
   }
+}
 
-  @keyframes float-anim {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-12px); }
+@layer base {
+  :root {
+    --spacing: 0.25rem;
   }
 
-  @keyframes typing-dot {
-    0%, 100% { transform: scale(1); opacity: 0.4; }
-    50% { transform: scale(1.3); opacity: 1; }
+  body {
+    font-family: var(--font-body);
+    background-color: var(--color-background-primary);
+    color: var(--color-text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+    line-height: 1.6;
+    font-size: 16px;
   }
-}
 
-/* ============================================================
-   Base Styles
-   ============================================================ */
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: var(--font-poppins);
-  background-color: var(--color-cream);
-  color: var(--color-charcoal);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  scroll-behavior: smooth;
-  line-height: 1.6;
-}
-
-h1, h2, h3, h4 {
-  font-family: var(--font-playfair);
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    color: var(--color-text-primary);
+  }
 }
 
 /* ============================================================
@@ -128,9 +181,9 @@ h1, h2, h3, h4 {
 .shimmer-bg {
   background: linear-gradient(
     90deg,
-    #F5E6CC 25%,
-    #FAF9F6 50%,
-    #F5E6CC 75%
+    var(--color-background-subtle) 25%,
+    var(--color-background-primary) 50%,
+    var(--color-background-subtle) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s linear infinite;
@@ -159,23 +212,40 @@ h1, h2, h3, h4 {
   overflow: hidden;
 }
 
-/* Focus styles for accessibility */
+/* ============================================================
+   Accessibility — Focus & Reduced Motion
+   ============================================================ */
+
 *:focus-visible {
-  outline: 2px solid var(--color-herbal);
+  outline: 2px solid var(--color-border-focus);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
-/* Custom scrollbar for desktop */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   Custom Scrollbar — Desktop Only
+   ============================================================ */
+
 @media (min-width: 1024px) {
   ::-webkit-scrollbar {
     width: 8px;
   }
   ::-webkit-scrollbar-track {
-    background: var(--color-cream);
+    background: var(--color-background-primary);
   }
   ::-webkit-scrollbar-thumb {
-    background-color: var(--color-warmgray);
+    background-color: var(--color-border-default);
     border-radius: 4px;
   }
 }

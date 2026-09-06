@@ -1,0 +1,14 @@
+flowchart TD
+    A["Camera Permission Requested"] --> B{"Permission Granted?"}
+    B -- No --> C["Show Permission Denied Dialog + Upload Photo Fallback"]
+    B -- Yes --> D["Initialize 1080p Video Stream"]
+    D --> E["Offload Frame to MediaPipe Wasm Worker"]
+    E --> F{"Quality Checks Pass? (Lighting, Distance, Blur)"}
+    F -- No --> G["Display Live Guidance: 'Move closer', 'More light'"]
+    G --> E
+    F -- Yes --> H["Render Solid Green Guide Ring + 1.5s Countdown"]
+    H --> I["Capture High-Res Frame to Canvas"]
+    I --> J["Strip EXIF Metadata in Client Memory"]
+    J --> K["Request Signed S3 Upload URL (API-CAP-002)"]
+    K --> L["Direct Binary PUT to S3 Bucket"]
+    L --> M["Navigate to /analyze/processing?id=..."]

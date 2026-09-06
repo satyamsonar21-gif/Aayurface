@@ -1,0 +1,30 @@
+flowchart LR
+    subgraph RawEventSources["Raw Event Producers"]
+        AuthSvc["Auth Service Events"]
+        EdgeSvc["Edge Function API Events"]
+        DBSvc["PostgreSQL Audit Events"]
+        StorageSvc["S3 Access Events"]
+    end
+
+    subgraph RedactionPipeline["Automated Redaction & Filtering Engine"]
+        RawEvents["Raw Event Bus / JSON Stream"]
+        RegexScrubber["Regex Pattern Scrubber:\n• Base64 Image Strings (data:image/*)\n• Passwords & Hashes\n• Bearer Tokens & Refresh Tokens\n• Phone Numbers & Email Addresses"]
+        AllowlistFilter["Strict Allowlist Field Filter:\n(Timestamp, Correlation ID, Event Type, Tenant Hash)"]
+    end
+
+    subgraph StorageSinks["Segregated Storage & Alerting Sinks"]
+        SecuritySIEM[("Dedicated Security SIEM / Audit Store\n(WORM: Write Once, Read Many)")]
+        AppLogs[("Application Monitoring / APM\n(Zero PII / Zero Biometrics)")]
+        PagerAlerts["Critical Security Alerts\n(Slack / PagerDuty on P0 Events)"]
+    end
+
+    AuthSvc --> RawEvents
+    EdgeSvc --> RawEvents
+    DBSvc --> RawEvents
+    StorageSvc --> RawEvents
+
+    RawEvents --> RegexScrubber
+    RegexScrubber --> AllowlistFilter
+    AllowlistFilter --> SecuritySIEM
+    AllowlistFilter --> AppLogs
+    AllowlistFilter --> PagerAlerts

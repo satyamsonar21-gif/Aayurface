@@ -1,0 +1,7 @@
+flowchart TD
+    Err["Backend Exception / Client Validation Error"] --> Catch["Global Error Handling Middleware"]
+    Catch --> MapCode["Map to Domain Error Code (e.g., RATE_LIMIT_EXCEEDED)"]
+    MapCode --> Scrub["PII & Secret Scrubber (Remove SQL, Stacks, Keys)"]
+    Scrub --> Format["Construct RFC 7807 Standard Error Envelope"]
+    Format --> EmitLog["Emit Structured Audit Log with X-Request-ID"]
+    EmitLog --> Send["Send HTTP 4xx/5xx JSON Response to Client"]

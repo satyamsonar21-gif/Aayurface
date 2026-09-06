@@ -1,0 +1,15 @@
+sequenceDiagram
+    autonumber
+    actor Attacker as Malicious Caller (User A)
+    participant GW as Edge Gateway
+    participant DB as PostgreSQL (Kernel RLS)
+    participant Audit as Security Audit Log
+
+    Note over Attacker,GW: Attacker has JWT for User A, but requests User B's Scan
+    Attacker->>GW: GET /api/v1/analyses/scan_id_belonging_to_user_B
+    GW->>GW: Extract auth.uid() = "User-A"
+    GW->>DB: SELECT * FROM scan_results WHERE id = :scan_id AND user_id = 'User-A'
+    DB-->>GW: Zero Rows Returned (RLS Barrier)
+    GW->>Audit: INSERT INTO security_audit_events (RLS_SECURITY_VIOLATION)
+    GW-->>Attacker: 404 Not Found (RESOURCE_NOT_FOUND)
+    Note over Attacker,GW: 404 prevents resource ID enumeration; zero data leaked

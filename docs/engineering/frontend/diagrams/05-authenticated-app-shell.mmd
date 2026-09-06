@@ -1,0 +1,11 @@
+flowchart TD
+    subgraph AppShell["AppLayout (Persistent Shell)"]
+        TopBar["TopBar (Brand Logo, Language Selector, User Avatar Menu)"]
+        Sidebar["Desktop Left Sidebar (Navigation Items, Routine Quick-Link)"]
+        ContentArea["Dynamic Route Content Viewport (PageTransitions)"]
+        BottomNav["Mobile Bottom Navigation Bar (5 Core Touch Tabs)"]
+    end
+
+    Sidebar --> ContentArea
+    TopBar --> ContentArea
+    ContentArea --> BottomNav

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Logo from '../common/Logo';
@@ -23,7 +24,7 @@ const TopBar: React.FC<TopBarProps> = ({
   return (
     <header
       className={cn(
-        'h-14 flex items-center justify-between px-4 bg-white border-b border-warmgray sticky top-0 z-40',
+        'h-16 flex items-center justify-between px-4 sm:px-6 bg-background-surface/90 backdrop-blur-md border-b border-border-default sticky top-0 z-30 transition-all',
         className
       )}
     >
@@ -31,16 +32,20 @@ const TopBar: React.FC<TopBarProps> = ({
         {showBack && (
           <button
             onClick={onBack}
-            className="p-2 -ml-2 rounded-full hover:bg-warmgray transition-colors text-charcoal"
-            aria-label="Go back"
+            className="p-2 -ml-2 rounded-full hover:bg-background-subtle transition-colors text-text-secondary hover:text-text-primary min-w-[44px] min-h-[44px] flex items-center justify-center"
+            aria-label="Go back to previous screen"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
         )}
       </div>
 
-      <div className="flex-1 flex justify-center items-center font-playfair font-semibold text-lg text-charcoal">
-        {showLogo ? <Logo size="sm" /> : title}
+      <div className="flex-1 flex justify-center items-center font-display font-semibold text-lg sm:text-xl text-text-primary tracking-tight truncate px-2">
+        {showLogo ? (
+          <Link to="/" className="cursor-pointer" aria-label="AayurFace Home">
+            <Logo size="sm" />
+          </Link>
+        ) : title}
       </div>
 
       <div className="flex items-center justify-end min-w-[3rem]">

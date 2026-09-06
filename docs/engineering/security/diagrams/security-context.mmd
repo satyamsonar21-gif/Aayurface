@@ -1,0 +1,47 @@
+graph TD
+    subgraph UntrustedClientZone["Untrusted Client Zone (Browser / Device)"]
+        User["User Browser Session"]
+        DOM["DOM & React SPA Runtime"]
+        Camera["Camera Stream (WebRTC)"]
+        WasmGateway["MediaPipe FaceMesh (Wasm In-Memory)"]
+        User --> DOM
+        DOM --> Camera
+        Camera --> WasmGateway
+    end
+
+    subgraph PerimeterZone["Network & API Perimeter Zone"]
+        TLS["TLS 1.3 Termination (HTTPS)"]
+        WAF["Rate Limiter & Origin Shield"]
+        EdgeAuth["JWT Authentication Gateway (Deno)"]
+        TLS --> WAF
+        WAF --> EdgeAuth
+    end
+
+    subgraph ExecutionZone["Serverless Execution Zone (Edge Functions)"]
+        ZodValidator["Zod Input Sanitizer"]
+        DomainOrchestrator["Analysis Orchestration Engine"]
+        FeatureExtractor["Deterministic CV Feature Extractor"]
+        AIEngine["Constrained AI Reasoning Service"]
+        EdgeAuth --> ZodValidator
+        ZodValidator --> DomainOrchestrator
+        DomainOrchestrator --> FeatureExtractor
+        DomainOrchestrator --> AIEngine
+    end
+
+    subgraph IsolatedDataZone["Secure Isolated Data Zone"]
+        DB[("PostgreSQL 15+ Engine\nRow-Level Security Enforced")]
+        PgVector[("pgvector Classical Store\nRead-Only Knowledge")]
+        PrivateStorage[("Private S3 Bucket\nNo Public Reads / Signed URLs Only")]
+        DB --- PgVector
+    end
+
+    subgraph ThirdPartyZone["External Third-Party Enclave"]
+        OpenAI["OpenAI API (Zero Data Retention)"]
+    end
+
+    DOM -->|Signed PUT Upload| PrivateStorage
+    DOM -->|API Request with Bearer JWT| TLS
+    FeatureExtractor -->|Signed Read| PrivateStorage
+    DomainOrchestrator -->|SQL Query auth.uid()| DB
+    AIEngine -->|Constrained Prompt Payload| OpenAI
+    OpenAI -->|Validated JSON Schema| AIEngine

@@ -1,0 +1,40 @@
+flowchart LR
+    subgraph Identity["1. Identity & Compliance"]
+        A1["/auth/v1/*"]
+        A2["/api/v1/profile"]
+        A3["/api/v1/consents"]
+        A4["/api/v1/onboarding/*"]
+    end
+
+    subgraph Assessment["2. Assessment & Capture"]
+        B1["/api/v1/questionnaires/*"]
+        B2["/api/v1/lifestyle/*"]
+        B3["/api/v1/captures/*"]
+    end
+
+    subgraph Intelligence["3. Analysis & Intelligence"]
+        C1["POST /api/v1/analyses"]
+        C2["GET /api/v1/analyses/:id/status"]
+        C3["GET /api/v1/analyses/:id"]
+        C4["GET /api/v1/analyses/:id/explainability"]
+        C5["GET /api/v1/analyses/:id/recommendations"]
+    end
+
+    subgraph Engagement["4. Action & Collaboration"]
+        D1["/api/v1/routines/*"]
+        D2["/api/v1/history"]
+        D3["/api/v1/progress/*"]
+        D4["/api/v1/voice/*"]
+        D5["/api/v1/reports/*"]
+        D6["/api/v1/shares/*"]
+    end
+
+    subgraph Governance["5. Governance & Research"]
+        E1["/api/v1/admin/*"]
+        E2["/api/v1/research/*"]
+    end
+
+    Identity --> Assessment
+    Assessment --> Intelligence
+    Intelligence --> Engagement
+    Engagement -.-> Governance

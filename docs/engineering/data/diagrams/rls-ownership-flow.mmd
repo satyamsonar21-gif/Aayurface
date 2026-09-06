@@ -1,0 +1,31 @@
+sequenceDiagram
+    autonumber
+    actor Client as Authenticated Client (JWT)
+    participant EdgeGateway as Edge Function API
+    participant PostgresKernel as PostgreSQL 15+ Engine (Kernel)
+    participant UserOwnedTable as Table: scan_results
+
+    Note over Client,PostgresKernel: Target RLS Enforcement Protocol (Milestone 04)
+
+    Client->>EdgeGateway: GET /api/v1/analysis/3fa85f64-5717-4562-b3fc-2c963f66afa6
+    EdgeGateway->>EdgeGateway: Verify RS256 JWT Signature
+    EdgeGateway->>EdgeGateway: Extract auth.uid() = 'usr-tenant-123'
+    
+    EdgeGateway->>PostgresKernel: Establish Connection with JWT Context<br/>SET LOCAL request.jwt.claim.sub = 'usr-tenant-123'
+    EdgeGateway->>PostgresKernel: SELECT * FROM scan_results WHERE id = '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+
+    PostgresKernel->>PostgresKernel: Inspect Table RLS Status (ENABLE ROW LEVEL SECURITY)
+    PostgresKernel->>PostgresKernel: Evaluate Policy: "Users can view own scan results"<br/>Filter Expression: USING (auth.uid() = user_id)
+
+    alt Row user_id == 'usr-tenant-123' (Legitimate Owner)
+        PostgresKernel->>UserOwnedTable: Fetch Row
+        UserOwnedTable-->>PostgresKernel: Return Matching Tuple
+        PostgresKernel-->>EdgeGateway: Return 1 Row { id, dominant_dosha, ... }
+        EdgeGateway-->>Client: HTTP 200 OK
+    else Row user_id == 'usr-tenant-999' (Cross-Tenant BOLA Attempt)
+        PostgresKernel->>UserOwnedTable: Condition evaluates to FALSE
+        UserOwnedTable-->>PostgresKernel: 0 Rows Returned (Engine conceals existence)
+        PostgresKernel-->>EdgeGateway: Return 0 Rows (Empty Set)
+        EdgeGateway-->>Client: HTTP 404 Not Found (Anti-Enumeration Mask)
+        Note over EdgeGateway,Client: Zero information leakage; attacker cannot confirm UUID exists
+    end

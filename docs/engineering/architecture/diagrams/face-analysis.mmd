@@ -1,0 +1,38 @@
+flowchart TD
+    subgraph ClientGateway["Tier 1: Client Capture Quality Gateway (Browser WebAssembly)"]
+        Stream["Video Stream (WebRTC Canvas)"] --> Mesh["MediaPipe Face Mesh (468 3D Points)"]
+        Mesh --> C1{"Face Count = 1?"}
+        C1 -->|No| R1["Warning: No Face or Multiple Faces"]
+        C1 -->|Yes| C2{"Centering Offset <= 15%?"}
+        C2 -->|No| R2["Guide: Center Face in Oval"]
+        C2 -->|Yes| C3{"Inter-Pupil Scale OK?"}
+        C3 -->|No| R3["Guide: Move Closer / Farther"]
+        C3 -->|Yes| C4{"Luma 80 <= Y <= 220?"}
+        C4 -->|No| R4["Guide: Improve / Dim Lighting"]
+        C4 -->|Yes| C5{"Laplacian Var >= Threshold?"}
+        C5 -->|No| R5["Guide: Hold Still (Blur Detected)"]
+        C5 -->|Yes| C6{"Landmark Confidence >= 0.85?"}
+        C6 -->|No| R6["Guide: Remove Obstruction"]
+        C6 -->|Yes| Approved["GATEWAY APPROVED (Capture Button Enabled)"]
+    end
+
+    Approved -->|User Clicks Capture| Encrypt["Encrypt & Upload Single Frame via Signed URL"]
+
+    subgraph ServerExtraction["Tier 2: Server-Side Biometric Feature Extraction (Edge / Python Worker)"]
+        Encrypt --> S3["Private S3 Storage Bucket"]
+        S3 --> Download["Retrieve Frame via Short-Lived Signed GET"]
+        Download --> Preproc["Image Validation & ROI Segmentation"]
+        Preproc --> Redness["CIELAB a* Channel Mean (Micro-Vascular Redness Index)"]
+        Preproc --> Texture["GLCM Entropy & Contrast (Surface Texture Roughness)"]
+        Preproc --> Pigment["CIELAB L* StDev (Melanin Uniformity & Under-Eye Contrast)"]
+        Preproc --> Sebum["T-Zone Specular Reflectance (Sebum Indicator)"]
+        Preproc --> Morph["Facial Width-to-Height Ratio (Ayurvedic Morphology)"]
+
+        Redness --> Normalize["Assemble & Normalize VisualObservations Vector [0.0 - 1.0]"]
+        Texture --> Normalize
+        Pigment --> Normalize
+        Sebum --> Normalize
+        Morph --> Normalize
+    end
+
+    Normalize --> Fusion["Handoff to Multimodal Fusion Engine"]

@@ -1,0 +1,23 @@
+flowchart TD
+    subgraph IngestionProvenance["1. Admin Knowledge Ingestion & Validation"]
+        ClassicalSource["Authoritative Classical Texts\n(Charaka, Sushruta, Bhavaprakasha)"] --> ExpertVetting["Ayurvedic Domain Expert Review & Verification"]
+        ExpertVetting --> AdminSignoff["Cryptographic Signature & Version Assignment\n(status: 'VERIFIED', version: 'v1.2.0')"]
+        AdminSignoff --> ChunkAndEmbed["Chunk (400-600 tokens) & Embed\n(OpenAI text-embedding-3-small)"]
+        ChunkAndEmbed --> ReadOnlyStore[("PostgreSQL knowledge_chunks Table\nRead-Only for Application Roles")]
+    end
+
+    subgraph RuntimeRetrieval["2. Grounded Runtime Retrieval & Isolation"]
+        UserQuery["User Concern Query String"] --> QueryVectorize["Vectorize Runtime Query"]
+        QueryVectorize --> CosineSearch["Cosine Distance Search\nSELECT ... ORDER BY embedding <=> query LIMIT 5"]
+        ReadOnlyStore --> CosineSearch
+        
+        CosineSearch --> ThresholdGate{"Cosine Similarity >= 0.75\nAND Match Count >= 2?"}
+        
+        ThresholdGate -->|No: Low Similarity / Miss| SafeFallback["Enforce Safe Fallback Mode:\nDo NOT invoke generative herb synthesis;\nPresent general skin wellness guidelines"]
+        ThresholdGate -->|Yes: Grounded Hits| ValidatedChunks["Pass Top-K Verified Verses to Prompt Fencer"]
+    end
+
+    subgraph SecurityProtections["3. Security Guarantees"]
+        ValidatedChunks --> InjectionDefense["Strip Markdown/HTML Executables from Verses"]
+        InjectionDefense --> PromptInjector["Inject into System Prompt with Exact Verse Citations"]
+    end

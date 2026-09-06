@@ -1,0 +1,20 @@
+flowchart TD
+    ClientReq["Client Request Received\n(Endpoint, Path UUID, Bearer JWT)"] --> CheckJWT{"Valid JWT & Non-Expired?"}
+    
+    CheckJWT -->|No| Deny401["Return HTTP 401 Unauthorized\n(Terminate & Log Audit Event)"]
+    CheckJWT -->|Yes| ExtractUID["Extract Verified auth.uid() & Role"]
+    
+    ExtractUID --> CheckRBAC{"Route Accessible by Role?\n(anon, authenticated, admin)"}
+    CheckRBAC -->|No| Deny403["Return HTTP 403 Forbidden\n(Permission Denied)"]
+    
+    CheckRBAC -->|Yes| CheckTargetResource{"Is Resource User-Owned?\n(e.g., /analysis/{id})"}
+    
+    CheckTargetResource -->|No: Shared Public/Static| AllowExecution["Execute Endpoint Logic"]
+    CheckTargetResource -->|Yes: User Sensitive Asset| QueryOwnership["Query Resource Metadata in Database"]
+    
+    QueryOwnership --> EvaluateOwner{"resource.user_id == auth.uid()?"}
+    EvaluateOwner -->|No: Attempted IDOR| DenyIDOR["Return HTTP 404 Not Found\n(Mask Existence to Prevent Enumeration)"]
+    EvaluateOwner -->|Yes: Verified Owner| AllowExecution
+    
+    AllowExecution --> RLSGate["PostgreSQL RLS Execution Gate\n(Enforce WHERE user_id = auth.uid())"]
+    RLSGate --> SuccessReturn["Return HTTP 200 OK\n(Only Requested User's Records)"]

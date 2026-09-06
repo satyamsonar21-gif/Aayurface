@@ -11,27 +11,40 @@ const Logo: React.FC<LogoProps> = ({ size = 'md', variant = 'full', className })
   const sizeClasses = {
     sm: 'w-6 h-6',
     md: 'w-8 h-8',
-    lg: 'w-12 h-12',
+    lg: 'w-10 h-10',
   };
 
   const textClasses = {
-    sm: 'text-lg',
+    sm: 'text-xl',
     md: 'text-2xl',
-    lg: 'text-4xl',
+    lg: 'text-3xl sm:text-4xl',
   };
 
   return (
-    <div className={cn('flex items-center gap-2', className)}>
+    <div className={cn('flex items-center gap-2.5 select-none', className)}>
+      {/* Refined Ayurvedic Botanical Emblem */}
       <svg
-        className={cn('text-herbal', sizeClasses[size])}
-        viewBox="0 0 24 24"
-        fill="currentColor"
+        className={cn('text-brand-primary shrink-0 transition-transform duration-200 hover:scale-105', sizeClasses[size])}
+        viewBox="0 0 32 32"
+        fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM11 19.93C7.06 19.43 4 16.05 4 12C4 7.95 7.06 4.57 11 4.07V19.93ZM13 4.07C16.94 4.57 20 7.95 20 12C20 16.05 16.94 19.43 13 19.93V4.07Z" />
+        <circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="1.5" className="opacity-30" />
+        <path
+          d="M16 4C16 4 11 11 11 16.5C11 19.5 13.2 22 16 22C18.8 22 21 19.5 21 16.5C21 11 16 4 16 4Z"
+          fill="currentColor"
+          className="text-brand-primary"
+        />
+        <circle cx="16" cy="16.5" r="2" fill="#C5A059" />
+        <path
+          d="M8 20C10.5 23 13.5 24 16 24C18.5 24 21.5 23 24 20"
+          stroke="#C5A059"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
       </svg>
       {variant === 'full' && (
-        <span className={cn('font-playfair font-bold text-herbal', textClasses[size])}>
+        <span className={cn('font-display font-semibold tracking-tight text-brand-primary', textClasses[size])}>
           Aayurface
         </span>
       )}

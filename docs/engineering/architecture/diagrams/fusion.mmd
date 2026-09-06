@@ -1,0 +1,48 @@
+flowchart TD
+    subgraph Inputs["Multimodal Input Vectors (Normalized: Sum = 1.0)"]
+        V_vis["Visual Vector V_vis\n(Texture, Redness, Sebum)"]
+        V_quiz["Questionnaire Vector V_quiz\n(15-Q Tridosha Intake)"]
+        V_life["Lifestyle Vector V_life\n(Diet, Sleep, Stress, Climate)"]
+    end
+
+    subgraph FusionEngine["Configurable Multimodal Fusion Strategy (DEC-005)"]
+        Config["FusionConfiguration Registry\n(Prototyping Hypothesis: 40/35/25)"]
+        Combiner["Weighted Combination\nT_fused = w_v*V_vis + w_q*V_quiz + w_l*V_life"]
+        Normalized["Normalized Constitutional Tendencies\n[Vata%, Pitta%, Kapha%]"]
+    end
+
+    subgraph AgreementEngine["Inter-Modality Agreement & Conflict Analysis"]
+        Cosine["Pairwise Cosine Similarity Matrix\nS_vq, S_vl, S_ql"]
+        Harmonic["Harmonic Mean Agreement Index (A)"]
+        Gate{"Agreement Gate"}
+        High["HIGH_AGREEMENT\n(A >= 0.80) -> Jade Badge"]
+        Med["MODERATE_AGREEMENT\n(0.60 <= A < 0.80) -> Amber Badge"]
+        Low["LOW_AGREEMENT\n(A < 0.60) -> Amber Advisory + Retake"]
+    end
+
+    subgraph ConfidenceCalc["Calibrated Multi-Dimensional Confidence"]
+        Inputs_Q["Capture Quality (Q_cap)"]
+        Inputs_C["Input Completeness (C_input)"]
+        Formula["Confidence = Q_cap * C_input * A * 100%"]
+        Score["Calibrated Score (0 - 100%)"]
+    end
+
+    V_vis --> Combiner
+    V_quiz --> Combiner
+    V_life --> Combiner
+    Config --> Combiner
+    Combiner --> Normalized
+
+    V_vis --> Cosine
+    V_quiz --> Cosine
+    V_life --> Cosine
+    Cosine --> Harmonic
+    Harmonic --> Gate
+    Gate -->|>= 0.80| High
+    Gate -->|0.60 - 0.79| Med
+    Gate -->|< 0.60| Low
+
+    Harmonic --> Formula
+    Inputs_Q --> Formula
+    Inputs_C --> Formula
+    Formula --> Score

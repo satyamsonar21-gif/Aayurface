@@ -1,0 +1,37 @@
+flowchart LR
+    subgraph ClientEndpoints["API Endpoints (Phase 05 Contracts)"]
+        EP1["POST /api/v1/captures/upload-url"]
+        EP2["POST /api/v1/analysis/orchestrate"]
+        EP3["GET /api/v1/analysis/:id"]
+        EP4["PUT /api/v1/profile"]
+        EP5["DELETE /api/v1/profile/account"]
+    end
+
+    subgraph EdgeMiddleware["Edge Gateway Processing & Invariants"]
+        JWT["1. RS256 JWT Verification\n(Derive auth.uid())"]
+        Zod["2. Strict Zod Input Validation\n(Strip unwhitelisted keys)"]
+        Idem["3. Idempotency Key Gate\n(Cache response for 120s)"]
+        Rate["4. Rate Limiting Middleware\n(Proposed: 5 scans/user/hour)"]
+    end
+
+    subgraph DatabaseLayer["TARGET: PostgreSQL Relational Engine (Kernel RLS — Requires Implementation)"]
+        Tx["ACID Transaction Boundary\n(Isolation: READ COMMITTED)"]
+        RLS["Kernel Row-Level Security Check\n(USING auth.uid() = user_id)"]
+        Tables[("Target Relational Tables:\n• profiles\n• captures\n• analysis_jobs\n• scan_results\n• routines\n• consents")]
+        Audit[("security_audit_events\n(Target Immutable Vault — Requires Validation)")]
+    end
+
+    EP1 --> JWT
+    EP2 --> JWT
+    EP3 --> JWT
+    EP4 --> JWT
+    EP5 --> JWT
+
+    JWT --> Zod
+    Zod --> Idem
+    Idem --> Rate
+    Rate --> Tx
+
+    Tx --> RLS
+    RLS --> Tables
+    Tx -.->|Emit Audit Events| Audit

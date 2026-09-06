@@ -1,0 +1,43 @@
+flowchart TD
+    subgraph Routes["1. Routes & Layouts Layer"]
+        R["src/routes/"]
+        L["src/layouts/ (Public, Onboarding, App, Fullscreen)"]
+    end
+
+    subgraph Features["2. Domain Features Layer"]
+        F1["features/auth/"]
+        F2["features/onboarding/"]
+        F3["features/consent/"]
+        F4["features/capture/"]
+        F5["features/analysis/"]
+        F6["features/results/"]
+        F7["features/routine/"]
+        F8["features/history/"]
+        F9["features/progress/"]
+        F10["features/voice/"]
+        F11["features/reports/"]
+        F12["features/sharing/"]
+    end
+
+    subgraph UI["3. Reusable UI Components Layer"]
+        U1["components/ui/ (Button, Input, Card, Modal, Badge)"]
+        U2["components/feedback/ (Toast, Spinner, Skeleton)"]
+    end
+
+    subgraph Core["4. Core Services & State Layer"]
+        C1["api/ (HTTP Client, Interceptors)"]
+        C2["state/ (Zustand Stores)"]
+        C3["hooks/ (A11y, Media Queries)"]
+    end
+
+    subgraph Foundation["5. Shared Foundation Layer"]
+        T1["tokens/ (Colors, Spacing, Typography)"]
+        T2["types/ (DTOs, Contract Schemas)"]
+        T3["utils/ (Date, Formatting, Math)"]
+    end
+
+    Routes --> Features
+    Features --> UI
+    Features --> Core
+    UI --> Foundation
+    Core --> Foundation

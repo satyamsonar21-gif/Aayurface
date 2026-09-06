@@ -1,0 +1,27 @@
+flowchart TB
+    subgraph Browser["User Browser / Client Device"]
+        UI["React 19 SPA (Vite 8)"]
+        Wasm["MediaPipe Face Mesh Worker"]
+        Canvas["EXIF Stripping Canvas"]
+        Zustand["Zustand Client UI State"]
+        TanStack["TanStack Query v5 Server State"]
+    end
+
+    subgraph CDN["Static Edge CDN"]
+        Assets["Cloudflare Pages / Vercel (HTML, JS, CSS, Wasm)"]
+    end
+
+    subgraph Backend["AayurFace Backend (Phase 05 Boundary)"]
+        Gateway["Supabase Edge API Gateway (REST / HTTPS)"]
+        Auth["Supabase Auth (RS256 JWT)"]
+        S3["Private Biometric S3 Bucket"]
+    end
+
+    Assets --> Browser
+    UI <--> Wasm
+    UI <--> Canvas
+    UI <--> Zustand
+    UI <--> TanStack
+    TanStack -->|Bearer RS256 JWT| Gateway
+    UI -->|Direct Signed PUT (image/jpeg)| S3
+    UI -.->|Token Refresh / Logout| Auth

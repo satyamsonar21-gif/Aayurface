@@ -1,0 +1,67 @@
+flowchart TB
+    subgraph Clients["Clients Layer"]
+        SPA["React SPA (Web)"]
+        Mobile["Mobile Web App"]
+    end
+
+    subgraph Gateway["Edge API Gateway (Deno Runtime)"]
+        WAF["WAF & Rate Limiting"]
+        AuthZ["JWT Auth & Server-Derived Identity"]
+        ZodGate["Zod Input Validation Gate"]
+        IdemGate["Idempotency Cache"]
+    end
+
+    subgraph Services["Domain Services Layer"]
+        ProfSvc["Profile & Onboarding Service"]
+        ConsSvc["Consent & Compliance Ledger"]
+        CaptSvc["Capture & Quality Service"]
+        AnlSvc["Analysis Orchestration Service"]
+        RoutSvc["Dinacharya Routine Service"]
+        VoiceSvc["Conversational Guidance Service"]
+    end
+
+    subgraph Workers["Asynchronous AI Processing"]
+        Queue["PostgreSQL Job Queue (SKIP LOCKED)"]
+        Worker["AI Orchestration Worker"]
+        CV["Computer Vision Extractor"]
+        Fusion["Multimodal Fusion & Confidence"]
+        RAG["pgvector Semantic Retrieval"]
+        Safety["AI Output & Safety Gate"]
+    end
+
+    subgraph Storage["Persistence & External Services"]
+        PG[("PostgreSQL 15/16 (Kernel RLS)")]
+        S3[("Private S3 (AES-256 KMS)")]
+        OpenAI["OpenAI GPT-4o API"]
+        SupabaseAuth["Supabase Auth (Delegated)"]
+    end
+
+    SPA -->|HTTPS / Bearer JWT| WAF
+    Mobile -->|HTTPS / Bearer JWT| WAF
+    WAF --> AuthZ
+    AuthZ --> ZodGate
+    ZodGate --> IdemGate
+    IdemGate --> ProfSvc
+    IdemGate --> ConsSvc
+    IdemGate --> CaptSvc
+    IdemGate --> AnlSvc
+    IdemGate --> RoutSvc
+    IdemGate --> VoiceSvc
+
+    ProfSvc --> PG
+    ConsSvc --> PG
+    CaptSvc --> PG
+    CaptSvc --> S3
+    RoutSvc --> PG
+    VoiceSvc --> OpenAI
+    VoiceSvc --> PG
+
+    AnlSvc -->|202 Accepted Insert| Queue
+    Queue --> Worker
+    Worker --> CV
+    Worker --> Fusion
+    Worker --> RAG
+    Worker --> OpenAI
+    Worker --> Safety
+    Safety --> PG
+    AuthZ -.-> SupabaseAuth

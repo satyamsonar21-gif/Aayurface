@@ -1,0 +1,157 @@
+erDiagram
+    auth_users ||--|| profiles : "has"
+    profiles ||--|| user_preferences : "configures"
+    profiles ||--o{ consents : "records"
+    profiles ||--o{ questionnaire_responses : "submits"
+    profiles ||--o{ lifestyle_contexts : "logs"
+    profiles ||--o{ captures : "uploads"
+    profiles ||--o{ analysis_jobs : "triggers"
+    profiles ||--o{ scan_results : "owns"
+    profiles ||--o{ routines : "follows"
+    profiles ||--o{ progress_checkpoints : "tracks"
+    profiles ||--o{ shared_reports : "creates"
+
+    captures ||--|| capture_quality_metrics : "measured_by"
+    captures ||--o| scan_results : "provides_visual_evidence"
+    
+    questionnaire_responses ||--o| scan_results : "provides_quiz_vector"
+    lifestyle_contexts ||--o| scan_results : "provides_lifestyle_vector"
+    
+    analysis_jobs ||--o| scan_results : "yields"
+    
+    scan_results ||--|| visual_observations : "contains_cv_vector"
+    scan_results ||--|| multimodal_fusions : "derived_from"
+    scan_results ||--o{ recommendation_items : "generates"
+    
+    fusion_configurations ||--o{ multimodal_fusions : "governed_by"
+    
+    routines ||--o{ routine_items : "contains"
+    routines ||--o{ routine_tracking : "adherence_logged_in"
+    
+    knowledge_sources ||--o{ knowledge_documents : "includes"
+    knowledge_documents ||--o{ knowledge_chunks : "partitioned_into"
+    knowledge_chunks ||--o{ recommendation_items : "grounds_herb"
+
+    research_subjects ||--o{ expert_annotations : "reviewed_by"
+    research_subjects ||--|| consensus_labels : "adjudicated_to"
+
+    profiles ||--o| research_subjects : "anonymized_from"
+
+    profiles {
+        uuid id PK
+        varchar email
+        varchar full_name
+        varchar age_bracket
+        varchar gender
+        varchar role
+        boolean is_verified
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    consents {
+        uuid id PK
+        uuid user_id FK
+        varchar scope
+        varchar policy_version
+        varchar status
+        varchar client_metadata_hash
+        timestamptz granted_at
+        timestamptz revoked_at
+    }
+
+    captures {
+        uuid id PK
+        uuid user_id FK
+        varchar storage_path
+        varchar mime_type
+        int file_size_bytes
+        varchar checksum_sha256
+        varchar retention_state
+        timestamptz captured_at
+        timestamptz purged_at
+    }
+
+    scan_results {
+        uuid id PK
+        uuid user_id FK
+        uuid capture_id FK
+        uuid job_id FK
+        varchar dominant_dosha
+        varchar agreement_state
+        float calibrated_confidence
+        boolean is_degraded
+        varchar cv_version
+        varchar prompt_version
+        varchar knowledge_version
+        varchar schema_version
+        timestamptz created_at
+    }
+
+    visual_observations {
+        uuid id PK
+        uuid scan_id FK
+        float luma_mean
+        float cielab_a_mean
+        float cielab_b_mean
+        float glcm_contrast
+        float glcm_homogeneity
+        float melanin_index
+        float erythema_index
+        jsonb regional_features
+        timestamptz created_at
+    }
+
+    multimodal_fusions {
+        uuid id PK
+        uuid scan_id FK
+        uuid configuration_id FK
+        float visual_vata
+        float visual_pitta
+        float visual_kapha
+        float quiz_vata
+        float quiz_pitta
+        float quiz_kapha
+        float lifestyle_vata
+        float lifestyle_pitta
+        float lifestyle_kapha
+        float fused_vata
+        float fused_pitta
+        float fused_kapha
+        float agreement_index
+        timestamptz created_at
+    }
+
+    knowledge_chunks {
+        uuid id PK
+        uuid document_id FK
+        varchar source_work
+        varchar section_reference
+        text content_sanskrit
+        text content_english
+        text content_hindi
+        int token_count
+        varchar status
+        timestamptz approved_at
+    }
+
+    routines {
+        uuid id PK
+        uuid user_id FK
+        uuid scan_id FK
+        varchar title
+        varchar target_dosha
+        boolean is_active
+        timestamptz created_at
+    }
+
+    shared_reports {
+        uuid id PK
+        uuid user_id FK
+        uuid scan_id FK
+        varchar token_hash
+        timestamptz expires_at
+        boolean is_revoked
+        int view_count
+        timestamptz created_at
+    }

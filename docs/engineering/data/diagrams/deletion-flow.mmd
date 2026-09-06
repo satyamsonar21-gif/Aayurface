@@ -1,0 +1,22 @@
+flowchart TD
+    User["User Client (SPA)"] -->|DELETE /api/v1/profile/account| EdgeAPI["Edge Function API Gateway"]
+    
+    subgraph PreFlightGate["1. Authentication & State Invalidation"]
+        EdgeAPI --> VerifyReAuth["Challenge Re-Authentication (Password / OAuth)"]
+        VerifyReAuth --> MarkPending["UPDATE profiles SET status = 'PENDING_DELETION'\nRevoke all active JWTs & refresh tokens"]
+        MarkPending --> EnqueueTask["Enqueue Idempotent Deletion Job\n(Payload: userId, timestamp)"]
+    end
+
+    subgraph PurgeSubsystem["2. Asynchronous Multi-Storage Hard Purge Worker"]
+        EnqueueTask --> S3ObjectPurge["Step 2A: S3 Hard Object Deletion\n• List & Delete facial-captures/{userId}/*\n• List & Delete reports/{userId}/*"]
+        S3ObjectPurge --> SQLCascade["Step 2B: Database Kernel Cascading Purge\nDELETE FROM auth.users WHERE id = :userId;\n(Cascades via ON DELETE CASCADE to:\n profiles, consents, questionnaire_responses,\n lifestyle_contexts, captures, scan_results,\n routines, routine_tracking, shared_reports)"]
+        SQLCascade --> CacheEviction["Step 2C: Distributed Edge Cache Invalidation\nPurge session keys & rate-limiting states"]
+    end
+
+    subgraph VerificationAudit["3. Forensic Verification & Tombstoning"]
+        CacheEviction --> VerifyZero["Assert Zero Rows in DB & Zero Objects in S3"]
+        VerifyZero -->|Success| WriteTombstone["INSERT INTO deletion_tombstones\n{ tenant_hash: SHA-256(userId),\n  purged_at: NOW(),\n  compliance_authority: 'DPDP_GDPR_ERASURE' }"]
+        VerifyZero -->|Failure| RetryWithBackoff["Retry Task with Exponential Backoff\nTrigger High-Priority SRE Alert"]
+    end
+
+    WriteTombstone --> Complete([Account Lifespan Permanently Obliterated])

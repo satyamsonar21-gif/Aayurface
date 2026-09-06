@@ -1,0 +1,7 @@
+flowchart TD
+    Err["HTTP Error / Runtime Exception"] --> Gate{"Error Type?"}
+    Gate -- "401 Unauthorized" --> R1["Toast: 'Session Expired' -> Redirect /login"]
+    Gate -- "403 Consent Required" --> R2["Modal: 'Biometric Consent Required'"]
+    Gate -- "404 Not Found" --> R3["Render Full-Page 404 with Return CTA"]
+    Gate -- "429 Rate Limit" --> R4["Modal: '5 Scans/Hour Limit Reached' + Timer"]
+    Gate -- "500 / Network Error" --> R5["ErrorBoundary: 'Wellness server issue' + Retry"]

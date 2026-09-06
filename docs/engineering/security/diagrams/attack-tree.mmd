@@ -1,0 +1,32 @@
+flowchart TD
+    Root["AayurFace Multi-Vector Attack Surface"]
+
+    Root --> AttackA["Attack A: Steal Another User's Facial Image"]
+    AttackA --> A1["Guess S3 Object Key\n(Mitigation: UUIDv4 + Private Bucket)"]
+    AttackA --> A2["Access Public S3 URL\n(Mitigation: Zero Public Reads / 403 Forbidden)"]
+    AttackA --> A3["Forge Signed URL\n(Mitigation: HMAC-SHA256 Signature with Secret)"]
+    AttackA --> A4["BOLA via Upload Endpoint\n(Mitigation: Path Isolation `{userId}/*` enforced by JWT)"]
+
+    Root --> AttackB["Attack B: Access Another User's Analysis (BOLA/IDOR)"]
+    AttackB --> B1["Alter UUID in GET /analysis/{id}\n(Mitigation: PostgreSQL RLS auth.uid() = user_id)"]
+    AttackB --> B2["Pass spoofed userId in Request Body\n(Mitigation: Derive Identity Exclusively from JWT)"]
+
+    Root --> AttackC["Attack C: Escalate User Privileges to Admin"]
+    AttackC --> C1["Mass Assignment in User Profile\n(Mitigation: Zod Schema Disallows Role Updates)"]
+    AttackC --> C2["Tamper with Client JWT Role Claim\n(Mitigation: Asymmetric RS256 Signature Verification)"]
+
+    Root --> AttackD["Attack D: Poison RAG Classical Knowledge"]
+    AttackD --> D1["Submit Injected Verse via Consumer Chat\n(Mitigation: RAG queries read-only knowledge_chunks)"]
+    AttackD --> D2["Compromise Admin Ingestion Portal\n(Mitigation: Domain Expert Review + Cryptographic Sign-off)"]
+
+    Root --> AttackE["Attack E: Manipulate AI into Unsafe Recommendations"]
+    AttackE --> E1["Prompt Injection in Skin Concerns Input\n(Mitigation: XML/Markdown Delimiter Fencing)"]
+    AttackE --> E2["Jailbreak to bypass Non-Diagnostic Rules\n(Mitigation: Post-Inference Zod Schema & Safety Filter)"]
+
+    Root --> AttackF["Attack F: Exfiltrate Server Secrets"]
+    AttackF --> F1["Extract from Client JS Bundle\n(Mitigation: Zero Server Secrets in Vite Build)"]
+    AttackF --> F2["Read Secrets from Edge Function Logs\n(Mitigation: Automated Regex Redaction in Logger)"]
+
+    Root --> AttackG["Attack G: Abuse Share & PDF Links"]
+    AttackG --> G1["Brute-force Guess Share Token\n(Mitigation: 256-bit Cryptographic Entropy Token)"]
+    AttackG --> G2["Access Expired Share Link\n(Mitigation: Strict Expiration Timestamp Enforcement)"]

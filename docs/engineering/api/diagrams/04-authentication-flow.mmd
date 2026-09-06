@@ -1,0 +1,18 @@
+sequenceDiagram
+    autonumber
+    actor User as User Browser
+    participant SupaAuth as Supabase Auth Service
+    participant EdgeGW as Edge API Gateway
+    participant DB as PostgreSQL Database
+
+    User->>SupaAuth: POST /auth/v1/signup (email, password)
+    SupaAuth->>DB: INSERT INTO auth.users (Argon2 Hash)
+    DB->>DB: Trigger `on_auth_user_created`
+    DB->>DB: INSERT INTO profiles (id, full_name, language)
+    SupaAuth-->>User: 200 OK (RS256 Access Token + Refresh Token)
+
+    User->>EdgeGW: GET /api/v1/profile (Bearer <access_token>)
+    EdgeGW->>EdgeGW: Verify JWT Signature (sub = auth.uid())
+    EdgeGW->>DB: SELECT * FROM profiles WHERE id = auth.uid()
+    DB-->>EdgeGW: Profile Row
+    EdgeGW-->>User: 200 OK ({ data: profile })

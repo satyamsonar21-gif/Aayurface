@@ -1,0 +1,16 @@
+sequenceDiagram
+    autonumber
+    actor UI as UI Component
+    participant Hook as useQuery / useMutation
+    participant Client as API Client (Fetch Wrapper)
+    participant Auth as Supabase Auth Session
+    participant Gateway as Phase 05 Edge Gateway
+
+    UI->>Hook: Trigger query/mutation
+    Hook->>Client: Call typed endpoint function
+    Client->>Auth: Retrieve active RS256 JWT
+    Auth-->>Client: Return `access_token`
+    Client->>Gateway: HTTPS Request + `Authorization: Bearer <jwt>`
+    Gateway-->>Client: HTTP 200/201/202 JSON Envelope
+    Client-->>Hook: Return `data` payload
+    Hook-->>UI: Re-render with fresh server state

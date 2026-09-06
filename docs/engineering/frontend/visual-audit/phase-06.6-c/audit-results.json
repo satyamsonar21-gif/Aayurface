@@ -1,0 +1,134 @@
+{
+  "timestamp": "2026-09-04T09:55:30.857Z",
+  "publicLandingTested": true,
+  "entryCtaVerified": true,
+  "dashboardEnteredWithoutLoginWall": true,
+  "twoWayNavigationVerified": true,
+  "sidebarStateVerified": true,
+  "mobileDrawerVerified": true,
+  "refreshPersistence": {
+    "/dashboard": {
+      "status": "PASSED",
+      "httpStatus": 304,
+      "finalUrl": "http://localhost:5173/dashboard"
+    },
+    "/scan": {
+      "status": "PASSED",
+      "httpStatus": 304,
+      "finalUrl": "http://localhost:5173/scan"
+    },
+    "/chat": {
+      "status": "PASSED",
+      "httpStatus": 304,
+      "finalUrl": "http://localhost:5173/chat"
+    },
+    "/history": {
+      "status": "PASSED",
+      "httpStatus": 304,
+      "finalUrl": "http://localhost:5173/history"
+    },
+    "/remedies": {
+      "status": "PASSED",
+      "httpStatus": 304,
+      "finalUrl": "http://localhost:5173/remedies"
+    },
+    "/routine": {
+      "status": "PASSED",
+      "httpStatus": 304,
+      "finalUrl": "http://localhost:5173/routine"
+    },
+    "/progress": {
+      "status": "PASSED",
+      "httpStatus": 304,
+      "finalUrl": "http://localhost:5173/progress"
+    },
+    "/profile": {
+      "status": "PASSED",
+      "httpStatus": 304,
+      "finalUrl": "http://localhost:5173/profile"
+    },
+    "/settings": {
+      "status": "PASSED",
+      "httpStatus": 304,
+      "finalUrl": "http://localhost:5173/settings"
+    }
+  },
+  "browserHistoryTraversal": true,
+  "routesVerified": [
+    {
+      "path": "/dashboard",
+      "label": "Dashboard Home",
+      "passed": true,
+      "status": 304
+    },
+    {
+      "path": "/scan",
+      "label": "Scan Camera Experience",
+      "passed": true,
+      "status": 304
+    },
+    {
+      "path": "/chat",
+      "label": "Ayurvedic Intelligence Chat",
+      "passed": true,
+      "status": 304
+    },
+    {
+      "path": "/history",
+      "label": "Skin Assessment History",
+      "passed": true,
+      "status": 304
+    },
+    {
+      "path": "/remedies",
+      "label": "Ayurvedic Remedies Library",
+      "passed": true,
+      "status": 304
+    },
+    {
+      "path": "/routine",
+      "label": "Dinacharya Daily Routine",
+      "passed": true,
+      "status": 304
+    },
+    {
+      "path": "/progress",
+      "label": "Constitutional Progress",
+      "passed": true,
+      "status": 304
+    },
+    {
+      "path": "/profile",
+      "label": "User Profile & Constitution",
+      "passed": true,
+      "status": 304
+    },
+    {
+      "path": "/settings",
+      "label": "Application Settings",
+      "passed": true,
+      "status": 304
+    }
+  ],
+  "consoleErrors": [],
+  "capturedScreenshots": [
+    "01-landing-localhost.png",
+    "02-landing-entry-cta.png",
+    "03-dashboard-entered.png",
+    "04-desktop-sidebar-expanded.png",
+    "05-desktop-sidebar-collapsed.png",
+    "08-returned-to-landing.png",
+    "route-01-dashboard.png",
+    "route-02-scan.png",
+    "route-03-chat.png",
+    "route-04-history.png",
+    "route-05-remedies.png",
+    "route-06-routine.png",
+    "route-07-progress.png",
+    "route-08-profile.png",
+    "route-09-settings.png",
+    "02b-landing-mobile-375.png",
+    "06-mobile-dashboard-375.png",
+    "07-mobile-drawer-open-375.png"
+  ]
+}

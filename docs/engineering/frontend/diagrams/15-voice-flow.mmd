@@ -1,0 +1,15 @@
+sequenceDiagram
+    autonumber
+    actor User as User
+    participant VoiceUI as VoiceAssistant Screen
+    participant Speech as Web Speech API (Browser RAM)
+    participant API as POST /api/v1/voice/chat
+    participant Gateway as Backend AI Orchestrator
+
+    User->>VoiceUI: Tap Microphone & Speak
+    VoiceUI->>Speech: Start Ephemeral Speech Recognition
+    Speech-->>VoiceUI: Transcribed Text String (Audio bytes dropped in RAM)
+    VoiceUI->>API: HTTP POST /api/v1/voice/chat { messageText }
+    API->>Gateway: Ground query with Classical RAG + Safety Filter
+    Gateway-->>API: 200 OK { responseText, groundedCitations, disclaimer }
+    API-->>VoiceUI: Display Grounded Text Response + Audio Synthesis

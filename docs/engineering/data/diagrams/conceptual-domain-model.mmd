@@ -1,0 +1,84 @@
+classDiagram
+    class IdentityDomain {
+        +UserCredentials
+        +SessionTokens
+        +FederatedIdentity
+    }
+
+    class UserProfileDomain {
+        +UserProfile
+        +UserPreferences
+        +ConsentLedger
+    }
+
+    class IntakeWellnessDomain {
+        +QuestionnaireTemplate
+        +QuestionnaireResponse
+        +LifestyleContext
+    }
+
+    class BiometricCaptureDomain {
+        +CaptureSession
+        +CaptureAttempt
+        +QualityMetrics
+        +S3FacialObjectReference
+    }
+
+    class AnalysisExecutionDomain {
+        +AnalysisJob
+        +AnalysisSnapshot
+        +VisualObservationVector
+        +MultimodalFusionVector
+    }
+
+    class AyurvedicIntelligenceDomain {
+        +TridoshaBalance
+        +PrakritiVikritiState
+        +ClassicalCitations
+        +ActionableRituals
+    }
+
+    class RoutineGuidanceDomain {
+        +DailyRoutine
+        +RoutineItem
+        +AdherenceTracking
+    }
+
+    class LongitudinalProgressDomain {
+        +ProgressCheckpoint
+        +DoshicTrendDelta
+        +SymptomTimeline
+    }
+
+    class ClassicalKnowledgeDomain {
+        +KnowledgeSource
+        +KnowledgeDocument
+        +VettedKnowledgeChunk
+        +pgvectorEmbedding
+    }
+
+    class ResearchExpertEvaluationDomain {
+        +DeIdentifiedSubject
+        +ExpertAnnotation
+        +ConsensusAdjudication
+        +FairnessBenchmark
+    }
+
+    class SecurityAuditDomain {
+        +SecurityAuditEvent
+        +AccessLog
+        +DeletionTombstone
+    }
+
+    IdentityDomain --> UserProfileDomain : provisioned_for
+    UserProfileDomain --> IntakeWellnessDomain : submits
+    UserProfileDomain --> BiometricCaptureDomain : captures
+    IntakeWellnessDomain --> AnalysisExecutionDomain : feeds_inputs
+    BiometricCaptureDomain --> AnalysisExecutionDomain : feeds_pixels
+    AnalysisExecutionDomain --> AyurvedicIntelligenceDomain : synthesizes
+    AyurvedicIntelligenceDomain --> RoutineGuidanceDomain : prescribes
+    RoutineGuidanceDomain --> LongitudinalProgressDomain : accumulates
+    ClassicalKnowledgeDomain --> AyurvedicIntelligenceDomain : grounds_citations
+    UserProfileDomain --> ResearchExpertEvaluationDomain : optional_deidentified_contribution
+    SecurityAuditDomain --> IdentityDomain : audits_auth
+    SecurityAuditDomain --> UserProfileDomain : audits_deletion

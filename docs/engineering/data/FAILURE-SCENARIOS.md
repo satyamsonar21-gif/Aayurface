@@ -1,0 +1,26 @@
+# AayurFace — Database Architecture Specification
+## Database Failure Mode & Effects Analysis (FMEA) — 12 Catastrophic Scenarios
+
+**Phase:** Phase 04 — Database & Data Architecture  
+**Date:** 2026-09-03  
+**Status:** FORMAL ARCHITECTURAL SPECIFICATION (Target Design; Implementation Pending)  
+**Authority:** Principal Database Architect, Platform/SRE Architect, Data Security Architect  
+
+---
+
+### 1. FMEA Analysis Matrix (12 Scenarios)
+
+| Scenario ID & Catastrophic Event | Root Cause | Impact on Data & System | Automated Mitigation / Defense Mechanism | Recovery Protocol & Data Restoration |
+|---|---|---|---|---|
+| **FMEA-01: Partial Analysis Write** | Network drop or DB crash mid-way through saving observations or recommendations. | Corrupt or incomplete analysis snapshot; missing recommendations. | Wrapped in single ACID transaction (`BEGIN ... COMMIT`). If any child insert fails, entire transaction rolls back. | PostgreSQL automatically rolls back; `analysis_jobs` transitions to `RETRYING`; zero partial data persists. |
+| **FMEA-02: S3 Upload OK, DB Fails** | Client PUTs photo to S3, but network drops before client can notify API to record metadata. | Orphaned image file in private S3 bucket accumulating storage costs. | Ephemeral S3 pre-signed URL tags object with `upload_status: pending`. | Daily reaper cron scans S3 objects older than 24h lacking corresponding `captures` row and hard-deletes them. |
+| **FMEA-03: Worker Crashes Mid-Job** | Serverless worker encounters OOM or container crash while calculating fusion math. | Analysis job stuck indefinitely in `PROCESSING` state; user mobile screen hangs. | `execution_deadline` set to `NOW() + INTERVAL '5 minutes'`. | Background reaper query detects expired processing jobs, resets status to `RETRYING`, and increments `attempt_count`. |
+| **FMEA-04: Upstream OpenAI Timeout** | OpenAI API returns HTTP 429 (Rate Limit) or HTTP 504 (Gateway Timeout). | Analysis pipeline cannot complete foundation model synthesis. | Exponential backoff retry logic (2s, 4s, 8s) up to `max_attempts = 3`. | Worker catches HTTP error, logs `error_category = 'RATE_LIMITED'`, sets job status to `RETRYING`, and releases lock. |
+| **FMEA-05: pgvector Memory Pressure** | HNSW graph size exceeds available PostgreSQL shared buffer cache. | Vector searches fall back to disk swaps; latency jumps from 20ms to >500ms. | Observability alerts on HNSW query time $> 50\text{ms}$; shared_buffers tuned to $\ge 25\%$ system RAM. | SRE scales instance RAM tier or reduces `hnsw.ef_search` from 40 to 30; corpus chunk size capped at $\le 50,000$. |
+| **FMEA-06: Deletion Fails Halfway** | S3 files deleted, but database network drops before SQL cascade can execute. | Inconsistent state: user profile still exists, but images are missing. | Multi-stage deletion state machine with idempotent retry queue. | Deletion worker retries task from failed step using idempotent `DELETE FROM auth.users WHERE id = :userId`. |
+| **FMEA-07: Backup Resurrection** | Database restored to point-in-time snapshot; previously deleted users reappear. | Statutory violation of DPDP/GDPR right to erasure. | Autonomous `deletion_tombstones` ledger recording SHA-256 hashes of purged users. | Post-restoration reconciliation script automatically scans tombstones and re-executes hard purges. |
+| **FMEA-08: Duplicate Concurrent Jobs** | Mobile user double-taps "Analyze Skin", triggering two parallel API requests. | Two parallel workers execute inference, doubling OpenAI API cost and creating duplicate scans. | Database constraint: `UNIQUE (user_id, idempotency_key)` on `analysis_jobs`. | Second insert fails with error 23505; API catches error and returns existing job ID; worker executes only once. |
+| **FMEA-09: LLM Violates JSON Schema** | Model hallucinates unparseable markdown or includes prohibited clinical disease terms. | Schema validation failure; cannot map to relational columns. | Edge worker parses response through strict Zod schema; regex scans for prohibited terms. | If validation fails, worker triggers automated retry with explicit correction prompt; if still invalid, triggers fallback. |
+| **FMEA-10: RLS Misconfiguration** | Developer writes flawed RLS policy or omits `ENABLE ROW LEVEL SECURITY`. | Catastrophic BOLA vulnerability; cross-tenant data leakage. | CI/CD automated lint asserting 100% of tables have `relrowsecurity = TRUE`; integration tests assert cross-reads fail. | CI pipeline halts deployment immediately; staging test suite flags missing RLS. |
+| **FMEA-11: Migration Table Lock** | Migration script attempts to add column or index without `CONCURRENTLY`, locking table. | Database locks active user reads; API times out; platform outage. | Strict zero-downtime migration guidelines; all indexes created with `CREATE INDEX CONCURRENTLY`. | CI tests migrations against simulated concurrent query workload; locks lasting $> 5\text{s}$ fail pipeline. |
+| **FMEA-12: Pool Exhaustion** | Spike in traffic saturates database connection pool; new queries rejected. | HTTP 500 errors across all client API endpoints. | PgBouncer connection pooler in transaction mode; max connection limits; short statement timeouts (10s). | Gateway rejects excess traffic with HTTP 429; auto-scaling worker limits connection bursts. |

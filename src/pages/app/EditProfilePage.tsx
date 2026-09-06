@@ -1,114 +1,163 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, Lock } from 'lucide-react';
-import TopBar from '@/components/layout/TopBar';
+import { ChevronLeft, Lock, Check } from 'lucide-react';
 import PageWrapper from '@/components/layout/PageWrapper';
-import { getInitials } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 import type { SkinType } from '@/types';
 
 export default function EditProfilePage() {
   const navigate = useNavigate();
-  const [name, setName] = useState('Namrata Sen');
-  const [skinType, setSkinType] = useState<SkinType>('dry');
+  const { user, updateProfile } = useAuth();
+
+  const [name, setName] = useState(user?.full_name || 'Namrata Sen');
+  const [skinType, setSkinType] = useState<SkinType>(user?.skin_type || 'dry');
+  const [isSaving, setIsSaving] = useState(false);
 
   const skinTypes = [
-    { id: 'dry', label: 'Dry (Vata)', desc: 'Often feels tight, flaky, or rough.' },
-    { id: 'oily', label: 'Oily (Kapha)', desc: 'Prone to shine, enlarged pores, or acne.' },
-    { id: 'combination', label: 'Combination', desc: 'Oily T-zone, dry or normal cheeks.' },
-    { id: 'normal', label: 'Normal (Pitta)', desc: 'Balanced, rarely breaks out.' },
+    { id: 'dry', label: 'Vata Predominant (Dry/Delicate)', desc: 'Feels dry, thin, matte, or tight. Requires grounding and warm moisture.' },
+    { id: 'normal', label: 'Pitta Predominant (Sensitive/Warm)', desc: 'Warm, radiant, prone to redness or reactivity. Requires soothing botanical balance.' },
+    { id: 'oily', label: 'Kapha Predominant (Oily/Dense)', desc: 'Supple, thick, prone to sebum shine or congestion. Requires clarifying herbs.' },
+    { id: 'combination', label: 'Doshic Harmonic (Combination)', desc: 'Vata or Pitta cheeks with Kapha T-zone. Requires adaptive dual care.' },
   ];
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/profile');
+    setIsSaving(true);
+    try {
+      await updateProfile({
+        full_name: name,
+        skin_type: skinType,
+      });
+      navigate('/profile');
+    } catch {
+      navigate('/profile');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-cream flex flex-col">
-      <TopBar title="Edit Profile" onBack={() => navigate('/profile')} />
-      
-      <PageWrapper className="pt-20 pb-24">
+    <PageWrapper>
+      <div className="space-y-8 max-w-2xl mx-auto w-full pb-16 font-body">
+        
+        {/* Navigation Breadcrumb */}
+        <div className="flex items-center justify-between pb-3 border-b border-border-default">
+          <button
+            onClick={() => navigate('/profile')}
+            className="inline-flex items-center gap-1.5 text-caption font-semibold text-text-secondary hover:text-brand-primary transition-colors cursor-pointer"
+          >
+            <ChevronLeft size={16} />
+            Back to Profile
+          </button>
+          
+          <span className="text-caption text-text-tertiary">
+            Account Preferences
+          </span>
+        </div>
+
         <form onSubmit={handleSave} className="space-y-8">
           
-          <div className="flex flex-col items-center">
-            <div className="relative">
-              <div className="w-20 h-20 bg-herbal rounded-full flex items-center justify-center text-white text-2xl font-playfair shadow-md border-2 border-white">
-                {getInitials(name)}
-              </div>
-              <button type="button" className="absolute bottom-0 right-0 p-1.5 bg-white rounded-full shadow-sm border border-warmgray text-herbal">
-                <Camera className="w-4 h-4" />
-              </button>
-            </div>
-            <button type="button" className="mt-3 text-sm text-herbal font-medium">Change Photo</button>
+          {/* Header */}
+          <div className="space-y-1">
+            <h1 className="font-display text-2xl sm:text-3xl font-semibold text-text-primary">
+              Edit Account & Constitution
+            </h1>
+            <p className="text-body-md text-text-secondary">
+              Keep your profile details and primary Prakriti constitutional tendency up to date.
+            </p>
           </div>
 
-          <div className="space-y-4">
+          {/* User Avatar Initial Banner */}
+          <div className="flex items-center gap-4 p-4 rounded-lg bg-background-surface border border-border-default">
+            <div className="w-14 h-14 rounded-full bg-brand-primary text-text-inverse flex items-center justify-center font-display text-2xl font-semibold shadow-sm">
+              {name.charAt(0).toUpperCase()}
+            </div>
             <div>
-              <label className="block text-sm font-medium text-charcoal mb-1.5">Full Name</label>
+              <p className="font-display text-lg font-semibold text-text-primary">{name}</p>
+              <p className="text-caption text-text-tertiary">{user?.email || 'namrata.sen@example.com'}</p>
+            </div>
+          </div>
+
+          {/* Form Fields */}
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="block text-caption font-body font-medium text-text-secondary uppercase tracking-wider">
+                Full Name
+              </label>
               <input 
                 type="text" 
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-white border border-warmgray rounded-lg px-4 py-3 text-charcoal focus:outline-none focus:border-herbal focus:ring-1 focus:ring-herbal transition-colors"
+                required
+                className="w-full rounded-md border border-border-default bg-background-surface px-4 py-3 font-body text-body-md text-text-primary focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all shadow-sm"
               />
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-charcoal mb-1.5">Email Address</label>
+            <div className="space-y-1.5">
+              <label className="block text-caption font-body font-medium text-text-secondary uppercase tracking-wider">
+                Email Address (Permanent Identifier)
+              </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-4 w-4 text-charcoal-light/50" />
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-text-tertiary">
+                  <Lock className="h-4 w-4" />
                 </div>
                 <input 
                   type="email" 
-                  value="namrata.sen@example.com"
+                  value={user?.email || "namrata.sen@example.com"}
                   disabled
-                  className="w-full bg-warmgray/20 border border-warmgray/50 rounded-lg pl-10 pr-4 py-3 text-charcoal-light cursor-not-allowed"
+                  className="w-full rounded-md border border-border-default/60 bg-background-subtle/70 pl-10 pr-4 py-3 font-body text-body-md text-text-tertiary cursor-not-allowed"
                 />
               </div>
-              <p className="text-xs text-charcoal-light mt-1">Email cannot be changed.</p>
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-charcoal mb-3">Primary Skin Type</label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {/* Primary Skin Type / Prakriti Selector */}
+          <div className="space-y-3">
+            <label className="block text-caption font-body font-medium text-text-secondary uppercase tracking-wider">
+              Primary Skin Constitution (Prakriti)
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {skinTypes.map(type => (
                 <button
                   key={type.id}
                   type="button"
                   onClick={() => setSkinType(type.id as SkinType)}
-                  className={`p-4 rounded-card text-left transition-all border ${
+                  className={`p-4 rounded-lg text-left transition-all border cursor-pointer ${
                     skinType === type.id 
-                      ? 'bg-leaf-soft border-herbal shadow-sm' 
-                      : 'bg-white border-warmgray/40 hover:border-herbal/50'
+                      ? 'bg-emerald-50/70 border-brand-primary text-text-primary shadow-sm ring-1 ring-brand-primary' 
+                      : 'bg-background-surface border-border-default hover:border-brand-secondary/40 text-text-primary'
                   }`}
                 >
-                  <p className="font-playfair font-semibold text-charcoal mb-1">{type.label}</p>
-                  <p className="text-xs text-charcoal-light leading-relaxed">{type.desc}</p>
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <p className="font-display font-semibold text-base">{type.label}</p>
+                    {skinType === type.id && <Check className="w-4 h-4 text-brand-primary" />}
+                  </div>
+                  <p className="text-caption text-text-secondary leading-relaxed font-normal">{type.desc}</p>
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="pt-4 flex flex-col gap-3">
+          {/* Action Buttons */}
+          <div className="pt-4 flex flex-col sm:flex-row gap-3">
             <button 
               type="submit"
-              className="w-full bg-herbal text-white py-4 rounded-button font-medium shadow-md hover:bg-herbal-dark transition-colors"
+              disabled={isSaving}
+              className="flex-1 bg-brand-primary text-text-inverse py-3.5 px-6 rounded-md font-body font-medium text-body-md shadow-sm hover:bg-brand-primary-hover transition-colors cursor-pointer disabled:opacity-60 text-center"
             >
-              Save Changes
+              {isSaving ? 'Saving Changes...' : 'Save Profile Changes'}
             </button>
             <button 
               type="button"
               onClick={() => navigate('/profile')}
-              className="w-full py-4 text-charcoal-light font-medium hover:text-charcoal transition-colors"
+              className="py-3.5 px-6 border border-border-default bg-background-surface hover:bg-background-subtle text-text-secondary rounded-md font-body font-medium text-body-md transition-colors cursor-pointer text-center"
             >
               Cancel
             </button>
           </div>
 
         </form>
-      </PageWrapper>
-    </div>
+      </div>
+    </PageWrapper>
   );
 }

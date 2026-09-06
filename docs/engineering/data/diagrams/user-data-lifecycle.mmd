@@ -1,0 +1,25 @@
+flowchart TD
+    Start([User Registration]) --> CreateAuth["1. Supabase Auth Provisioning\nInsert record into auth.users\nTrigger public.handle_new_user()"]
+    CreateAuth --> CreateProfile["2. Create Profile Record\nINSERT INTO profiles (id, email, full_name)\nStatus: onboarding_completed = FALSE"]
+    CreateProfile --> ConsentModal["3. Onboarding Consent Gate\nGrant unbundled scopes in consents table\n(biometric_processing, history_storage)"]
+    ConsentModal --> IntakeSubmission["4. Baseline Constitutional Intake\nSubmit 15-question intake & lifestyle context\n(questionnaire_responses, lifestyle_contexts)"]
+    IntakeSubmission --> ActiveState["5. ACTIVE ENGAGEMENT STATE\n• Upload captures via signed URLs\n• Trigger analysis jobs\n• Track daily routines & progress"]
+
+    ActiveState --> UpdateProfile["6A. User Modifies Profile\nUPDATE profiles / user_preferences\n(Soft-mutable state)"]
+    UpdateProfile --> ActiveState
+
+    ActiveState --> RevokeConsent["6B. User Revokes Consent Scope\nINSERT INTO consents (status = 'REVOKED')\nImmediately purges pending S3 captures"]
+    RevokeConsent --> ActiveState
+
+    ActiveState --> DeleteRequest["7. User Initiates Account Erasure\nDELETE /api/v1/profile/account\nRequires re-authentication"]
+    
+    DeleteRequest --> MarkTombstone["8. Set User Status = 'PENDING_DELETION'\nRevoke active refresh tokens"]
+    MarkTombstone --> EnqueueWorker["9. Enqueue Cascading Purge Worker Task"]
+
+    subgraph PurgeWorker["10. Asynchronous Multi-Storage Hard Purge"]
+        EnqueueWorker --> DeleteS3["Step 10A: Hard-Delete S3 Objects\nDelete facial-captures/{userId}/*\nDelete reports/{userId}/*"]
+        DeleteS3 --> DeleteSQL["Step 10B: Execute Cascading SQL Purge\nDELETE FROM auth.users WHERE id = userId;\n(Cascades across profiles, scans, routines)"]
+    end
+
+    PurgeWorker --> RecordTombstone["11. Write Anonymous Immutable Tombstone\nINSERT INTO deletion_tombstones\n{ tenant_hash: SHA256(userId), timestamp }"]
+    RecordTombstone --> Terminated([12. Lifecycle Terminated / Data Obliterated])
