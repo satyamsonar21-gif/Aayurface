@@ -29,3 +29,5 @@ dist-ssr
 
 # Tool artifacts
 .aider-desk/
+supabase/.temp/
+

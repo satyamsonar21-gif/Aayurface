@@ -111,17 +111,24 @@ CREATE INDEX IF NOT EXISTS idx_daily_tips_display_date ON daily_tips(display_dat
 
 -- Auto-create profile on user sign-up
 CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
 BEGIN
-  INSERT INTO public.profiles (id, full_name, email)
+  INSERT INTO public.profiles (id, full_name)
   VALUES (
     NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', 'User'),
-    NEW.email
-  );
+    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', '')
+  )
+  ON CONFLICT (id) DO NOTHING;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
+
+REVOKE ALL ON FUNCTION public.handle_new_user() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM anon, authenticated;
 
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
@@ -129,80 +136,126 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 -- Auto-update updated_at timestamp
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = ''
+AS $$
 BEGIN
   NEW.updated_at = NOW();
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
-DROP TRIGGER IF EXISTS update_profiles_updated_at ON profiles;
+REVOKE ALL ON FUNCTION public.update_updated_at_column() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.update_updated_at_column() FROM anon, authenticated;
+
+DROP TRIGGER IF EXISTS update_profiles_updated_at ON public.profiles;
 CREATE TRIGGER update_profiles_updated_at
-  BEFORE UPDATE ON profiles
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+  BEFORE UPDATE ON public.profiles
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
 -- Get today's daily tip
-CREATE OR REPLACE FUNCTION get_todays_tip()
-RETURNS SETOF daily_tips AS $$
+CREATE OR REPLACE FUNCTION public.get_todays_tip()
+RETURNS SETOF public.daily_tips
+LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = ''
+AS $$
 BEGIN
   RETURN QUERY
-  SELECT * FROM daily_tips
+  SELECT * FROM public.daily_tips
   WHERE display_date = CURRENT_DATE AND is_active = TRUE
   LIMIT 1;
   
   IF NOT FOUND THEN
     RETURN QUERY
-    SELECT * FROM daily_tips
+    SELECT * FROM public.daily_tips
     WHERE is_active = TRUE
     ORDER BY display_order ASC NULLS LAST, created_at ASC
     LIMIT 1;
   END IF;
 END;
-$$ LANGUAGE plpgsql;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.get_todays_tip() TO anon, authenticated;
 
 -- ============================================================
 -- ROW LEVEL SECURITY (RLS)
 -- ============================================================
 
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE scan_results ENABLE ROW LEVEL SECURITY;
-ALTER TABLE saved_remedies ENABLE ROW LEVEL SECURITY;
-ALTER TABLE chat_sessions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE chat_messages ENABLE ROW LEVEL SECURITY;
-ALTER TABLE remedies ENABLE ROW LEVEL SECURITY;
-ALTER TABLE daily_tips ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.scan_results ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.saved_remedies ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.chat_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.chat_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.remedies ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.daily_tips ENABLE ROW LEVEL SECURITY;
 
 -- Profiles: users can only access their own
-CREATE POLICY "Users can view own profile" ON profiles
-  FOR SELECT USING (auth.uid() = id);
-CREATE POLICY "Users can update own profile" ON profiles
-  FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Users can view own profile" ON public.profiles
+  FOR SELECT TO authenticated USING ((SELECT auth.uid()) = id);
+CREATE POLICY "Users can update own profile" ON public.profiles
+  FOR UPDATE TO authenticated
+  USING ((SELECT auth.uid()) = id)
+  WITH CHECK ((SELECT auth.uid()) = id);
+CREATE POLICY "Users can insert own profile" ON public.profiles
+  FOR INSERT TO authenticated
+  WITH CHECK ((SELECT auth.uid()) = id);
 
 -- Scan results: users can only access their own
-CREATE POLICY "Users can view own scans" ON scan_results
-  FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own scans" ON scan_results
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can delete own scans" ON scan_results
-  FOR DELETE USING (auth.uid() = user_id);
+CREATE POLICY "Users can view own scans" ON public.scan_results
+  FOR SELECT TO authenticated USING ((SELECT auth.uid()) = user_id);
+CREATE POLICY "Users can insert own scans" ON public.scan_results
+  FOR INSERT TO authenticated WITH CHECK ((SELECT auth.uid()) = user_id);
+CREATE POLICY "Users can update own scans" ON public.scan_results
+  FOR UPDATE TO authenticated
+  USING ((SELECT auth.uid()) = user_id)
+  WITH CHECK ((SELECT auth.uid()) = user_id);
+CREATE POLICY "Users can delete own scans" ON public.scan_results
+  FOR DELETE TO authenticated USING ((SELECT auth.uid()) = user_id);
 
 -- Saved remedies: users manage their own
-CREATE POLICY "Users can manage own saved remedies" ON saved_remedies
-  FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "Users can view own saved remedies" ON public.saved_remedies
+  FOR SELECT TO authenticated USING ((SELECT auth.uid()) = user_id);
+CREATE POLICY "Users can insert own saved remedies" ON public.saved_remedies
+  FOR INSERT TO authenticated WITH CHECK ((SELECT auth.uid()) = user_id);
+CREATE POLICY "Users can update own saved remedies" ON public.saved_remedies
+  FOR UPDATE TO authenticated
+  USING ((SELECT auth.uid()) = user_id)
+  WITH CHECK ((SELECT auth.uid()) = user_id);
+CREATE POLICY "Users can delete own saved remedies" ON public.saved_remedies
+  FOR DELETE TO authenticated USING ((SELECT auth.uid()) = user_id);
 
 -- Chat sessions: users manage their own
-CREATE POLICY "Users can manage own chat sessions" ON chat_sessions
-  FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "Users can view own chat sessions" ON public.chat_sessions
+  FOR SELECT TO authenticated USING ((SELECT auth.uid()) = user_id);
+CREATE POLICY "Users can insert own chat sessions" ON public.chat_sessions
+  FOR INSERT TO authenticated WITH CHECK ((SELECT auth.uid()) = user_id);
+CREATE POLICY "Users can update own chat sessions" ON public.chat_sessions
+  FOR UPDATE TO authenticated
+  USING ((SELECT auth.uid()) = user_id)
+  WITH CHECK ((SELECT auth.uid()) = user_id);
+CREATE POLICY "Users can delete own chat sessions" ON public.chat_sessions
+  FOR DELETE TO authenticated USING ((SELECT auth.uid()) = user_id);
 
 -- Chat messages: users manage their own
-CREATE POLICY "Users can manage own chat messages" ON chat_messages
-  FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "Users can view own chat messages" ON public.chat_messages
+  FOR SELECT TO authenticated USING ((SELECT auth.uid()) = user_id);
+CREATE POLICY "Users can insert own chat messages" ON public.chat_messages
+  FOR INSERT TO authenticated WITH CHECK ((SELECT auth.uid()) = user_id);
+CREATE POLICY "Users can update own chat messages" ON public.chat_messages
+  FOR UPDATE TO authenticated
+  USING ((SELECT auth.uid()) = user_id)
+  WITH CHECK ((SELECT auth.uid()) = user_id);
+CREATE POLICY "Users can delete own chat messages" ON public.chat_messages
+  FOR DELETE TO authenticated USING ((SELECT auth.uid()) = user_id);
 
 -- Remedies: public read access
-CREATE POLICY "Public can read remedies" ON remedies
+CREATE POLICY "Public can read remedies" ON public.remedies
   FOR SELECT USING (TRUE);
 
 -- Daily tips: public read access (active only)
-CREATE POLICY "Public can read daily tips" ON daily_tips
+CREATE POLICY "Public can read daily tips" ON public.daily_tips
   FOR SELECT USING (is_active = TRUE);
