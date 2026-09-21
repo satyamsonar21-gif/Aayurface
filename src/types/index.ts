@@ -129,6 +129,40 @@ export interface UserProfile extends User {
   saved_remedy_count: number;
 }
 
+export interface UserConsent {
+  id: string;
+  user_id: string;
+  consent_type: string;
+  consent_version: string;
+  granted: boolean;
+  granted_at: string;
+  revoked_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ConsentItemInput {
+  consent_type: string;
+  consent_version: string;
+  granted: boolean;
+}
+
+export interface WellnessFactors {
+  sleepHours?: string;
+  hydrationLevel?: string;
+  stressLevel?: string;
+  climate?: string;
+  skinConcerns?: string[];
+}
+
+export interface CompleteOnboardingData {
+  fullName?: string;
+  skinType: SkinType;
+  dosha?: Dosha | null;
+  wellnessFactors?: WellnessFactors;
+  consents: ConsentItemInput[];
+}
+
 // Auth types
 export interface AuthContextType {
   user: User | null;
@@ -140,6 +174,7 @@ export interface AuthContextType {
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   updateProfile: (data: Partial<User>) => Promise<void>;
+  completeOnboarding: (data: CompleteOnboardingData) => Promise<void>;
 }
 
 // Scan status

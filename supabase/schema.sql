@@ -92,6 +92,20 @@ CREATE TABLE IF NOT EXISTS daily_tips (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- User consents for camera processing, educational terms, and research
+CREATE TABLE IF NOT EXISTS user_consents (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  consent_type TEXT NOT NULL,
+  consent_version TEXT NOT NULL,
+  granted BOOLEAN NOT NULL DEFAULT TRUE,
+  granted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  revoked_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT user_consents_user_type_key UNIQUE (user_id, consent_type)
+);
+
 -- ============================================================
 -- INDEXES
 -- ============================================================
@@ -101,6 +115,8 @@ CREATE INDEX IF NOT EXISTS idx_scan_results_created_at ON scan_results(created_a
 CREATE INDEX IF NOT EXISTS idx_chat_messages_session_id ON chat_messages(session_id);
 CREATE INDEX IF NOT EXISTS idx_chat_messages_created_at ON chat_messages(created_at);
 CREATE INDEX IF NOT EXISTS idx_saved_remedies_user_id ON saved_remedies(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_consents_user_id ON user_consents(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_consents_type ON user_consents(consent_type);
 CREATE INDEX IF NOT EXISTS idx_remedies_skin_concerns ON remedies USING GIN (skin_concerns);
 CREATE INDEX IF NOT EXISTS idx_remedies_skin_types ON remedies USING GIN (skin_types);
 CREATE INDEX IF NOT EXISTS idx_daily_tips_display_date ON daily_tips(display_date);
@@ -159,6 +175,11 @@ CREATE TRIGGER update_profiles_updated_at
   BEFORE UPDATE ON public.profiles
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_user_consents_updated_at ON public.user_consents;
+CREATE TRIGGER update_user_consents_updated_at
+  BEFORE UPDATE ON public.user_consents
+  FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
 -- Get today's daily tip
 CREATE OR REPLACE FUNCTION public.get_todays_tip()
 RETURNS SETOF public.daily_tips
@@ -189,6 +210,7 @@ GRANT EXECUTE ON FUNCTION public.get_todays_tip() TO anon, authenticated;
 -- ============================================================
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_consents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.scan_results ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.saved_remedies ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.chat_sessions ENABLE ROW LEVEL SECURITY;
@@ -209,6 +231,28 @@ DROP POLICY IF EXISTS "Users can insert own profile" ON public.profiles;
 CREATE POLICY "Users can insert own profile" ON public.profiles
   FOR INSERT TO authenticated
   WITH CHECK ((SELECT auth.uid()) = id);
+
+-- User consents: users can only access their own
+DROP POLICY IF EXISTS "Users can view own consents" ON public.user_consents;
+CREATE POLICY "Users can view own consents" ON public.user_consents
+  FOR SELECT TO authenticated
+  USING ((SELECT auth.uid()) = user_id);
+
+DROP POLICY IF EXISTS "Users can insert own consents" ON public.user_consents;
+CREATE POLICY "Users can insert own consents" ON public.user_consents
+  FOR INSERT TO authenticated
+  WITH CHECK ((SELECT auth.uid()) = user_id);
+
+DROP POLICY IF EXISTS "Users can update own consents" ON public.user_consents;
+CREATE POLICY "Users can update own consents" ON public.user_consents
+  FOR UPDATE TO authenticated
+  USING ((SELECT auth.uid()) = user_id)
+  WITH CHECK ((SELECT auth.uid()) = user_id);
+
+DROP POLICY IF EXISTS "Users can delete own consents" ON public.user_consents;
+CREATE POLICY "Users can delete own consents" ON public.user_consents
+  FOR DELETE TO authenticated
+  USING ((SELECT auth.uid()) = user_id);
 
 -- Scan results: users can only access their own
 DROP POLICY IF EXISTS "Users can view own scans" ON public.scan_results;

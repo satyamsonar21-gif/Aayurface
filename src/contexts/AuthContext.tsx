@@ -5,8 +5,9 @@
 
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import type { User as SupabaseAuthUser } from '@supabase/supabase-js';
-import type { User, AuthContextType, SkinType, Dosha } from '@/types';
+import type { User, AuthContextType, SkinType, Dosha, CompleteOnboardingData } from '@/types';
 import { supabase } from '@/lib/supabase';
+import { recordUserConsents } from '@/lib/onboardingService';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -226,6 +227,62 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser((prev) => (prev ? { ...prev, ...data, updated_at: new Date().toISOString() } : null));
   }, [user]);
 
+  const completeOnboarding = useCallback(async (data: CompleteOnboardingData) => {
+    if (!user) {
+      throw new Error('Cannot complete onboarding: No authenticated session found');
+    }
+
+    const { fullName, skinType, dosha = null, wellnessFactors, consents } = data;
+
+    const profileData: Partial<User> = {
+      full_name: fullName !== undefined ? fullName.trim() : user.full_name,
+      skin_type: skinType,
+      dosha: dosha,
+      onboarding_completed: true,
+    };
+
+    // 1. Update Supabase Auth user metadata
+    const { error: authError } = await supabase.auth.updateUser({
+      data: {
+        ...profileData,
+        wellness_factors: wellnessFactors || null,
+      },
+    });
+
+    if (authError) {
+      console.error('[AuthContext] Error updating auth metadata during onboarding:', authError);
+      throw authError;
+    }
+
+    // 2. Persist to public.profiles table
+    try {
+      const { error: dbError } = await supabase
+        .from('profiles')
+        .update({
+          full_name: profileData.full_name,
+          skin_type: profileData.skin_type,
+          dosha: profileData.dosha,
+          onboarding_completed: true,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id);
+
+      if (dbError) {
+        console.warn('[AuthContext] Could not update profiles table during onboarding:', dbError.message);
+      }
+    } catch (dbErr) {
+      console.warn('[AuthContext] Exception updating profiles table during onboarding:', dbErr);
+    }
+
+    // 3. Persist server-authoritative consents to user_consents table
+    if (consents && consents.length > 0) {
+      await recordUserConsents(user.id, consents);
+    }
+
+    // 4. Update domain state immediately so route guards immediately recognize onboarding completion
+    setUser((prev) => (prev ? { ...prev, ...profileData, updated_at: new Date().toISOString() } : null));
+  }, [user]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -238,6 +295,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signOut,
         resetPassword,
         updateProfile,
+        completeOnboarding,
       }}
     >
       {children}

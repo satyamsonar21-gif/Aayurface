@@ -31,7 +31,7 @@ export default function ProfilePage() {
 
   const doshaLabel = user?.dosha 
     ? `${user.dosha.charAt(0).toUpperCase() + user.dosha.slice(1)} Constitution` 
-    : (user?.skin_type ? `${user.skin_type.charAt(0).toUpperCase() + user.skin_type.slice(1)} Skin Type` : 'Constitutional Balance');
+    : (user?.skin_type ? `${user.skin_type.charAt(0).toUpperCase() + user.skin_type.slice(1)} Profile (Self-reported)` : 'Constitutional focus not established');
 
   const doshaVariant = (user?.dosha as any) || (user?.skin_type as any) || 'default';
 

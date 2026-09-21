@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Bell, Lock, Sparkles, LogOut, ChevronRight } from 'lucide-react';
+import { Shield, Bell, Lock, Sparkles, LogOut, ChevronRight, Check } from 'lucide-react';
 import PageWrapper from '@/components/layout/PageWrapper';
 import { useAuth } from '@/contexts/AuthContext';
+import { getUserConsents, updateSingleConsent, CURRENT_CONSENT_VERSIONS } from '@/lib/onboardingService';
+import type { UserConsent } from '@/types';
 
 interface NotificationSettings {
   morningRitual: boolean;
@@ -18,7 +20,32 @@ const DEFAULT_NOTIFICATIONS: NotificationSettings = {
 
 export default function SettingsPage() {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
+
+  const [consents, setConsents] = useState<UserConsent[]>([]);
+  const [isUpdatingConsent, setIsUpdatingConsent] = useState(false);
+
+  useEffect(() => {
+    if (user?.id) {
+      getUserConsents(user.id).then(setConsents);
+    }
+  }, [user?.id]);
+
+  const toggleResearchConsent = async (nextVal: boolean) => {
+    if (!user?.id) return;
+    setIsUpdatingConsent(true);
+    const success = await updateSingleConsent(
+      user.id,
+      'wellness_research',
+      nextVal,
+      CURRENT_CONSENT_VERSIONS.wellness_research
+    );
+    if (success) {
+      const updated = await getUserConsents(user.id);
+      setConsents(updated);
+    }
+    setIsUpdatingConsent(false);
+  };
 
   const [notifications, setNotifications] = useState<NotificationSettings>(() => {
     try {
@@ -166,6 +193,53 @@ export default function SettingsPage() {
                 <span className="text-caption font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                   Local Browser Encrypted
                 </span>
+              </div>
+
+              {/* Authoritative Server-Side Consents */}
+              <div className="pt-3 border-t border-border-default/60 space-y-2.5">
+                <p className="text-caption font-semibold text-text-secondary uppercase tracking-wider">
+                  Authoritative Server-Side Consents
+                </p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2.5 rounded-md bg-background-primary/40 border border-border-default/50 text-caption">
+                    <div>
+                      <span className="font-semibold text-text-primary block">Camera Processing</span>
+                      <span className="text-text-tertiary">Version {CURRENT_CONSENT_VERSIONS.camera_processing}</span>
+                    </div>
+                    <span className="text-emerald-800 font-semibold flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      <Check size={12} /> Active
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between p-2.5 rounded-md bg-background-primary/40 border border-border-default/50 text-caption">
+                    <div>
+                      <span className="font-semibold text-text-primary block">Educational Terms & Health Disclaimer</span>
+                      <span className="text-text-tertiary">Version {CURRENT_CONSENT_VERSIONS.terms_and_privacy}</span>
+                    </div>
+                    <span className="text-emerald-800 font-semibold flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      <Check size={12} /> Active
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between p-2.5 rounded-md bg-background-primary/40 border border-border-default/50 text-caption">
+                    <div>
+                      <span className="font-semibold text-text-primary block">Anonymous Botanical Research</span>
+                      <span className="text-text-tertiary">Version {CURRENT_CONSENT_VERSIONS.wellness_research} • Optional</span>
+                    </div>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={consents.find((c) => c.consent_type === 'wellness_research')?.granted ?? false}
+                        disabled={isUpdatingConsent}
+                        onChange={(e) => toggleResearchConsent(e.target.checked)}
+                        className="w-4 h-4 accent-brand-primary rounded cursor-pointer min-h-[16px] min-w-[16px]"
+                      />
+                      <span className="text-text-secondary font-medium">
+                        {consents.find((c) => c.consent_type === 'wellness_research')?.granted ? 'Opted In' : 'Opted Out'}
+                      </span>
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

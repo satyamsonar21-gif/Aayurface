@@ -1,0 +1,85 @@
+{
+  "timestamp": "2026-09-21T13:12:52.015Z",
+  "allPassed": true,
+  "total": 9,
+  "passed": 9,
+  "failed": 0,
+  "testUser": {
+    "email": "dev.seeker.1789996341470@aayurface.local",
+    "fullName": "Priya Sharma"
+  },
+  "results": [
+    {
+      "id": "PHASE08-01",
+      "name": "Unauthenticated /dashboard Access Redirects to /signin",
+      "expected": "URL includes /signin",
+      "actual": "http://localhost:5173/signin",
+      "status": "PASS",
+      "details": "Protected route guard enforces strict signin redirection"
+    },
+    {
+      "id": "PHASE08-02",
+      "name": "Unauthenticated /onboarding Access Redirects to /signin",
+      "expected": "URL includes /signin",
+      "actual": "http://localhost:5173/signin",
+      "status": "PASS",
+      "details": "Onboarding route guard requires active session before intake"
+    },
+    {
+      "id": "PHASE08-03",
+      "name": "Fresh User Post-Registration Routes Deterministically to /onboarding",
+      "expected": "URL includes /onboarding",
+      "actual": "http://localhost:5173/onboarding",
+      "status": "PASS",
+      "details": "User signed up with onboarding_completed: false redirected directly to /onboarding"
+    },
+    {
+      "id": "PHASE08-04",
+      "name": "Incomplete Onboarding Enforces Gating on All App Routes",
+      "expected": "Direct navigation to /dashboard or /scan redirected back to /onboarding",
+      "actual": "dashboard => http://localhost:5173/onboarding, scan => http://localhost:5173/onboarding",
+      "status": "PASS",
+      "details": "ProtectedRoute intercepts incomplete users and forces /onboarding completion"
+    },
+    {
+      "id": "PHASE08-05",
+      "name": "Onboarding Review Truthfully Discloses Constitutional Focus Not Established",
+      "expected": "Review contains \"Focus not established\" and \"Self-Reported\"",
+      "actual": "Focus not established: true, Self-Reported: true",
+      "status": "PASS",
+      "details": "No fabricated dosha in review intake card"
+    },
+    {
+      "id": "PHASE08-06",
+      "name": "Atomic Onboarding Completion Persists State and Routes to /dashboard",
+      "expected": "URL is /dashboard",
+      "actual": "http://localhost:5173/dashboard",
+      "status": "PASS",
+      "details": "Auth metadata and profile updated; user seamlessly redirected to dashboard"
+    },
+    {
+      "id": "PHASE08-07",
+      "name": "Completed User Blocked from Re-entering /onboarding",
+      "expected": "Redirected away from /onboarding to /dashboard",
+      "actual": "http://localhost:5173/dashboard",
+      "status": "PASS",
+      "details": "ProtectedRoute detects onboarding_completed: true and guards against redundant onboarding"
+    },
+    {
+      "id": "PHASE08-08",
+      "name": "Settings Page Displays Server-Side Authoritative Consents",
+      "expected": "Displays Camera, Disclaimer, and Research consents with versions",
+      "actual": "Camera: true, Disclaimer: true, Research: true",
+      "status": "PASS",
+      "details": "Authoritative user_consents queried and rendered in Settings"
+    },
+    {
+      "id": "PHASE08-09",
+      "name": "Profile Page Truthfulness: No Fabricated Dosha",
+      "expected": "Reflects Self-reported skin tendency and non-fabricated dosha status",
+      "actual": "Aayurface  PRIMARY  Home Scan Skin Chat with Ayurveda  JOURNEY  My History Remedies Daily Routine Progress  ACCOUNT  Profile Settings P Priya Sharma Ayurvedic Seeker Public Landing P Priya Sharma  dev.seeker.1789996341470@aayurface.local  Combination Profile (Self-reported) Member since 2026 Edit Pr",
+      "status": "PASS",
+      "details": "Prakriti dosha not fabricated without real scan"
+    }
+  ]
+}

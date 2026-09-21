@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { ProtectedRoute, PublicRoute } from './guards';
 import * as AuthModule from '@/contexts/AuthContext';
+import type { User, AuthContextType } from '@/types';
 
 // Mock useAuth
 vi.mock('@/contexts/AuthContext', async () => {
@@ -13,22 +14,33 @@ vi.mock('@/contexts/AuthContext', async () => {
   };
 });
 
+function mockAuth(overrides: Partial<AuthContextType> = {}): AuthContextType {
+  const defaults: AuthContextType = {
+    user: null,
+    isLoading: false,
+    isAuthenticated: false,
+    signUp: vi.fn(),
+    signIn: vi.fn(),
+    signInWithGoogle: vi.fn(),
+    signOut: vi.fn(),
+    resetPassword: vi.fn(),
+    updateProfile: vi.fn(),
+    completeOnboarding: vi.fn(),
+  };
+  const value = { ...defaults, ...overrides };
+  vi.mocked(AuthModule.useAuth).mockReturnValue(value);
+  return value;
+}
+
 describe('Route Guards Suite (ProtectedRoute & PublicRoute)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('renders loading spinner when auth is loading in ProtectedRoute', () => {
-    vi.mocked(AuthModule.useAuth).mockReturnValue({
-      user: null,
+    mockAuth({
       isLoading: true,
       isAuthenticated: false,
-      signUp: vi.fn(),
-      signIn: vi.fn(),
-      signInWithGoogle: vi.fn(),
-      signOut: vi.fn(),
-      resetPassword: vi.fn(),
-      updateProfile: vi.fn(),
     });
 
     render(
@@ -51,16 +63,10 @@ describe('Route Guards Suite (ProtectedRoute & PublicRoute)', () => {
   });
 
   it('redirects unauthenticated user from /dashboard to /signin and does NOT render protected content', () => {
-    vi.mocked(AuthModule.useAuth).mockReturnValue({
+    mockAuth({
       user: null,
       isLoading: false,
       isAuthenticated: false,
-      signUp: vi.fn(),
-      signIn: vi.fn(),
-      signInWithGoogle: vi.fn(),
-      signOut: vi.fn(),
-      resetPassword: vi.fn(),
-      updateProfile: vi.fn(),
     });
 
     render(
@@ -79,22 +85,15 @@ describe('Route Guards Suite (ProtectedRoute & PublicRoute)', () => {
       </MemoryRouter>
     );
 
-    // Must be redirected to /signin
     expect(screen.getByText('Sign In Screen')).toBeInTheDocument();
     expect(screen.queryByText('Protected Dashboard Content')).not.toBeInTheDocument();
   });
 
   it('redirects unauthenticated user from /scan to /signin and preserves location in state', () => {
-    vi.mocked(AuthModule.useAuth).mockReturnValue({
+    mockAuth({
       user: null,
       isLoading: false,
       isAuthenticated: false,
-      signUp: vi.fn(),
-      signIn: vi.fn(),
-      signInWithGoogle: vi.fn(),
-      signOut: vi.fn(),
-      resetPassword: vi.fn(),
-      updateProfile: vi.fn(),
     });
 
     render(
@@ -117,17 +116,10 @@ describe('Route Guards Suite (ProtectedRoute & PublicRoute)', () => {
     expect(screen.queryByText('Scan Camera Engine')).not.toBeInTheDocument();
   });
 
-  it('allows authenticated user into protected route', () => {
-    vi.mocked(AuthModule.useAuth).mockReturnValue({
+  it('allows authenticated and onboarded user into protected route', () => {
+    mockAuth({
       user: AuthModule.DEMO_USER,
-      isLoading: false,
       isAuthenticated: true,
-      signUp: vi.fn(),
-      signIn: vi.fn(),
-      signInWithGoogle: vi.fn(),
-      signOut: vi.fn(),
-      resetPassword: vi.fn(),
-      updateProfile: vi.fn(),
     });
 
     render(
@@ -151,16 +143,9 @@ describe('Route Guards Suite (ProtectedRoute & PublicRoute)', () => {
   });
 
   it('redirects authenticated user away from /signin to /dashboard', () => {
-    vi.mocked(AuthModule.useAuth).mockReturnValue({
+    mockAuth({
       user: AuthModule.DEMO_USER,
-      isLoading: false,
       isAuthenticated: true,
-      signUp: vi.fn(),
-      signIn: vi.fn(),
-      signInWithGoogle: vi.fn(),
-      signOut: vi.fn(),
-      resetPassword: vi.fn(),
-      updateProfile: vi.fn(),
     });
 
     render(
@@ -184,16 +169,9 @@ describe('Route Guards Suite (ProtectedRoute & PublicRoute)', () => {
   });
 
   it('allows unauthenticated visitor on PublicRoute when restrictAuthenticated is false', () => {
-    vi.mocked(AuthModule.useAuth).mockReturnValue({
+    mockAuth({
       user: null,
-      isLoading: false,
       isAuthenticated: false,
-      signUp: vi.fn(),
-      signIn: vi.fn(),
-      signInWithGoogle: vi.fn(),
-      signOut: vi.fn(),
-      resetPassword: vi.fn(),
-      updateProfile: vi.fn(),
     });
 
     render(
@@ -215,16 +193,9 @@ describe('Route Guards Suite (ProtectedRoute & PublicRoute)', () => {
   });
 
   it('allows authenticated user on PublicRoute when restrictAuthenticated is false (Landing page remains accessible)', () => {
-    vi.mocked(AuthModule.useAuth).mockReturnValue({
+    mockAuth({
       user: AuthModule.DEMO_USER,
-      isLoading: false,
       isAuthenticated: true,
-      signUp: vi.fn(),
-      signIn: vi.fn(),
-      signInWithGoogle: vi.fn(),
-      signOut: vi.fn(),
-      resetPassword: vi.fn(),
-      updateProfile: vi.fn(),
     });
 
     render(
@@ -243,8 +214,131 @@ describe('Route Guards Suite (ProtectedRoute & PublicRoute)', () => {
       </MemoryRouter>
     );
 
-    // Landing page remains accessible to authenticated users
     expect(screen.getByText('Public Landing Page')).toBeInTheDocument();
     expect(screen.queryByText('Authenticated Dashboard')).not.toBeInTheDocument();
+  });
+
+  it('redirects authenticated user with incomplete onboarding from /dashboard to /onboarding', () => {
+    const incompleteUser: User = {
+      ...AuthModule.DEMO_USER,
+      id: 'incomplete-user-1',
+      onboarding_completed: false,
+    };
+
+    mockAuth({
+      user: incompleteUser,
+      isAuthenticated: true,
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/dashboard']}>
+        <Routes>
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <div>Protected Dashboard Content</div>
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/onboarding" element={<div>Onboarding Flow</div>} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('Onboarding Flow')).toBeInTheDocument();
+    expect(screen.queryByText('Protected Dashboard Content')).not.toBeInTheDocument();
+  });
+
+  it('allows authenticated user with incomplete onboarding to access /onboarding', () => {
+    const incompleteUser: User = {
+      ...AuthModule.DEMO_USER,
+      id: 'incomplete-user-2',
+      onboarding_completed: false,
+    };
+
+    mockAuth({
+      user: incompleteUser,
+      isAuthenticated: true,
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/onboarding']}>
+        <Routes>
+          <Route
+            path="/onboarding"
+            element={
+              <ProtectedRoute>
+                <div>Onboarding Flow Content</div>
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/dashboard" element={<div>Dashboard Content</div>} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('Onboarding Flow Content')).toBeInTheDocument();
+    expect(screen.queryByText('Dashboard Content')).not.toBeInTheDocument();
+  });
+
+  it('redirects authenticated user with completed onboarding away from /onboarding to /dashboard', () => {
+    mockAuth({
+      user: AuthModule.DEMO_USER, // onboarding_completed: true
+      isAuthenticated: true,
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/onboarding']}>
+        <Routes>
+          <Route
+            path="/onboarding"
+            element={
+              <ProtectedRoute>
+                <div>Onboarding Flow Content</div>
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/dashboard" element={<div>Forwarded to Dashboard</div>} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('Forwarded to Dashboard')).toBeInTheDocument();
+    expect(screen.queryByText('Onboarding Flow Content')).not.toBeInTheDocument();
+  });
+
+  it('redirects authenticated user with incomplete onboarding away from /signin to /onboarding', () => {
+    const incompleteUser: User = {
+      ...AuthModule.DEMO_USER,
+      id: 'incomplete-user-3',
+      onboarding_completed: false,
+    };
+
+    mockAuth({
+      user: incompleteUser,
+      isAuthenticated: true,
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/signin']}>
+        <Routes>
+          <Route
+            path="/signin"
+            element={
+              <PublicRoute>
+                <div>Sign In Form</div>
+              </PublicRoute>
+            }
+          />
+          <Route path="/onboarding" element={<div>Onboarding Target</div>} />
+          <Route path="/dashboard" element={<div>Dashboard Target</div>} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('Onboarding Target')).toBeInTheDocument();
+    expect(screen.queryByText('Sign In Form')).not.toBeInTheDocument();
+    expect(screen.queryByText('Dashboard Target')).not.toBeInTheDocument();
   });
 });
