@@ -1,23 +1,20 @@
 // ============================================================
-// Aayurface — Auth Context (Mock Provider with LocalStorage)
-// In production, connect to Supabase Auth
+// Aayurface — Real Supabase Authentication Provider (Phase 07)
+// Connected to Supabase Auth (GoTrue) & PostgreSQL RLS
 // ============================================================
 
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
-import type { User, AuthContextType } from '@/types';
+import type { User as SupabaseAuthUser } from '@supabase/supabase-js';
+import type { User, AuthContextType, SkinType, Dosha } from '@/types';
+import { supabase } from '@/lib/supabase';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const USERS_KEY = 'aayurface_users';
-const SESSION_KEY = 'aayurface_session';
-
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-export interface StoredUser extends User {
-  password?: string;
-}
-
-export const DEMO_USER: StoredUser = {
+/**
+ * Isolated test fixture for test suites (e.g. guards.test.tsx).
+ * NEVER injected into localStorage or the live authentication workflow.
+ */
+export const TEST_FIXTURE_USER: User = {
   id: 'user-namrata-sen',
   email: 'namrata.sen@example.com',
   full_name: 'Namrata Sen',
@@ -27,157 +24,207 @@ export const DEMO_USER: StoredUser = {
   onboarding_completed: true,
   created_at: '2026-01-15T00:00:00.000Z',
   updated_at: '2026-01-15T00:00:00.000Z',
-  password: 'Ayur@123',
 };
+
+// Preserved for test backward-compatibility
+export const DEMO_USER = TEST_FIXTURE_USER;
+
+/**
+ * Resolves an authenticated Supabase user into the domain User entity.
+ * Checks the database profiles table if available, falling back to auth user metadata.
+ */
+async function resolveUserProfile(sbUser: SupabaseAuthUser): Promise<User> {
+  const fallbackUser: User = {
+    id: sbUser.id,
+    email: sbUser.email || '',
+    full_name: (sbUser.user_metadata?.full_name as string) || (sbUser.user_metadata?.name as string) || '',
+    avatar_url: (sbUser.user_metadata?.avatar_url as string) || null,
+    skin_type: (sbUser.user_metadata?.skin_type as SkinType) || null,
+    dosha: (sbUser.user_metadata?.dosha as Dosha) || null,
+    onboarding_completed: Boolean(sbUser.user_metadata?.onboarding_completed),
+    created_at: sbUser.created_at,
+    updated_at: sbUser.updated_at || sbUser.created_at,
+  };
+
+  try {
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', sbUser.id)
+      .maybeSingle();
+
+    if (!error && profile) {
+      return {
+        id: profile.id,
+        email: sbUser.email || '',
+        full_name: profile.full_name || fallbackUser.full_name,
+        avatar_url: profile.avatar_url || fallbackUser.avatar_url,
+        skin_type: profile.skin_type || fallbackUser.skin_type,
+        dosha: profile.dosha || fallbackUser.dosha,
+        onboarding_completed: Boolean(profile.onboarding_completed),
+        created_at: profile.created_at || fallbackUser.created_at,
+        updated_at: profile.updated_at || fallbackUser.updated_at,
+      };
+    }
+  } catch (err) {
+    console.warn('[AuthContext] Could not fetch profile from table, using auth metadata:', err);
+  }
+
+  return fallbackUser;
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // initially true while we check local storage
+  // AUTH_INITIALIZING: true until Supabase verifies session
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing session on mount
-    const savedSession = localStorage.getItem(SESSION_KEY);
-    if (savedSession) {
-      try {
-        const parsedUser = JSON.parse(savedSession);
-        setUser(parsedUser);
-      } catch (e) {
-        console.error("Failed to parse session", e);
+    let isMounted = true;
+
+    // 1. Initial Session Hydration from Supabase
+    supabase.auth.getSession().then(async ({ data: { session }, error }) => {
+      if (!isMounted) return;
+      if (error) {
+        console.error('[AuthContext] Error retrieving session:', error.message);
+        setUser(null);
+        setIsLoading(false);
+        return;
       }
-    }
-    setIsLoading(false);
+
+      if (session?.user) {
+        const resolved = await resolveUserProfile(session.user);
+        if (isMounted) {
+          setUser(resolved);
+          setIsLoading(false);
+        }
+      } else {
+        if (isMounted) {
+          setUser(null);
+          setIsLoading(false);
+        }
+      }
+    }).catch((err) => {
+      if (isMounted) {
+        console.error('[AuthContext] Session hydration exception:', err);
+        setUser(null);
+        setIsLoading(false);
+      }
+    });
+
+    // 2. Realtime Auth State Listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!isMounted) return;
+      if (session?.user) {
+        const resolved = await resolveUserProfile(session.user);
+        if (isMounted) {
+          setUser(resolved);
+          setIsLoading(false);
+        }
+      } else {
+        if (isMounted) {
+          setUser(null);
+          setIsLoading(false);
+        }
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const getStoredUsers = (): StoredUser[] => {
-    const users = localStorage.getItem(USERS_KEY);
-    if (users) {
-      try {
-        return JSON.parse(users);
-      } catch {
-        return [DEMO_USER];
-      }
-    }
-    // Seed default registered account in stored users so a valid account exists for login testing
-    localStorage.setItem(USERS_KEY, JSON.stringify([DEMO_USER]));
-    return [DEMO_USER];
-  };
-
-  const saveStoredUsers = (users: StoredUser[]) => {
-    localStorage.setItem(USERS_KEY, JSON.stringify(users));
-  };
-
-  const saveSession = (userObj: User | null) => {
-    if (userObj) {
-      localStorage.setItem(SESSION_KEY, JSON.stringify(userObj));
-    } else {
-      localStorage.removeItem(SESSION_KEY);
-    }
-    setUser(userObj);
-  };
-
   const signUp = useCallback(async (email: string, password: string, fullName: string) => {
-    await delay(300);
-    
-    const users = getStoredUsers();
-    const existingUser = users.find(u => u.email === email);
-    if (existingUser) {
-      throw new Error("User with this email already exists.");
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+        },
+      },
+    });
+
+    if (error) {
+      throw error;
     }
 
-    const newUser: StoredUser = {
-      id: crypto.randomUUID ? crypto.randomUUID() : `user-${Date.now()}`,
-      email,
-      full_name: fullName,
-      avatar_url: null,
-      skin_type: null,
-      dosha: null,
-      onboarding_completed: false,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      password,
-    };
-
-    users.push(newUser);
-    saveStoredUsers(users);
-    
-    // Save session without password property
-    const { password: _, ...sessionUser } = newUser;
-    saveSession(sessionUser);
+    if (data.session?.user) {
+      const resolved = await resolveUserProfile(data.session.user);
+      setUser(resolved);
+    }
   }, []);
 
   const signIn = useCallback(async (email: string, password: string) => {
-    await delay(300);
-    
-    const users = getStoredUsers();
-    const existingUser = users.find(u => u.email === email);
-    
-    if (!existingUser) {
-      throw new Error("Invalid email or password.");
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      throw error;
     }
 
-    const expectedPassword = existingUser.password || (existingUser.email === DEMO_USER.email ? 'Ayur@123' : undefined);
-    if (!expectedPassword || expectedPassword !== password) {
-      throw new Error("Invalid email or password.");
+    if (data.session?.user) {
+      const resolved = await resolveUserProfile(data.session.user);
+      setUser(resolved);
     }
-
-    const { password: _, ...sessionUser } = existingUser;
-    saveSession(sessionUser);
   }, []);
 
   const signInWithGoogle = useCallback(async () => {
-    await delay(300);
-    
-    const email = 'google.user@gmail.com';
-    const users = getStoredUsers();
-    let existingUser = users.find(u => u.email === email);
-    
-    if (!existingUser) {
-      existingUser = {
-        id: crypto.randomUUID ? crypto.randomUUID() : `user-${Date.now()}`,
-        email,
-        full_name: 'Google User',
-        avatar_url: null,
-        skin_type: null,
-        dosha: null,
-        onboarding_completed: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-      users.push(existingUser);
-      saveStoredUsers(users);
-    }
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`,
+      },
+    });
 
-    saveSession(existingUser);
+    if (error) {
+      throw error;
+    }
   }, []);
 
   const signOut = useCallback(async () => {
-    saveSession(null);
+    const { error } = await supabase.auth.signOut();
+    setUser(null);
+    if (error) {
+      console.error('[AuthContext] Error signing out:', error.message);
+    }
   }, []);
 
-  const resetPassword = useCallback(async (_email: string) => {
-    await delay(300);
-    // Simulated — no actual reset in localStorage
+  const resetPassword = useCallback(async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/forgot-password`,
+    });
+    if (error) {
+      throw error;
+    }
   }, []);
 
   const updateProfile = useCallback(async (data: Partial<User>) => {
-    setUser((prev) => {
-      if (!prev) return prev;
-      const updatedUser = { ...prev, ...data, updated_at: new Date().toISOString() };
-      
-      // Update session
-      saveSession(updatedUser);
-      
-      // Update user in users list
-      const users = getStoredUsers();
-      const userIndex = users.findIndex(u => u.id === updatedUser.id);
-      if (userIndex !== -1) {
-        users[userIndex] = updatedUser;
-        saveStoredUsers(users);
-      }
-      
-      return updatedUser;
+    if (!user) return;
+
+    // 1. Update Supabase Auth metadata
+    const { error: authError } = await supabase.auth.updateUser({
+      data,
     });
-  }, []);
+    if (authError) {
+      throw authError;
+    }
+
+    // 2. Update profiles table if available (omit email which is authoritative in auth.users)
+    try {
+      const { email: _email, id: _id, created_at: _created, ...profileUpdate } = data;
+      if (Object.keys(profileUpdate).length > 0) {
+        await supabase.from('profiles').update(profileUpdate).eq('id', user.id);
+      }
+    } catch (err) {
+      console.warn('[AuthContext] Could not update profiles table:', err);
+    }
+
+    // 3. Update local state
+    setUser((prev) => (prev ? { ...prev, ...data, updated_at: new Date().toISOString() } : null));
+  }, [user]);
 
   return (
     <AuthContext.Provider
