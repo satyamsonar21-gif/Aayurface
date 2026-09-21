@@ -10,10 +10,13 @@
 -- ============================================================
 
 -- ------------------------------------------------------------
--- 1. HARDEN handle_new_user()
+-- 1. HARDEN handle_new_user() & REPAIR PROFILES EMAIL CONSTRAINT
 -- ------------------------------------------------------------
+-- Ensure email column is not strictly blocking if omitted
+ALTER TABLE public.profiles ALTER COLUMN email DROP NOT NULL;
+
 -- Ensure SECURITY DEFINER with locked empty search_path
--- Fully qualify public.profiles
+-- Fully qualify public.profiles and include NEW.email
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -21,12 +24,15 @@ SECURITY DEFINER
 SET search_path = ''
 AS $$
 BEGIN
-  INSERT INTO public.profiles (id, full_name)
+  INSERT INTO public.profiles (id, full_name, email)
   VALUES (
     NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', '')
+    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', ''),
+    NEW.email
   )
-  ON CONFLICT (id) DO NOTHING;
+  ON CONFLICT (id) DO UPDATE
+  SET full_name = EXCLUDED.full_name,
+      email = COALESCE(EXCLUDED.email, public.profiles.email);
   RETURN NEW;
 END;
 $$;

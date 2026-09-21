@@ -117,12 +117,15 @@ SECURITY DEFINER
 SET search_path = ''
 AS $$
 BEGIN
-  INSERT INTO public.profiles (id, full_name)
+  INSERT INTO public.profiles (id, full_name, email)
   VALUES (
     NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', '')
+    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', ''),
+    NEW.email
   )
-  ON CONFLICT (id) DO NOTHING;
+  ON CONFLICT (id) DO UPDATE
+  SET full_name = EXCLUDED.full_name,
+      email = COALESCE(EXCLUDED.email, public.profiles.email);
   RETURN NEW;
 END;
 $$;
@@ -194,68 +197,89 @@ ALTER TABLE public.remedies ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.daily_tips ENABLE ROW LEVEL SECURITY;
 
 -- Profiles: users can only access their own
+DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
 CREATE POLICY "Users can view own profile" ON public.profiles
   FOR SELECT TO authenticated USING ((SELECT auth.uid()) = id);
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 CREATE POLICY "Users can update own profile" ON public.profiles
   FOR UPDATE TO authenticated
   USING ((SELECT auth.uid()) = id)
   WITH CHECK ((SELECT auth.uid()) = id);
+DROP POLICY IF EXISTS "Users can insert own profile" ON public.profiles;
 CREATE POLICY "Users can insert own profile" ON public.profiles
   FOR INSERT TO authenticated
   WITH CHECK ((SELECT auth.uid()) = id);
 
 -- Scan results: users can only access their own
+DROP POLICY IF EXISTS "Users can view own scans" ON public.scan_results;
 CREATE POLICY "Users can view own scans" ON public.scan_results
   FOR SELECT TO authenticated USING ((SELECT auth.uid()) = user_id);
+DROP POLICY IF EXISTS "Users can insert own scans" ON public.scan_results;
 CREATE POLICY "Users can insert own scans" ON public.scan_results
   FOR INSERT TO authenticated WITH CHECK ((SELECT auth.uid()) = user_id);
+DROP POLICY IF EXISTS "Users can update own scans" ON public.scan_results;
 CREATE POLICY "Users can update own scans" ON public.scan_results
   FOR UPDATE TO authenticated
   USING ((SELECT auth.uid()) = user_id)
   WITH CHECK ((SELECT auth.uid()) = user_id);
+DROP POLICY IF EXISTS "Users can delete own scans" ON public.scan_results;
 CREATE POLICY "Users can delete own scans" ON public.scan_results
   FOR DELETE TO authenticated USING ((SELECT auth.uid()) = user_id);
 
 -- Saved remedies: users manage their own
+DROP POLICY IF EXISTS "Users can view own saved remedies" ON public.saved_remedies;
 CREATE POLICY "Users can view own saved remedies" ON public.saved_remedies
   FOR SELECT TO authenticated USING ((SELECT auth.uid()) = user_id);
+DROP POLICY IF EXISTS "Users can insert own saved remedies" ON public.saved_remedies;
 CREATE POLICY "Users can insert own saved remedies" ON public.saved_remedies
   FOR INSERT TO authenticated WITH CHECK ((SELECT auth.uid()) = user_id);
+DROP POLICY IF EXISTS "Users can update own saved remedies" ON public.saved_remedies;
 CREATE POLICY "Users can update own saved remedies" ON public.saved_remedies
   FOR UPDATE TO authenticated
   USING ((SELECT auth.uid()) = user_id)
   WITH CHECK ((SELECT auth.uid()) = user_id);
+DROP POLICY IF EXISTS "Users can delete own saved remedies" ON public.saved_remedies;
 CREATE POLICY "Users can delete own saved remedies" ON public.saved_remedies
   FOR DELETE TO authenticated USING ((SELECT auth.uid()) = user_id);
 
 -- Chat sessions: users manage their own
+DROP POLICY IF EXISTS "Users can view own chat sessions" ON public.chat_sessions;
 CREATE POLICY "Users can view own chat sessions" ON public.chat_sessions
   FOR SELECT TO authenticated USING ((SELECT auth.uid()) = user_id);
+DROP POLICY IF EXISTS "Users can insert own chat sessions" ON public.chat_sessions;
 CREATE POLICY "Users can insert own chat sessions" ON public.chat_sessions
   FOR INSERT TO authenticated WITH CHECK ((SELECT auth.uid()) = user_id);
+DROP POLICY IF EXISTS "Users can update own chat sessions" ON public.chat_sessions;
 CREATE POLICY "Users can update own chat sessions" ON public.chat_sessions
   FOR UPDATE TO authenticated
   USING ((SELECT auth.uid()) = user_id)
   WITH CHECK ((SELECT auth.uid()) = user_id);
+DROP POLICY IF EXISTS "Users can delete own chat sessions" ON public.chat_sessions;
 CREATE POLICY "Users can delete own chat sessions" ON public.chat_sessions
   FOR DELETE TO authenticated USING ((SELECT auth.uid()) = user_id);
 
 -- Chat messages: users manage their own
+DROP POLICY IF EXISTS "Users can view own chat messages" ON public.chat_messages;
 CREATE POLICY "Users can view own chat messages" ON public.chat_messages
   FOR SELECT TO authenticated USING ((SELECT auth.uid()) = user_id);
+DROP POLICY IF EXISTS "Users can insert own chat messages" ON public.chat_messages;
 CREATE POLICY "Users can insert own chat messages" ON public.chat_messages
   FOR INSERT TO authenticated WITH CHECK ((SELECT auth.uid()) = user_id);
+DROP POLICY IF EXISTS "Users can update own chat messages" ON public.chat_messages;
 CREATE POLICY "Users can update own chat messages" ON public.chat_messages
   FOR UPDATE TO authenticated
   USING ((SELECT auth.uid()) = user_id)
   WITH CHECK ((SELECT auth.uid()) = user_id);
+DROP POLICY IF EXISTS "Users can delete own chat messages" ON public.chat_messages;
 CREATE POLICY "Users can delete own chat messages" ON public.chat_messages
   FOR DELETE TO authenticated USING ((SELECT auth.uid()) = user_id);
 
 -- Remedies: public read access
+DROP POLICY IF EXISTS "Public can read remedies" ON public.remedies;
 CREATE POLICY "Public can read remedies" ON public.remedies
   FOR SELECT USING (TRUE);
 
 -- Daily tips: public read access (active only)
+DROP POLICY IF EXISTS "Public can read daily tips" ON public.daily_tips;
 CREATE POLICY "Public can read daily tips" ON public.daily_tips
   FOR SELECT USING (is_active = TRUE);
