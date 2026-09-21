@@ -99,7 +99,7 @@ const Sidebar: React.FC = () => {
         <button
           onClick={toggleSidebar}
           aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          className="p-1.5 rounded-md hover:bg-background-subtle text-text-secondary hover:text-text-primary transition-colors ml-auto cursor-pointer"
+          className="p-2 rounded-md hover:bg-background-subtle text-text-secondary hover:text-text-primary transition-colors ml-auto cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center"
         >
           {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </button>
@@ -131,10 +131,10 @@ const Sidebar: React.FC = () => {
                     title={isCollapsed ? item.label : undefined}
                     className={cn(
                       'group flex items-center rounded-md transition-all duration-200 text-body-md relative',
-                      isCollapsed ? 'justify-center p-3' : 'gap-3 px-3 py-2',
+                      isCollapsed ? 'justify-center p-2.5 min-h-[44px]' : 'gap-3 px-3 py-2.5 min-h-[44px]',
                       isActive
-                        ? 'bg-brand-primary/10 text-brand-primary font-semibold border-l-2 border-brand-primary'
-                        : 'text-text-secondary hover:text-text-primary hover:bg-background-subtle border-l-2 border-transparent'
+                        ? 'bg-brand-accent-subtle text-brand-primary font-semibold border-l-2 border-brand-accent'
+                        : 'text-text-secondary hover:text-text-primary hover:bg-background-subtle/80 border-l-2 border-transparent'
                     )}
                   >
                     <Icon

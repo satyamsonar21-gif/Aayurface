@@ -114,20 +114,20 @@ export const CameraViewfinder: React.FC<CameraViewfinderProps> = ({
           <h3 className="font-display text-xl sm:text-2xl font-semibold mb-2">
             Camera Permission Required
           </h3>
-          <p className="text-sm text-white/70 max-w-sm mb-6 leading-relaxed font-body">
+          <p className="text-sm text-white/90 max-w-sm mb-6 leading-relaxed font-body">
             {error?.message || 'Camera access is blocked. Allow camera permission in your browser settings and try again.'}
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={onRetry}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md bg-[#1E3A2F] text-white text-sm font-medium hover:bg-[#152B23] border border-[#C5A059]/40 transition-colors cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 min-h-[44px] rounded-md bg-[#1E3A2F] text-white text-sm font-medium hover:bg-[#152B23] border border-[#C5A059]/40 transition-colors cursor-pointer"
             >
               <RefreshCw className="w-4 h-4" />
               Try Again
             </button>
             <button
               onClick={onUploadClick}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md bg-white/10 text-white text-sm font-medium hover:bg-white/15 border border-white/10 transition-colors cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 min-h-[44px] rounded-md bg-white/10 text-white text-sm font-medium hover:bg-white/15 border border-white/10 transition-colors cursor-pointer"
             >
               <Upload className="w-4 h-4" />
               Upload Photo Instead
@@ -144,20 +144,20 @@ export const CameraViewfinder: React.FC<CameraViewfinderProps> = ({
           <h3 className="font-display text-xl sm:text-2xl font-semibold mb-2">
             Camera Unavailable
           </h3>
-          <p className="text-sm text-white/70 max-w-sm mb-6 leading-relaxed font-body">
+          <p className="text-sm text-white/90 max-w-sm mb-6 leading-relaxed font-body">
             {error?.message || 'No usable camera was found or access was restricted.'}
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={onRetry}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md bg-[#1E3A2F] text-white text-sm font-medium hover:bg-[#152B23] border border-[#C5A059]/40 transition-colors cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 min-h-[44px] rounded-md bg-[#1E3A2F] text-white text-sm font-medium hover:bg-[#152B23] border border-[#C5A059]/40 transition-colors cursor-pointer"
             >
               <RefreshCw className="w-4 h-4" />
               Try Again
             </button>
             <button
               onClick={onUploadClick}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-md bg-white/10 text-white text-sm font-medium hover:bg-white/15 border border-white/10 transition-colors cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 min-h-[44px] rounded-md bg-white/10 text-white text-sm font-medium hover:bg-white/15 border border-white/10 transition-colors cursor-pointer"
             >
               <Upload className="w-4 h-4" />
               Upload Photo Instead

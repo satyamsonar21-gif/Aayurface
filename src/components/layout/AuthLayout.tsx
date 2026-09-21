@@ -44,7 +44,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, className, title, sub
 
           <div className="mt-8 text-center">
             <p className="font-body text-caption text-text-tertiary">
-              Evidence-Aware Multimodal Ayurvedic Intelligence
+              Evidence-Aware Ayurvedic Facial Wellness
             </p>
           </div>
         </div>

@@ -46,7 +46,7 @@ describe('Route Guards Suite (ProtectedRoute & PublicRoute)', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText(/Loading Ayurvedic Intelligence/i)).toBeInTheDocument();
+    expect(screen.getByText(/Loading AayurFace/i)).toBeInTheDocument();
     expect(screen.queryByText('Protected Dashboard Content')).not.toBeInTheDocument();
   });
 

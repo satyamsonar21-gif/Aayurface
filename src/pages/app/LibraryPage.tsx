@@ -87,7 +87,7 @@ export default function LibraryPage() {
             {/* All vs Saved Tabs */}
             <div className="flex bg-background-subtle p-1 rounded-md border border-border-default w-full sm:w-auto">
               <button 
-                className={`flex-1 sm:flex-none px-4 py-1.5 rounded-sm text-caption font-body font-semibold transition-all cursor-pointer ${
+                className={`flex-1 sm:flex-none px-4 py-2 min-h-[44px] rounded-sm text-caption font-body font-semibold transition-all cursor-pointer flex items-center justify-center ${
                   activeTab === 'all' 
                     ? 'bg-background-surface text-brand-primary shadow-sm' 
                     : 'text-text-secondary hover:text-text-primary'
@@ -97,7 +97,7 @@ export default function LibraryPage() {
                 All Formulations ({MOCK_REMEDIES.length})
               </button>
               <button 
-                className={`flex-1 sm:flex-none px-4 py-1.5 rounded-sm text-caption font-body font-semibold transition-all cursor-pointer ${
+                className={`flex-1 sm:flex-none px-4 py-2 min-h-[44px] rounded-sm text-caption font-body font-semibold transition-all cursor-pointer flex items-center justify-center ${
                   activeTab === 'saved' 
                     ? 'bg-background-surface text-brand-primary shadow-sm' 
                     : 'text-text-secondary hover:text-text-primary'
@@ -110,10 +110,10 @@ export default function LibraryPage() {
           </div>
 
           {/* Skin Concern Filter Chips */}
-          <div className="flex overflow-x-auto gap-2 pb-1 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div className="flex overflow-x-auto gap-2 pb-1 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 items-center">
             <button
               onClick={() => setActiveConcern(null)}
-              className={`whitespace-nowrap px-3.5 py-1.5 rounded-full text-caption font-body font-medium transition-colors cursor-pointer ${
+              className={`whitespace-nowrap px-4 py-2 min-h-[44px] rounded-full text-caption font-body font-medium transition-colors cursor-pointer flex items-center justify-center ${
                 activeConcern === null 
                   ? 'bg-brand-primary text-text-inverse shadow-sm' 
                   : 'bg-background-surface border border-border-default text-text-secondary hover:text-text-primary hover:bg-background-subtle'
@@ -121,11 +121,11 @@ export default function LibraryPage() {
             >
               All Concerns
             </button>
-            {SKIN_CONCERNS.map((concern) => (
+            {SKIN_CONCERNS.filter(c => c.toLowerCase() !== 'all').map((concern) => (
               <button
                 key={concern}
                 onClick={() => setActiveConcern(concern === activeConcern ? null : concern)}
-                className={`whitespace-nowrap px-3.5 py-1.5 rounded-full text-caption font-body font-medium transition-colors capitalize cursor-pointer ${
+                className={`whitespace-nowrap px-4 py-2 min-h-[44px] rounded-full text-caption font-body font-medium transition-colors capitalize cursor-pointer flex items-center justify-center ${
                   activeConcern === concern 
                     ? 'bg-brand-primary text-text-inverse shadow-sm' 
                     : 'bg-background-surface border border-border-default text-text-secondary hover:text-text-primary hover:bg-background-subtle'
@@ -223,7 +223,7 @@ export default function LibraryPage() {
                         onClick={(e) => toggleSave(remedy.id, e)}
                         title={isSaved ? "Remove from saved" : "Save formulation"}
                         aria-label={isSaved ? "Remove from saved" : "Save formulation"}
-                        className="p-1.5 rounded-full text-text-tertiary hover:text-brand-primary hover:bg-background-subtle transition-colors shrink-0 cursor-pointer"
+                        className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full text-text-tertiary hover:text-brand-primary hover:bg-background-subtle transition-colors shrink-0 cursor-pointer"
                       >
                         <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-brand-accent text-brand-accent' : ''}`} />
                       </button>

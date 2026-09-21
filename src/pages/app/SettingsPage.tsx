@@ -67,13 +67,13 @@ export default function SettingsPage() {
           </p>
         </div>
 
-        {/* Informative Presentation State Banner */}
+        {/* System & Local Preferences Banner */}
         <div className="p-4 rounded-md bg-background-subtle border border-border-default flex items-start gap-3">
           <Sparkles className="w-5 h-5 text-brand-accent shrink-0 mt-0.5" />
           <div className="text-caption text-text-secondary space-y-0.5">
-            <p className="font-semibold text-text-primary">Presentation Mode — Local Preferences</p>
+            <p className="font-semibold text-text-primary">System & Local Preferences</p>
             <p>
-              Settings are stored locally in your browser session. AayurFace operates as a private, client-side digital wellness companion.
+              Preferences are preserved across your active session. AayurFace operates as an evidence-aware Ayurvedic wellness companion.
             </p>
           </div>
         </div>
@@ -187,7 +187,7 @@ export default function SettingsPage() {
             <div className="flex flex-col sm:flex-row gap-3 pt-1">
               <button
                 onClick={() => navigate('/profile/edit')}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-md border border-border-default bg-background-surface text-text-primary text-body-md font-medium hover:bg-background-subtle transition-colors cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 min-h-[44px] rounded-md border border-border-default bg-background-surface text-text-primary text-body-md font-medium hover:bg-background-subtle transition-colors cursor-pointer shadow-xs"
               >
                 Edit Profile Details
                 <ChevronRight className="w-4 h-4 text-text-tertiary" />
@@ -195,7 +195,7 @@ export default function SettingsPage() {
 
               <button
                 onClick={handleLogout}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-md border border-red-200 text-red-700 bg-red-50/50 text-body-md font-medium hover:bg-red-50 hover:text-red-800 transition-colors cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 min-h-[44px] rounded-md border border-red-200 text-red-700 bg-red-50/50 text-body-md font-medium hover:bg-red-100 hover:text-red-800 transition-colors cursor-pointer shadow-xs"
               >
                 <LogOut className="w-4 h-4" />
                 Sign Out

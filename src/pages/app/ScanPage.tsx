@@ -54,24 +54,40 @@ export default function ScanPage() {
     navigate(`/results/${assessment.id}`);
   };
 
+  const isReview = state === 'preview';
+
   return (
-    <div className="relative w-full h-[100dvh] bg-[#FAF8F5] text-[#1A1F1C] overflow-hidden flex flex-col font-body select-none">
-      {/* 1. Top Navigation Bar */}
-      <header className="h-14 px-4 sm:px-6 z-50 flex items-center justify-between border-b border-[#E6DFD5] bg-[#FAF8F5]/95 backdrop-blur-md shrink-0">
+    <div className="relative w-full h-[100dvh] bg-background-primary text-text-primary overflow-hidden flex flex-col font-body select-none">
+      {/* 1. Top Navigation Bar with 3-Step Progression */}
+      <header className="h-16 px-4 sm:px-6 z-50 flex items-center justify-between border-b border-border-default bg-background-primary/95 backdrop-blur-md shrink-0">
         <button
           onClick={() => navigate('/dashboard')}
           aria-label="Return to Dashboard"
-          className="p-2 rounded-full hover:bg-[#F3EFEA] text-[#1A1F1C] transition-colors cursor-pointer"
+          className="p-2 rounded-full hover:bg-background-subtle text-text-primary transition-colors cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
 
-        <div className="flex flex-col items-center">
-          <span className="font-display font-semibold text-base sm:text-lg text-[#1A1F1C] tracking-tight">
+        {/* Center: Title + 3-Step Subtle Progress Indicator */}
+        <div className="flex flex-col items-center gap-0.5">
+          <h1 className="font-display text-xs sm:text-sm font-semibold text-text-primary tracking-wide">
             Skin Wellness Observation
-          </span>
-          <span className="text-[11px] text-[#5C6660] flex items-center gap-1 font-body">
-            <ShieldCheck size={12} className="text-[#C5A059]" />
+          </h1>
+          <div className="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-[11px] font-body tracking-wider uppercase font-semibold">
+            <span className={isReview ? 'text-text-tertiary' : 'text-brand-primary border-b border-brand-primary pb-0.5'}>
+              01 Capture
+            </span>
+            <span className="text-border-default">→</span>
+            <span className={isReview ? 'text-brand-primary border-b border-brand-primary pb-0.5' : 'text-text-tertiary'}>
+              02 Review
+            </span>
+            <span className="text-border-default">→</span>
+            <span className="text-text-tertiary">
+              03 Understand
+            </span>
+          </div>
+          <span className="text-[10px] text-text-secondary hidden sm:flex items-center gap-1 font-body">
+            <ShieldCheck size={11} className="text-brand-accent" />
             Client-Side Capture • Non-Diagnostic
           </span>
         </div>
@@ -80,7 +96,7 @@ export default function ScanPage() {
           onClick={retry}
           aria-label="Restart camera"
           title="Restart camera stream"
-          className="p-2 rounded-full hover:bg-[#F3EFEA] text-[#1A1F1C] transition-colors cursor-pointer"
+          className="p-2 rounded-full hover:bg-background-subtle text-text-primary transition-colors cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center"
         >
           <RefreshCw className="w-5 h-5" />
         </button>
@@ -90,7 +106,7 @@ export default function ScanPage() {
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
         {/* Zone 1: Camera Hero */}
         <main 
-          className="w-full lg:flex-1 h-[44vh] sm:h-[48vh] lg:h-full shrink-0 lg:shrink p-3 sm:p-4 lg:p-6 bg-[#FAF8F5] flex items-center justify-center min-h-0"
+          className="w-full lg:flex-1 h-[44vh] sm:h-[48vh] lg:h-full shrink-0 lg:shrink p-3 sm:p-4 lg:p-6 bg-background-primary flex items-center justify-center min-h-0"
           aria-label="Camera Capture Area"
         >
           <div className="w-full h-full max-w-4xl max-h-[82vh] flex items-center justify-center">

@@ -223,9 +223,9 @@ export default function LandingPage() {
               {/* Description (§7) */}
               <motion.p 
                 variants={fadeInUp} 
-                className="text-base sm:text-lg text-[#5C6660] max-w-xl leading-relaxed font-normal"
+                className="text-base sm:text-lg text-text-secondary max-w-xl leading-relaxed font-normal"
               >
-                Understand your skin, balance your doshas, and discover personalized Ayurvedic guidance — powered by AI, rooted in tradition.
+                Understand your skin, balance your doshas, and discover personalized Ayurvedic guidance — rooted in classical tradition, elevated by modern wellness technology.
               </motion.p>
 
               {/* Hero Buttons (§7) */}
@@ -488,7 +488,7 @@ export default function LandingPage() {
                 {/* Step 1 */}
                 <div className="flex flex-col space-y-3 p-4 border-b lg:border-b-0 lg:border-r border-[#E6DFD5]">
                   <span className="text-xs font-semibold uppercase tracking-widest text-[#C5A059] font-body">01 / Intake</span>
-                  <h4 className="font-display text-xl font-semibold text-[#1A1F1C]">Capture</h4>
+                  <h3 className="font-display text-xl font-semibold text-[#1A1F1C]">Capture</h3>
                   <p className="text-xs text-[#5C6660] leading-relaxed">
                     Client-side guided facial alignment with optimal lighting verification.
                   </p>
@@ -497,7 +497,7 @@ export default function LandingPage() {
                 {/* Step 2 */}
                 <div className="flex flex-col space-y-3 p-4 border-b lg:border-b-0 lg:border-r border-[#E6DFD5]">
                   <span className="text-xs font-semibold uppercase tracking-widest text-[#C5A059] font-body">02 / Signal</span>
-                  <h4 className="font-display text-xl font-semibold text-[#1A1F1C]">Visual Features</h4>
+                  <h3 className="font-display text-xl font-semibold text-[#1A1F1C]">Visual Features</h3>
                   <p className="text-xs text-[#5C6660] leading-relaxed">
                     Surface hydration, texture uniformity, and sebum distribution mapping.
                   </p>
@@ -506,7 +506,7 @@ export default function LandingPage() {
                 {/* Step 3 */}
                 <div className="flex flex-col space-y-3 p-4 border-b lg:border-b-0 lg:border-r border-[#E6DFD5]">
                   <span className="text-xs font-semibold uppercase tracking-widest text-[#C5A059] font-body">03 / Tradition</span>
-                  <h4 className="font-display text-xl font-semibold text-[#1A1F1C]">Ayurvedic Context</h4>
+                  <h3 className="font-display text-xl font-semibold text-[#1A1F1C]">Ayurvedic Context</h3>
                   <p className="text-xs text-[#5C6660] leading-relaxed">
                     Classical correlation with Charaka &amp; Sushruta doshic indicators.
                   </p>
@@ -515,7 +515,7 @@ export default function LandingPage() {
                 {/* Step 4 */}
                 <div className="flex flex-col space-y-3 p-4 border-b lg:border-b-0 lg:border-r border-[#E6DFD5]">
                   <span className="text-xs font-semibold uppercase tracking-widest text-[#C5A059] font-body">04 / Balance</span>
-                  <h4 className="font-display text-xl font-semibold text-[#1A1F1C]">Lifestyle Context</h4>
+                  <h3 className="font-display text-xl font-semibold text-[#1A1F1C]">Lifestyle Context</h3>
                   <p className="text-xs text-[#5C6660] leading-relaxed">
                     Sleep rhythm, climate zone, and seasonal transition (*Ritu*) factors.
                   </p>
@@ -524,7 +524,7 @@ export default function LandingPage() {
                 {/* Step 5 */}
                 <div className="flex flex-col space-y-3 p-4 border-b lg:border-b-0 lg:border-r border-[#E6DFD5]">
                   <span className="text-xs font-semibold uppercase tracking-widest text-[#C5A059] font-body">05 / Synthesis</span>
-                  <h4 className="font-display text-xl font-semibold text-[#1A1F1C]">Multimodal Reasoning</h4>
+                  <h3 className="font-display text-xl font-semibold text-[#1A1F1C]">Multimodal Reasoning</h3>
                   <p className="text-xs text-[#5C6660] leading-relaxed">
                     Cross-verification between visual tendencies and intake parameters.
                   </p>
@@ -533,7 +533,7 @@ export default function LandingPage() {
                 {/* Step 6 */}
                 <div className="flex flex-col space-y-3 p-4">
                   <span className="text-xs font-semibold uppercase tracking-widest text-[#C5A059] font-body">06 / Output</span>
-                  <h4 className="font-display text-xl font-semibold text-[#1A1F1C]">Personal Guidance</h4>
+                  <h3 className="font-display text-xl font-semibold text-[#1A1F1C]">Personal Guidance</h3>
                   <p className="text-xs text-[#5C6660] leading-relaxed">
                     Actionable herbal remedies, daily rituals, and ingredient precautions.
                   </p>

@@ -142,13 +142,13 @@ export default function RoutinePage() {
           </div>
         </div>
 
-        {/* Presentation Disclaimer */}
+        {/* Seasonal Dinacharya Framework Banner */}
         <div className="p-4 rounded-md bg-background-subtle border border-border-default flex items-start gap-3">
           <Sparkles className="w-5 h-5 text-brand-accent shrink-0 mt-0.5" />
           <div className="text-caption text-text-secondary space-y-0.5">
-            <p className="font-semibold text-text-primary">Presentation Mode — Seasonal Dinacharya Framework</p>
+            <p className="font-semibold text-text-primary">Seasonal Dinacharya Framework</p>
             <p>
-              These time-honored practices align with classical Ayurvedic daily regimens. Practice gently according to your personal comfort and constitutional tendencies.
+              These time-honored practices align with classical Ayurvedic daily regimens (Dinacharya). Practice gently according to your personal comfort and constitutional tendencies.
             </p>
           </div>
         </div>
@@ -177,7 +177,7 @@ export default function RoutinePage() {
                 >
                   <button
                     aria-label={item.completed ? 'Mark ritual incomplete' : 'Mark ritual complete'}
-                    className="mt-0.5 text-brand-primary shrink-0 transition-transform active:scale-90"
+                    className="mt-0.5 text-brand-primary shrink-0 transition-transform active:scale-90 p-1 min-h-[44px] min-w-[44px] flex items-center justify-center -m-1"
                   >
                     {item.completed ? (
                       <CheckCircle2 className="w-5 h-5 text-emerald-700" />
@@ -187,7 +187,7 @@ export default function RoutinePage() {
                   </button>
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-center justify-between gap-2">
-                      <h3 className={`font-body text-body-md font-medium ${item.completed ? 'text-text-secondary line-through' : 'text-text-primary'}`}>
+                      <h3 className={`font-body text-body-md font-medium ${item.completed ? 'text-text-tertiary line-through decoration-brand-accent/50 decoration-1' : 'text-text-primary'}`}>
                         {item.title} <span className="text-caption text-text-tertiary font-normal italic">({item.sanskritName})</span>
                       </h3>
                       <span className="text-caption text-text-tertiary flex items-center gap-1 shrink-0 font-body">
@@ -224,7 +224,7 @@ export default function RoutinePage() {
                 >
                   <button
                     aria-label={item.completed ? 'Mark ritual incomplete' : 'Mark ritual complete'}
-                    className="mt-0.5 text-brand-primary shrink-0 transition-transform active:scale-90"
+                    className="mt-0.5 text-brand-primary shrink-0 transition-transform active:scale-90 p-1 min-h-[44px] min-w-[44px] flex items-center justify-center -m-1"
                   >
                     {item.completed ? (
                       <CheckCircle2 className="w-5 h-5 text-emerald-700" />
@@ -234,7 +234,7 @@ export default function RoutinePage() {
                   </button>
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-center justify-between gap-2">
-                      <h3 className={`font-body text-body-md font-medium ${item.completed ? 'text-text-secondary line-through' : 'text-text-primary'}`}>
+                      <h3 className={`font-body text-body-md font-medium ${item.completed ? 'text-text-tertiary line-through decoration-brand-accent/50 decoration-1' : 'text-text-primary'}`}>
                         {item.title} <span className="text-caption text-text-tertiary font-normal italic">({item.sanskritName})</span>
                       </h3>
                       <span className="text-caption text-text-tertiary flex items-center gap-1 shrink-0 font-body">
@@ -277,7 +277,7 @@ export default function RoutinePage() {
                 >
                   <button
                     aria-label={item.completed ? 'Mark ritual incomplete' : 'Mark ritual complete'}
-                    className="mt-0.5 text-brand-primary shrink-0 transition-transform active:scale-90"
+                    className="mt-0.5 text-brand-primary shrink-0 transition-transform active:scale-90 p-1 min-h-[44px] min-w-[44px] flex items-center justify-center -m-1"
                   >
                     {item.completed ? (
                       <CheckCircle2 className="w-5 h-5 text-emerald-700" />
@@ -287,7 +287,7 @@ export default function RoutinePage() {
                   </button>
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-center justify-between gap-2">
-                      <h3 className={`font-body text-body-md font-medium ${item.completed ? 'text-text-secondary line-through' : 'text-text-primary'}`}>
+                      <h3 className={`font-body text-body-md font-medium ${item.completed ? 'text-text-tertiary line-through decoration-brand-accent/50 decoration-1' : 'text-text-primary'}`}>
                         {item.title} <span className="text-caption text-text-tertiary font-normal italic">({item.sanskritName})</span>
                       </h3>
                       <span className="text-caption text-text-tertiary flex items-center gap-1 shrink-0 font-body">

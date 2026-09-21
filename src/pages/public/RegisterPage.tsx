@@ -60,97 +60,105 @@ const RegisterPage = () => {
 
   return (
     <AuthLayout
-      title="Create Your Account"
-      subtitle="Begin your personalized Ayurvedic skin health journey"
+      title="Begin your journey"
+      subtitle="Create your personal AayurFace account."
     >
       <div className="w-full">
         {errorMsg && (
-          <div className="mb-5 p-3.5 bg-red-50 border border-red-200/80 text-red-900 rounded-md text-body-md text-center">
+          <div role="alert" className="mb-5 p-3.5 bg-red-50 border border-red-200/80 text-red-900 rounded-md text-body-md text-center">
             {errorMsg}
           </div>
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-4">
           <div className="space-y-1.5">
-            <label className="block text-caption font-body font-medium text-text-secondary uppercase tracking-wider">
+            <label htmlFor="register-fullName" className="block text-caption font-body font-medium text-text-secondary uppercase tracking-wider">
               Full Name
             </label>
             <input
               {...register('fullName')}
+              id="register-fullName"
               type="text"
               autoComplete="name"
               placeholder="e.g. Namrata Sen"
-              className="w-full rounded-md border border-border-default bg-background-surface px-4 py-3 font-body text-body-md text-text-primary placeholder:text-text-tertiary focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all"
+              aria-describedby={errors.fullName ? 'fullName-error' : undefined}
+              className="w-full rounded-md border border-border-default bg-background-surface px-4 py-3 font-body text-body-md text-text-primary placeholder:text-text-tertiary focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all min-h-[44px]"
             />
             {errors.fullName && (
-              <p className="text-red-700 text-caption font-body pl-0.5">{errors.fullName.message}</p>
+              <p id="fullName-error" role="alert" className="text-red-700 text-caption font-body pl-0.5">{errors.fullName.message}</p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-caption font-body font-medium text-text-secondary uppercase tracking-wider">
+            <label htmlFor="register-email" className="block text-caption font-body font-medium text-text-secondary uppercase tracking-wider">
               Email Address
             </label>
             <input
               {...register('email')}
+              id="register-email"
               type="email"
               autoComplete="email"
               placeholder="name@example.com"
-              className="w-full rounded-md border border-border-default bg-background-surface px-4 py-3 font-body text-body-md text-text-primary placeholder:text-text-tertiary focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all"
+              aria-describedby={errors.email ? 'email-error' : undefined}
+              className="w-full rounded-md border border-border-default bg-background-surface px-4 py-3 font-body text-body-md text-text-primary placeholder:text-text-tertiary focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all min-h-[44px]"
             />
             {errors.email && (
-              <p className="text-red-700 text-caption font-body pl-0.5">{errors.email.message}</p>
+              <p id="email-error" role="alert" className="text-red-700 text-caption font-body pl-0.5">{errors.email.message}</p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-caption font-body font-medium text-text-secondary uppercase tracking-wider">
+            <label htmlFor="register-password" className="block text-caption font-body font-medium text-text-secondary uppercase tracking-wider">
               Password (min 8 characters)
             </label>
             <div className="relative">
               <input
                 {...register('password')}
+                id="register-password"
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="new-password"
                 placeholder="••••••••"
-                className="w-full rounded-md border border-border-default bg-background-surface px-4 py-3 font-body text-body-md text-text-primary placeholder:text-text-tertiary focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all pr-11"
+                aria-describedby={errors.password ? 'password-error' : undefined}
+                className="w-full rounded-md border border-border-default bg-background-surface px-4 py-3 font-body text-body-md text-text-primary placeholder:text-text-tertiary focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all pr-11 min-h-[44px]"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-primary transition-colors p-1"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-primary transition-colors p-2 min-w-[40px] min-h-[40px] flex items-center justify-center cursor-pointer"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
             {errors.password && (
-              <p className="text-red-700 text-caption font-body pl-0.5">{errors.password.message}</p>
+              <p id="password-error" role="alert" className="text-red-700 text-caption font-body pl-0.5">{errors.password.message}</p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-caption font-body font-medium text-text-secondary uppercase tracking-wider">
+            <label htmlFor="register-confirmPassword" className="block text-caption font-body font-medium text-text-secondary uppercase tracking-wider">
               Confirm Password
             </label>
             <div className="relative">
               <input
                 {...register('confirmPassword')}
+                id="register-confirmPassword"
                 type={showConfirmPassword ? 'text' : 'password'}
                 placeholder="••••••••"
-                className="w-full rounded-md border border-border-default bg-background-surface px-4 py-3 font-body text-body-md text-text-primary placeholder:text-text-tertiary focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all pr-11"
+                aria-describedby={errors.confirmPassword ? 'confirmPassword-error' : undefined}
+                className="w-full rounded-md border border-border-default bg-background-surface px-4 py-3 font-body text-body-md text-text-primary placeholder:text-text-tertiary focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all pr-11 min-h-[44px]"
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-primary transition-colors p-1"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-primary transition-colors p-2 min-w-[40px] min-h-[40px] flex items-center justify-center cursor-pointer"
               >
                 {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
             {errors.confirmPassword && (
-              <p className="text-red-700 text-caption font-body pl-0.5">{errors.confirmPassword.message}</p>
+              <p id="confirmPassword-error" role="alert" className="text-red-700 text-caption font-body pl-0.5">{errors.confirmPassword.message}</p>
             )}
           </div>
 
@@ -158,7 +166,7 @@ const RegisterPage = () => {
             whileTap={{ scale: 0.98 }}
             disabled={isLoading}
             type="submit"
-            className="w-full bg-brand-primary text-text-inverse rounded-md py-3 font-body font-medium text-body-md mt-6 flex justify-center items-center gap-2 hover:bg-brand-primary-hover transition-all disabled:opacity-60 shadow-sm cursor-pointer"
+            className="w-full bg-brand-primary text-text-inverse rounded-md py-3 font-body font-medium text-body-md mt-6 flex justify-center items-center gap-2 hover:bg-brand-primary-hover transition-all disabled:opacity-60 shadow-sm cursor-pointer min-h-[44px]"
           >
             {isLoading ? <Loader2 className="animate-spin" size={18} /> : 'Create Account'}
           </motion.button>

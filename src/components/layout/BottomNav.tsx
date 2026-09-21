@@ -55,7 +55,7 @@ const BottomNav: React.FC = () => {
       {/* Mobile Bottom Bar */}
       <nav 
         aria-label="Mobile Navigation"
-        className="fixed bottom-0 left-0 right-0 h-16 bg-background-surface/95 backdrop-blur-md border-t border-border-default flex items-center justify-around px-2 z-40 lg:hidden shadow-lg select-none"
+        className="fixed bottom-0 left-0 right-0 h-16 bg-background-surface/95 backdrop-blur-md border-t border-border-default flex items-center justify-around px-2 z-40 lg:hidden shadow-lg select-none pb-[env(safe-area-inset-bottom,0px)]"
       >
         {/* Left Items: Home, Chat */}
         {leftNavItems.map((item) => {
@@ -200,9 +200,9 @@ const BottomNav: React.FC = () => {
                       to={item.path}
                       onClick={() => setIsDrawerOpen(false)}
                       className={cn(
-                        'flex items-center gap-3.5 p-3 rounded-lg transition-all',
+                        'flex items-center gap-3.5 p-3 rounded-lg transition-all min-h-[48px]',
                         isActive
-                          ? 'bg-brand-primary/10 text-brand-primary font-semibold border-l-2 border-brand-primary'
+                          ? 'bg-brand-accent-subtle text-brand-primary font-semibold border-l-2 border-brand-accent'
                           : 'text-text-primary hover:bg-background-subtle border-l-2 border-transparent'
                       )}
                     >

@@ -43,7 +43,7 @@ export default function RemedyDetailPage() {
         <div className="flex items-center justify-between pb-3 border-b border-border-default">
           <button
             onClick={() => navigate('/library')}
-            className="inline-flex items-center gap-1.5 text-caption font-semibold text-text-secondary hover:text-brand-primary transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 min-h-[44px] px-2.5 py-2 text-caption font-semibold text-text-secondary hover:text-brand-primary transition-colors cursor-pointer"
           >
             <ChevronLeft size={16} />
             Back to Library
@@ -51,7 +51,7 @@ export default function RemedyDetailPage() {
 
           <button
             onClick={toggleSave}
-            className="inline-flex items-center gap-1.5 text-caption font-body font-semibold px-3 py-1.5 rounded-full border border-border-default bg-background-surface hover:bg-background-subtle transition-colors cursor-pointer shadow-sm text-text-primary"
+            className="inline-flex items-center gap-1.5 min-h-[44px] text-caption font-body font-semibold px-4 py-2 rounded-full border border-border-default bg-background-surface hover:bg-background-subtle transition-colors cursor-pointer shadow-sm text-text-primary"
           >
             <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-brand-accent text-brand-accent' : 'text-text-tertiary'}`} />
             {isSaved ? 'Saved in Rituals' : 'Save Formulation'}
@@ -93,28 +93,39 @@ export default function RemedyDetailPage() {
 
         {/* Ingredients Block */}
         <div className="p-6 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-4">
-          <h2 className="font-display text-xl font-semibold text-text-primary">
-            Key Botanical Ingredients
-          </h2>
+          <div className="flex items-center justify-between pb-2 border-b border-border-default/60">
+            <h2 className="font-display text-xl font-semibold text-text-primary">
+              Key Botanical Ingredients
+            </h2>
+            <span className="text-caption text-text-tertiary">
+              {remedy.ingredients.length} active botanicals
+            </span>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             {remedy.ingredients.map((ing, i) => (
-              <div key={i} className="p-3.5 rounded-md bg-background-primary border border-border-default flex items-center justify-between gap-2">
-                <span className="font-body text-body-md text-text-primary font-medium">{ing.name}</span>
+              <div key={i} className="p-3.5 rounded-md bg-background-subtle border border-border-default flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand-accent" />
+                  <span className="font-body text-body-md text-text-primary font-medium">{ing.name}</span>
+                </div>
                 <span className="text-caption text-text-secondary font-body bg-background-surface px-2.5 py-0.5 rounded-sm border border-border-default">{ing.amount}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Preparation Steps */}
+        {/* Preparation Steps (Krama) */}
         <div className="p-6 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-4">
-          <h2 className="font-display text-xl font-semibold text-text-primary">
-            Preparation Method (Krama)
-          </h2>
+          <div className="pb-2 border-b border-border-default/60">
+            <span className="text-caption font-semibold uppercase tracking-wider text-brand-accent font-body">Phase 01</span>
+            <h2 className="font-display text-xl font-semibold text-text-primary">
+              Preparation Method (Krama)
+            </h2>
+          </div>
           <div className="space-y-3 pt-1">
             {remedy.preparation_steps.map((step, i) => (
-              <div key={i} className="flex items-start gap-3.5 p-3 rounded-md bg-background-primary/60 border border-border-default/60">
-                <span className="w-6 h-6 rounded-full bg-brand-primary text-text-inverse flex items-center justify-center text-xs font-semibold shrink-0 mt-0.5">
+              <div key={i} className="flex items-start gap-3.5 p-3.5 rounded-md bg-background-subtle/60 border border-border-default/60">
+                <span className="w-6 h-6 rounded-full bg-brand-primary text-text-inverse flex items-center justify-center text-xs font-semibold shrink-0 mt-0.5 shadow-xs">
                   {i + 1}
                 </span>
                 <p className="font-body text-body-md text-text-primary leading-relaxed font-normal">
@@ -125,15 +136,18 @@ export default function RemedyDetailPage() {
           </div>
         </div>
 
-        {/* Application Steps */}
+        {/* Application Steps (Vidhi) */}
         <div className="p-6 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-4">
-          <h2 className="font-display text-xl font-semibold text-text-primary">
-            Application Ritual (Lepa Vidhi)
-          </h2>
+          <div className="pb-2 border-b border-border-default/60">
+            <span className="text-caption font-semibold uppercase tracking-wider text-brand-accent font-body">Phase 02</span>
+            <h2 className="font-display text-xl font-semibold text-text-primary">
+              Application Ritual (Lepa Vidhi)
+            </h2>
+          </div>
           <div className="space-y-3 pt-1">
             {remedy.application_steps.map((step, i) => (
-              <div key={i} className="flex items-start gap-3.5 p-3 rounded-md bg-background-primary/60 border border-border-default/60">
-                <span className="w-6 h-6 rounded-full bg-brand-accent text-brand-primary flex items-center justify-center text-xs font-semibold shrink-0 mt-0.5">
+              <div key={i} className="flex items-start gap-3.5 p-3.5 rounded-md bg-background-subtle/60 border border-border-default/60">
+                <span className="w-6 h-6 rounded-full bg-brand-accent text-brand-primary flex items-center justify-center text-xs font-semibold shrink-0 mt-0.5 shadow-xs">
                   {i + 1}
                 </span>
                 <p className="font-body text-body-md text-text-primary leading-relaxed font-normal">
@@ -145,7 +159,7 @@ export default function RemedyDetailPage() {
         </div>
 
         {/* Classical Ayurvedic Insight */}
-        <div className="p-6 rounded-lg bg-background-subtle border border-border-default shadow-sm space-y-3">
+        <div className="p-6 rounded-lg bg-brand-accent-subtle/30 border border-brand-accent/30 shadow-sm space-y-3">
           <div className="flex items-center gap-2 text-brand-accent">
             <Sparkles size={16} />
             <h3 className="font-display text-lg font-semibold text-text-primary">

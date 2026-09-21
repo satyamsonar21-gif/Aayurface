@@ -48,7 +48,7 @@ export default function EditProfilePage() {
         <div className="flex items-center justify-between pb-3 border-b border-border-default">
           <button
             onClick={() => navigate('/profile')}
-            className="inline-flex items-center gap-1.5 text-caption font-semibold text-text-secondary hover:text-brand-primary transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 min-h-[44px] px-2 py-1 text-caption font-semibold text-text-secondary hover:text-brand-primary transition-colors cursor-pointer"
           >
             <ChevronLeft size={16} />
             Back to Profile

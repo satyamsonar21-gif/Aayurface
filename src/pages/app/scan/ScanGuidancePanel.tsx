@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // AayurFace — Scan Guidance Panel Component
 // Phase 06.7: Guidance Steps, Real-Time Status, Controls
 // Luxury Editorial Ayurvedic Wellness Aesthetic
@@ -39,19 +39,19 @@ export const ScanGuidancePanel: React.FC<ScanGuidancePanelProps> = ({
 
   return (
     <aside 
-      className="w-full lg:w-[360px] xl:w-[400px] bg-[#FAF8F5] border-t lg:border-t-0 lg:border-l border-[#E6DFD5] flex flex-col justify-between p-4 sm:p-5 lg:p-6 shrink-0 select-none overflow-y-auto"
+      className="w-full lg:w-[360px] xl:w-[400px] bg-background-primary border-t lg:border-t-0 lg:border-l border-border-default flex flex-col justify-between p-4 sm:p-5 lg:p-6 shrink-0 select-none overflow-y-auto"
       aria-label="Capture guidance and actions"
     >
       <div className="space-y-4">
         {/* 1. Header */}
         <div className="space-y-1">
-          <span className="text-[10px] font-semibold text-[#C5A059] uppercase tracking-wider font-body">
+          <span className="text-[10px] font-semibold text-brand-accent uppercase tracking-wider font-body">
             PREMIUM WELLNESS CAPTURE
           </span>
-          <h2 className="font-display text-xl sm:text-2xl font-semibold text-[#1A1F1C]">
+          <h2 className="font-display text-xl sm:text-2xl font-semibold text-text-primary">
             {isPreview ? 'Review Your Capture' : 'Facial Observation Guide'}
           </h2>
-          <p className="text-xs text-[#5C6660] leading-relaxed font-body">
+          <p className="text-xs text-text-secondary leading-relaxed font-body">
             {isPreview 
               ? 'Ensure your face is clearly visible with even lighting before continuing.'
               : 'Position your face inside the guide to capture a clear frame for assessment.'
@@ -60,20 +60,20 @@ export const ScanGuidancePanel: React.FC<ScanGuidancePanelProps> = ({
         </div>
 
         {/* 2. Real-time Status Card */}
-        <div className="p-3.5 rounded-xl bg-white border border-[#E6DFD5] shadow-xs space-y-2">
+        <div className="p-3.5 rounded-xl bg-background-surface border border-border-default shadow-xs space-y-2">
           <div className="flex items-center gap-2">
             <span 
               className={`w-2.5 h-2.5 rounded-full shrink-0 ${
                 isReady 
                   ? 'bg-emerald-500' 
                   : isPreview 
-                    ? 'bg-[#C5A059]' 
+                    ? 'bg-brand-accent' 
                     : state === 'requesting' || isCapturing
-                      ? 'bg-[#C5A059] animate-pulse'
+                      ? 'bg-brand-accent animate-pulse'
                       : 'bg-amber-400'
               }`} 
             />
-            <h3 className="font-display text-sm sm:text-base font-semibold text-[#1A1F1C]">
+            <h3 className="font-display text-sm sm:text-base font-semibold text-text-primary">
               {isReady && 'Camera Ready'}
               {state === 'requesting' && 'Requesting Camera Access…'}
               {isCapturing && 'Capturing Frame…'}
@@ -85,7 +85,7 @@ export const ScanGuidancePanel: React.FC<ScanGuidancePanelProps> = ({
             </h3>
           </div>
 
-          <p className="text-[11px] sm:text-xs text-[#5C6660] leading-normal font-body">
+          <p className="text-[11px] sm:text-xs text-text-secondary leading-normal font-body">
             {isReady && 'Live video is steady. Press Capture Photo when ready.'}
             {state === 'requesting' && 'Waiting for browser camera authorization.'}
             {isCapturing && 'Reading optical surface data from live video feed…'}
@@ -105,20 +105,20 @@ export const ScanGuidancePanel: React.FC<ScanGuidancePanelProps> = ({
                 onClick={onCapture}
                 disabled={!isReady || isCapturing}
                 aria-label="Capture photo for skin wellness assessment"
-                className={`w-full py-3.5 px-4 rounded-lg font-body font-semibold text-sm flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer ${
+                className={`w-full py-3.5 px-4 rounded-lg font-body font-semibold text-sm flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer min-h-[44px] ${
                   isReady && !isCapturing
-                    ? 'bg-[#1E3A2F] text-white hover:bg-[#152B23] border border-[#C5A059]/40 active:scale-[0.99]'
+                    ? 'bg-brand-primary text-text-inverse hover:bg-brand-primary-hover border border-brand-accent/40 active:scale-[0.99]'
                     : 'bg-neutral-200 text-neutral-400 border border-neutral-300 cursor-not-allowed'
                 }`}
               >
-                <Camera className="w-4 h-4 text-[#C5A059]" />
+                <Camera className="w-4 h-4 text-brand-accent" />
                 {isCapturing ? 'Capturing…' : 'Capture Photo'}
               </button>
 
               <button
                 onClick={onUploadClick}
                 aria-label="Upload photo from device"
-                className="w-full py-1.5 text-xs font-body font-medium text-[#5C6660] hover:text-[#1A1F1C] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                className="w-full py-2.5 text-xs font-body font-medium text-text-secondary hover:text-text-primary flex items-center justify-center gap-1.5 transition-colors cursor-pointer min-h-[40px]"
               >
                 <Upload className="w-3.5 h-3.5" />
                 Or upload photo from device
@@ -129,18 +129,18 @@ export const ScanGuidancePanel: React.FC<ScanGuidancePanelProps> = ({
               <button
                 onClick={onContinue}
                 aria-label="Continue to skin wellness assessment"
-                className="w-full py-3.5 px-4 rounded-lg font-body font-semibold text-sm bg-[#1E3A2F] text-white hover:bg-[#152B23] border border-[#C5A059]/40 flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer active:scale-[0.99]"
+                className="w-full py-3.5 px-4 rounded-lg font-body font-semibold text-sm bg-brand-primary text-text-inverse hover:bg-brand-primary-hover border border-brand-accent/40 flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer active:scale-[0.99] min-h-[44px]"
               >
                 <span>Continue to Assessment</span>
-                <ArrowRight className="w-4 h-4 text-[#C5A059]" />
+                <ArrowRight className="w-4 h-4 text-brand-accent" />
               </button>
 
               <button
                 onClick={onRetake}
                 aria-label="Retake photo"
-                className="w-full py-2.5 px-4 rounded-lg font-body font-medium text-xs bg-white text-[#1A1F1C] hover:bg-[#F3EFEA] border border-[#E6DFD5] flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-lg font-body font-medium text-xs bg-background-surface text-text-primary hover:bg-background-subtle border border-border-default flex items-center justify-center gap-2 transition-colors cursor-pointer min-h-[44px]"
               >
-                <RotateCcw className="w-3.5 h-3.5 text-[#5C6660]" />
+                <RotateCcw className="w-3.5 h-3.5 text-text-secondary" />
                 <span>Retake Photo</span>
               </button>
             </div>
@@ -150,52 +150,52 @@ export const ScanGuidancePanel: React.FC<ScanGuidancePanelProps> = ({
         {/* 4. Guidance Protocol / Checklist */}
         {!isPreview ? (
           <div className="space-y-2 pt-1">
-            <h4 className="text-[10px] font-semibold uppercase tracking-wider text-[#8A948E] font-body">
+            <h4 className="text-[10px] font-semibold uppercase tracking-wider text-text-tertiary font-body">
               Observation Protocol
             </h4>
 
             <div className="space-y-2">
-              <div className="flex items-start gap-2.5 p-2 rounded-lg bg-white/70 border border-[#E6DFD5]/60">
-                <Maximize2 size={14} className="text-[#C5A059] shrink-0 mt-0.5" />
+              <div className="flex items-start gap-2.5 p-2.5 rounded-lg bg-background-surface/80 border border-border-default/80">
+                <Maximize2 size={14} className="text-brand-accent shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs font-medium text-[#1A1F1C]">Center Facial Alignment</p>
-                  <p className="text-[11px] text-[#5C6660]">Position eyes and chin naturally inside the guide.</p>
+                  <p className="text-xs font-medium text-text-primary">Center Facial Alignment</p>
+                  <p className="text-[11px] text-text-secondary">Position eyes and chin naturally inside the guide.</p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-2.5 p-2 rounded-lg bg-white/70 border border-[#E6DFD5]/60">
-                <SunMedium size={14} className="text-[#C5A059] shrink-0 mt-0.5" />
+              <div className="flex items-start gap-2.5 p-2.5 rounded-lg bg-background-surface/80 border border-border-default/80">
+                <SunMedium size={14} className="text-brand-accent shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs font-medium text-[#1A1F1C]">Soft, Diffused Lighting</p>
-                  <p className="text-[11px] text-[#5C6660]">Face toward natural light. Avoid harsh backlights.</p>
+                  <p className="text-xs font-medium text-text-primary">Soft, Diffused Lighting</p>
+                  <p className="text-[11px] text-text-secondary">Face toward natural light. Avoid harsh backlights.</p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-2.5 p-2 rounded-lg bg-white/70 border border-[#E6DFD5]/60">
-                <Sparkles size={14} className="text-[#C5A059] shrink-0 mt-0.5" />
+              <div className="flex items-start gap-2.5 p-2.5 rounded-lg bg-background-surface/80 border border-border-default/80">
+                <Sparkles size={14} className="text-brand-accent shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs font-medium text-[#1A1F1C]">Natural, Relaxed Expression</p>
-                  <p className="text-[11px] text-[#5C6660]">Keep face uncovered and hold still.</p>
+                  <p className="text-xs font-medium text-text-primary">Natural, Relaxed Expression</p>
+                  <p className="text-[11px] text-text-secondary">Keep face uncovered and hold still.</p>
                 </div>
               </div>
             </div>
           </div>
         ) : (
           <div className="space-y-2 pt-1">
-            <h4 className="text-[10px] font-semibold uppercase tracking-wider text-[#8A948E] font-body">
+            <h4 className="text-[10px] font-semibold uppercase tracking-wider text-text-tertiary font-body">
               Capture Quality Checklist
             </h4>
 
             <div className="space-y-1.5">
-              <div className="flex items-center gap-2 text-xs text-[#1A1F1C] bg-white p-2 rounded-lg border border-[#E6DFD5]">
+              <div className="flex items-center gap-2 text-xs text-text-primary bg-background-surface p-2.5 rounded-lg border border-border-default">
                 <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
                 <span>Facial features framed and visible</span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-[#1A1F1C] bg-white p-2 rounded-lg border border-[#E6DFD5]">
+              <div className="flex items-center gap-2 text-xs text-text-primary bg-background-surface p-2.5 rounded-lg border border-border-default">
                 <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
                 <span>Captured frame stored in memory</span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-[#1A1F1C] bg-white p-2 rounded-lg border border-[#E6DFD5]">
+              <div className="flex items-center gap-2 text-xs text-text-primary bg-background-surface p-2.5 rounded-lg border border-border-default">
                 <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
                 <span>Ready for Ayurvedic assessment</span>
               </div>
@@ -205,9 +205,9 @@ export const ScanGuidancePanel: React.FC<ScanGuidancePanelProps> = ({
       </div>
 
       {/* 5. Safety & Privacy Notice at bottom */}
-      <div className="p-2.5 rounded-lg bg-[#F3EFEA] border border-[#E6DFD5] text-[11px] text-[#5C6660] leading-relaxed space-y-0.5 mt-4">
-        <div className="flex items-center gap-1.5 font-semibold text-[#1E3A2F]">
-          <ShieldCheck size={12} className="text-[#C5A059]" />
+      <div className="p-3 rounded-lg bg-background-subtle border border-border-default text-[11px] text-text-secondary leading-relaxed space-y-0.5 mt-4">
+        <div className="flex items-center gap-1.5 font-semibold text-brand-primary">
+          <ShieldCheck size={12} className="text-brand-accent" />
           <span>Wellness Guidance, Not Medical Diagnosis</span>
         </div>
         <p>

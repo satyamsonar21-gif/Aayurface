@@ -30,7 +30,7 @@ const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 function LoadingFallback() {
   return (
     <div className="min-h-screen bg-background-primary flex items-center justify-center">
-      <LoadingSpinner size="lg" message="Loading Ayurvedic Intelligence..." />
+      <LoadingSpinner size="lg" message="Loading AayurFace..." />
     </div>
   );
 }

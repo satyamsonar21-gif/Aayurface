@@ -172,17 +172,17 @@ export default function HomePage() {
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <button
                 onClick={() => navigate('/scan')}
-                className="inline-flex items-center gap-2.5 bg-brand-primary text-text-inverse px-6 py-3.5 rounded-md font-body font-semibold text-body-md hover:bg-brand-primary-hover transition-all shadow-sm cursor-pointer"
+                className="inline-flex items-center gap-2.5 bg-brand-primary text-text-inverse px-6 py-3.5 rounded-md font-body font-semibold text-body-md hover:bg-brand-primary-hover transition-all shadow-sm cursor-pointer min-h-[44px]"
               >
                 <Camera className="w-5 h-5 text-brand-accent" />
-                Scan Your Skin
+                Start Skin Scan
               </button>
 
               <button
-                onClick={() => navigate('/results/demo-scan')}
-                className="inline-flex items-center gap-1.5 text-body-md font-medium text-text-secondary hover:text-brand-primary transition-colors py-3 px-2 cursor-pointer group"
+                onClick={() => navigate('/history')}
+                className="inline-flex items-center gap-1.5 text-body-md font-medium text-text-secondary hover:text-brand-primary transition-colors py-3 px-3 cursor-pointer group min-h-[44px]"
               >
-                View Sample Insights (Reference)
+                View Journey
                 <ChevronRight className="w-4 h-4 text-text-tertiary group-hover:text-brand-primary group-hover:translate-x-0.5 transition-transform" />
               </button>
             </div>

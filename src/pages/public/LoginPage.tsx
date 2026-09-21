@@ -59,40 +59,42 @@ const LoginPage = () => {
   return (
     <AuthLayout
       title="Welcome Back"
-      subtitle="Sign in to your personalized Ayurvedic intelligence account"
+      subtitle="Continue your skin journey."
     >
       <div className="w-full">
         {errorMsg && (
-          <div className="mb-5 p-3.5 bg-red-50 border border-red-200/80 text-red-900 rounded-md text-body-md text-center">
+          <div role="alert" className="mb-5 p-3.5 bg-red-50 border border-red-200/80 text-red-900 rounded-md text-body-md text-center">
             {errorMsg}
           </div>
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-4">
           <div className="space-y-1.5">
-            <label className="block text-caption font-body font-medium text-text-secondary uppercase tracking-wider">
+            <label htmlFor="login-email" className="block text-caption font-body font-medium text-text-secondary uppercase tracking-wider">
               Email Address
             </label>
             <input
               {...register('email')}
+              id="login-email"
               type="email"
               autoComplete="email"
               placeholder="name@example.com"
-              className="w-full rounded-md border border-border-default bg-background-surface px-4 py-3 font-body text-body-md text-text-primary placeholder:text-text-tertiary focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all"
+              aria-describedby={errors.email ? 'email-error' : undefined}
+              className="w-full rounded-md border border-border-default bg-background-surface px-4 py-3 font-body text-body-md text-text-primary placeholder:text-text-tertiary focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all min-h-[44px]"
             />
             {errors.email && (
-              <p className="text-red-700 text-caption font-body pl-0.5">{errors.email.message}</p>
+              <p id="email-error" role="alert" className="text-red-700 text-caption font-body pl-0.5">{errors.email.message}</p>
             )}
           </div>
 
           <div className="space-y-1.5">
             <div className="flex justify-between items-center">
-              <label className="block text-caption font-body font-medium text-text-secondary uppercase tracking-wider">
+              <label htmlFor="login-password" className="block text-caption font-body font-medium text-text-secondary uppercase tracking-wider">
                 Password
               </label>
               <Link 
                 to="/forgot-password" 
-                className="text-caption font-body text-brand-primary hover:text-brand-primary-hover font-medium hover:underline"
+                className="text-caption font-body text-brand-primary hover:text-brand-primary-hover font-medium hover:underline py-1"
               >
                 Forgot Password?
               </Link>
@@ -101,22 +103,24 @@ const LoginPage = () => {
             <div className="relative">
               <input
                 {...register('password')}
+                id="login-password"
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="current-password"
                 placeholder="••••••••"
-                className="w-full rounded-md border border-border-default bg-background-surface px-4 py-3 font-body text-body-md text-text-primary placeholder:text-text-tertiary focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all pr-11"
+                aria-describedby={errors.password ? 'password-error' : undefined}
+                className="w-full rounded-md border border-border-default bg-background-surface px-4 py-3 font-body text-body-md text-text-primary placeholder:text-text-tertiary focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all pr-11 min-h-[44px]"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-primary transition-colors p-1"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-primary transition-colors p-2 min-w-[40px] min-h-[40px] flex items-center justify-center cursor-pointer"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
             {errors.password && (
-              <p className="text-red-700 text-caption font-body pl-0.5">{errors.password.message}</p>
+              <p id="password-error" role="alert" className="text-red-700 text-caption font-body pl-0.5">{errors.password.message}</p>
             )}
           </div>
 
@@ -124,7 +128,7 @@ const LoginPage = () => {
             whileTap={{ scale: 0.98 }}
             disabled={isLoading}
             type="submit"
-            className="w-full bg-brand-primary text-text-inverse rounded-md py-3 font-body font-medium text-body-md mt-6 flex justify-center items-center gap-2 hover:bg-brand-primary-hover transition-all disabled:opacity-60 shadow-sm cursor-pointer"
+            className="w-full bg-brand-primary text-text-inverse rounded-md py-3 font-body font-medium text-body-md mt-6 flex justify-center items-center gap-2 hover:bg-brand-primary-hover transition-all disabled:opacity-60 shadow-sm cursor-pointer min-h-[44px]"
           >
             {isLoading ? <Loader2 className="animate-spin" size={18} /> : 'Sign In'}
           </motion.button>

@@ -1,39 +1,15 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronRight, Clock, ArrowUpRight, Camera, Info } from 'lucide-react';
+import { ChevronRight, Clock, ArrowUpRight, Camera } from 'lucide-react';
 import PageWrapper from '@/components/layout/PageWrapper';
 import SkinBadge from '@/components/common/SkinBadge';
 import { useAuth } from '@/contexts/AuthContext';
 import { getUserAssessments } from '@/lib/assessmentStore';
 
-const SAMPLE_HISTORY_ENTRIES = [
-  {
-    id: 'sample-03',
-    date: 'February 24, 2026',
-    season: 'Shishira Ritu (Late Winter)',
-    primaryDosha: 'Pitta-Vata' as const,
-    badgeVariant: 'pitta' as const,
-    summary: 'Localized warmth in the T-zone with subtle dry cheek tendencies. High harmony across observables.',
-    recommendation: 'Gentle rosewater splash & cooling sandalwood application.',
-    scanId: 'demo-scan'
-  },
-  {
-    id: 'sample-02',
-    date: 'February 18, 2026',
-    season: 'Shishira Ritu (Late Winter)',
-    primaryDosha: 'Vata' as const,
-    badgeVariant: 'vata' as const,
-    summary: 'Mild dry air exposure noted. Skin barrier reflecting natural cold-weather moisture depletion.',
-    recommendation: 'Nourishing Kumkumadi taila abhyanga in the evening.',
-    scanId: 'demo-scan'
-  },
-];
-
 export default function HistoryPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [showSamples, setShowSamples] = useState(false);
 
   // Fetch real assessments strictly scoped to authenticated user
   const userAssessments = useMemo(() => {
@@ -113,7 +89,17 @@ export default function HistoryPage() {
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <SkinBadge label={assessment.doshaTendency.primary} variant="pitta" size="sm" />
+                      <SkinBadge 
+                        label={assessment.doshaTendency.primary} 
+                        variant={
+                          assessment.doshaTendency?.primary?.toLowerCase().includes('vata')
+                            ? 'vata'
+                            : assessment.doshaTendency?.primary?.toLowerCase().includes('kapha')
+                            ? 'kapha'
+                            : 'pitta'
+                        } 
+                        size="sm" 
+                      />
                       <span className="text-caption text-text-tertiary font-mono">
                         #{assessment.id.slice(0, 8)}
                       </span>
@@ -133,7 +119,7 @@ export default function HistoryPage() {
                   <div className="pt-2 flex justify-end">
                     <button
                       onClick={() => navigate(`/results/${assessment.id}`)}
-                      className="inline-flex items-center gap-1.5 text-caption font-semibold text-brand-primary hover:text-brand-primary-hover cursor-pointer group"
+                      className="inline-flex items-center gap-1.5 min-h-[44px] text-caption font-semibold text-brand-primary hover:text-brand-primary-hover cursor-pointer group"
                     >
                       View Full Observation Record
                       <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -167,7 +153,7 @@ export default function HistoryPage() {
             <div className="pt-2">
               <button
                 onClick={() => navigate('/scan')}
-                className="inline-flex items-center gap-2.5 bg-brand-primary text-text-inverse px-7 py-3 rounded-md font-body font-semibold text-body-md hover:bg-brand-primary-hover transition-all shadow-sm cursor-pointer"
+                className="inline-flex items-center justify-center gap-2.5 bg-brand-primary text-text-inverse px-7 py-3 min-h-[44px] rounded-md font-body font-semibold text-body-md hover:bg-brand-primary-hover transition-all shadow-sm cursor-pointer"
               >
                 <Camera className="w-4 h-4 text-brand-accent" />
                 Start Your First Observation
@@ -176,53 +162,18 @@ export default function HistoryPage() {
           </div>
         )}
 
-        {/* Toggle Sample Reference Entries */}
-        <div className="pt-6 border-t border-border-default">
-          <button
-            onClick={() => setShowSamples(!showSamples)}
-            className="text-caption font-medium text-text-tertiary hover:text-brand-primary flex items-center gap-1.5 transition-colors cursor-pointer"
-          >
-            <Info size={14} />
-            {showSamples ? 'Hide Sample Design References' : 'View Sample Design References (Illustrative Only)'}
-          </button>
-
-          {showSamples && (
-            <div className="mt-4 space-y-4">
-              <div className="p-3 bg-amber-50 border border-amber-200 text-amber-900 rounded text-caption">
-                <strong>Illustrative References:</strong> The entries below are static demo examples for design evaluation. They do not belong to your account.
-              </div>
-              {SAMPLE_HISTORY_ENTRIES.map((entry) => (
-                <div
-                  key={entry.id}
-                  className="p-4 rounded-lg bg-background-surface/80 border border-dashed border-border-default space-y-2 opacity-85"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-display font-semibold text-text-primary text-sm">{entry.date} (Sample)</span>
-                    <span className="text-[10px] uppercase font-semibold text-amber-900 bg-amber-100 px-2 py-0.5 rounded">Sample</span>
-                  </div>
-                  <p className="text-caption text-text-secondary">{entry.summary}</p>
-                  <button
-                    onClick={() => navigate(`/results/${entry.scanId}`)}
-                    className="text-caption text-brand-primary hover:underline font-medium inline-flex items-center gap-1"
-                  >
-                    Inspect Sample Reference <ChevronRight size={12} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Bottom Action */}
-        <div className="pt-4 text-center">
-          <button
-            onClick={() => navigate('/scan')}
-            className="inline-flex items-center gap-2 bg-brand-primary text-text-inverse px-6 py-3 rounded-md font-body font-medium hover:bg-brand-primary-hover transition-colors shadow-sm cursor-pointer"
-          >
-            Record Today's Observation
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
+        {/* Bottom Action (Shown only when user has recorded observations to avoid duplicate CTA on empty state) */}
+        {userAssessments.length > 0 && (
+          <div className="pt-4 text-center">
+            <button
+              onClick={() => navigate('/scan')}
+              className="inline-flex items-center justify-center gap-2 bg-brand-primary text-text-inverse px-6 py-3 min-h-[44px] rounded-md font-body font-medium hover:bg-brand-primary-hover transition-colors shadow-sm cursor-pointer"
+            >
+              Record Today's Observation
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
 
       </div>
     </PageWrapper>

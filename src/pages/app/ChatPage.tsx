@@ -6,10 +6,10 @@ import type { ChatMessage } from '@/types';
 import { generateId } from '@/lib/utils';
 
 const SUGGESTIONS = [
-  "How to balance excess Pitta heat in skin?",
-  "Herbal remedies for dry Vata patches",
-  "Morning Dinacharya ritual for natural glow",
-  "Benefits of Kumkumadi Tailam & Neem"
+  "Why was this recommendation made?",
+  "What should I do tonight?",
+  "What does my observation mean?",
+  "How to balance excess Pitta heat in skin?"
 ];
 
 export default function ChatPage() {
@@ -19,7 +19,7 @@ export default function ChatPage() {
       session_id: 'default',
       user_id: 'current',
       role: 'assistant',
-      content: "Namaste. I am your Ayurvedic wellness intelligence guide. You may ask about your skin constitution, classical herbs, Dinacharya rituals, or dietary principles for balanced skin harmony.",
+      content: "Namaste. I am Ayu, your personal Ayurvedic wellness guide. You may ask about your skin constitution, classical herbs, Dinacharya rituals, or how your facial observations align with classical principles.",
       created_at: new Date().toISOString()
     }
   ]);
@@ -55,7 +55,13 @@ export default function ChatPage() {
       let aiResponseText = "In Ayurvedic philosophy, skin equilibrium is directly connected to internal doshic balance and Agni (digestive fire). Cooling botanicals like Chandana (Sandalwood) and Manjistha help purify and soothe, while adequate hydration supports natural lustre.";
       const lowerText = text.toLowerCase();
       
-      if (lowerText.includes('pitta') || lowerText.includes('heat') || lowerText.includes('red') || lowerText.includes('acne')) {
+      if (lowerText.includes('why was this recommendation made') || lowerText.includes('why this recommendation')) {
+        aiResponseText = "Recommendations in AayurFace are derived from classical Dravyaguna principles. Each botanical is selected according to your observable doshic tendencies — balancing thermal qualities (Sheeta/Ushna), dryness or oiliness (Ruksha/Snigdha), and tissue vitality (Dhatu poshana).";
+      } else if (lowerText.includes('what should i do tonight') || lowerText.includes('tonight')) {
+        aiResponseText = "For tonight's ritual, begin with a gentle lukewarm water splash to cleanse environmental residue. Follow with 2 to 3 drops of warm Kumkumadi or almond oil pressed gently into temples and cheeks. Pair with a warm cup of CCF (Cumin, Coriander, Fennel) tea 30 minutes before sleep.";
+      } else if (lowerText.includes('what does my observation mean') || lowerText.includes('observation mean')) {
+        aiResponseText = "Your facial observation reflects transient constitutional shifts (Vikriti) — such as localized warmth, hydration gradients, and oil balance — mapped against your baseline nature (Prakriti). It provides a qualitative mirror to guide your daily Dinacharya rituals.";
+      } else if (lowerText.includes('pitta') || lowerText.includes('heat') || lowerText.includes('red') || lowerText.includes('acne')) {
         aiResponseText = "Excess Pitta often manifests as heat, redness, or localized inflammation. Classical recommendations include cooling Lepas with Neem, Rosewater, and pure Sandalwood. Internally, favor sweet, bitter, and astringent tastes while avoiding pungent, overly spicy foods.";
       } else if (lowerText.includes('vata') || lowerText.includes('dry') || lowerText.includes('flak')) {
         aiResponseText = "Vata imbalance causes dryness, moisture depletion, and fine roughness. Nourish the skin with gentle warm oil Abhyanga using Sesame or Kumkumadi Tailam. Drink warm CCF tea (Cumin, Coriander, Fennel) to support deep tissue hydration.";
@@ -86,7 +92,7 @@ export default function ChatPage() {
         session_id: 'default',
         user_id: 'current',
         role: 'assistant',
-        content: "Namaste. Conversation refreshed. What Ayurvedic skin query would you like to explore?",
+        content: "Namaste. Conversation refreshed. What Ayurvedic skin or ritual query would you like to explore with Ayu?",
         created_at: new Date().toISOString()
       }
     ]);
@@ -99,12 +105,12 @@ export default function ChatPage() {
         {/* Chat Header */}
         <div className="px-6 py-4 bg-background-surface border-b border-border-default flex items-center justify-between shrink-0 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-brand-primary text-text-inverse flex items-center justify-center shadow-sm">
-              <Bot size={18} className="text-brand-accent" />
+            <div className="w-10 h-10 rounded-full bg-brand-primary text-text-inverse flex items-center justify-center shadow-sm">
+              <Bot size={20} className="text-brand-accent" />
             </div>
             <div>
               <h1 className="font-display text-lg sm:text-xl font-semibold text-text-primary">
-                Ayurvedic Intelligence Guide
+                Ayu — Ayurvedic Wellness Guide
               </h1>
               <p className="text-[11px] text-text-secondary font-body">
                 Conversational Botanical & Constitutional Knowledge
@@ -116,7 +122,7 @@ export default function ChatPage() {
             onClick={handleNewChat}
             title="Start new conversation"
             aria-label="Start new conversation"
-            className="p-2 text-text-secondary hover:text-brand-primary hover:bg-background-subtle rounded-md transition-colors cursor-pointer"
+            className="p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-text-secondary hover:text-brand-primary hover:bg-background-subtle rounded-md transition-colors cursor-pointer"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -174,13 +180,13 @@ export default function ChatPage() {
 
         {/* Suggestion Chips */}
         {messages.length <= 2 && (
-          <div className="px-4 sm:px-6 py-2 overflow-x-auto whitespace-nowrap scrollbar-hide border-t border-border-default/40 bg-background-primary/50 shrink-0">
-            <div className="flex gap-2">
+          <div className="px-4 sm:px-6 py-2.5 overflow-x-auto whitespace-nowrap scrollbar-hide border-t border-border-default/40 bg-background-primary/50 shrink-0">
+            <div className="flex gap-2 items-center">
               {SUGGESTIONS.map((sug, i) => (
                 <button 
                   key={i}
                   onClick={() => handleSend(sug)}
-                  className="bg-background-surface border border-border-default text-text-secondary hover:text-brand-primary hover:border-brand-primary/40 text-caption font-body font-medium px-3.5 py-1.5 rounded-full transition-colors shrink-0 shadow-sm cursor-pointer"
+                  className="bg-background-surface border border-border-default text-text-secondary hover:text-brand-primary hover:border-brand-primary/40 text-caption font-body font-medium px-4 py-2 min-h-[44px] flex items-center justify-center rounded-full transition-colors shrink-0 shadow-sm cursor-pointer"
                 >
                   {sug}
                 </button>

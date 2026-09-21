@@ -14,7 +14,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background-primary flex items-center justify-center">
-        <LoadingSpinner size="lg" message="Loading Ayurvedic Intelligence..." />
+        <LoadingSpinner size="lg" message="Loading AayurFace..." />
       </div>
     );
   }
@@ -39,7 +39,7 @@ export function PublicRoute({ children, restrictAuthenticated = true }: PublicRo
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background-primary flex items-center justify-center">
-        <LoadingSpinner size="lg" />
+        <LoadingSpinner size="lg" message="Loading AayurFace..." />
       </div>
     );
   }

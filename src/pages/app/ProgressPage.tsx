@@ -1,37 +1,10 @@
 import { motion } from 'framer-motion';
-import { Sparkles, Calendar, Flame, Compass } from 'lucide-react';
+import { Sparkles, Calendar, Flame, Compass, Camera } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import PageWrapper from '@/components/layout/PageWrapper';
 import SkinBadge from '@/components/common/SkinBadge';
 import { useAuth } from '@/contexts/AuthContext';
 import { getUserAssessments } from '@/lib/assessmentStore';
-
-const reflections = [
-  {
-    week: 'Week 4 • Present Reflection',
-    season: 'Shishira Ritu (Late Winter)',
-    doshicFocus: 'Pitta Calm • Vata Hydration',
-    variant: 'pitta' as const,
-    observation: 'Skin feels noticeably calmer following regular evening abhyanga with Kumkumadi. Morning redness in the cheek zone has lessened.',
-    ritualsPracticed: 'Daily Rosewater & Herbal Splash • Kumkumadi Massage (5 of 7 days)',
-  },
-  {
-    week: 'Week 3 • Seasonal Transition',
-    season: 'Shishira Ritu (Late Winter)',
-    doshicFocus: 'Vata Nourishment',
-    variant: 'vata' as const,
-    observation: 'Cold, dry winds increased slight tightness around the mouth. Switched from cold to lukewarm rinses as advised in Dinacharya.',
-    ritualsPracticed: 'Ushapan Hydration • Warm CCF Tea • Nightly Ghee application',
-  },
-  {
-    week: 'Week 2 • Baseline Building',
-    season: 'Hemanta Ritu (Early Winter)',
-    doshicFocus: 'Balanced Agni & Cleansing',
-    variant: 'kapha' as const,
-    observation: 'Initial baseline setup. Began daily tongue scraping and regular botanical cleansing.',
-    ritualsPracticed: 'Neem-Rosewater splash • Consistent sleep schedule',
-  },
-];
 
 export default function ProgressPage() {
   const navigate = useNavigate();
@@ -114,46 +87,101 @@ export default function ProgressPage() {
           </div>
         </div>
 
-        {/* Weekly Qualitative Log */}
+        {/* Observational Reflections Section */}
         <div className="space-y-6 pt-2">
-          <h2 className="font-display text-2xl font-semibold text-text-primary">
-            Weekly Observational History
-          </h2>
-
-          <div className="space-y-4">
-            {reflections.map((item, idx) => (
-              <motion.div
-                key={item.week}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.08, duration: 0.3 }}
-                className="p-6 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-3"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-border-default/60">
-                  <div>
-                    <h3 className="font-display text-lg font-semibold text-text-primary">
-                      {item.week}
-                    </h3>
-                    <p className="text-caption text-text-tertiary">
-                      {item.season}
-                    </p>
-                  </div>
-                  <SkinBadge label={item.doshicFocus} variant={item.variant} size="sm" />
-                </div>
-
-                <div className="space-y-2">
-                  <p className="text-body-md text-text-secondary leading-relaxed">
-                    <strong className="text-text-primary font-medium">Reflection: </strong>
-                    {item.observation}
-                  </p>
-                  <p className="text-caption text-text-tertiary">
-                    <strong className="text-text-secondary font-medium">Rituals Practiced: </strong>
-                    {item.ritualsPracticed}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-2xl font-semibold text-text-primary">
+              Observational Progression
+            </h2>
+            {userAssessments.length > 0 && (
+              <span className="text-caption text-text-tertiary">
+                {userAssessments.length} journal {userAssessments.length === 1 ? 'entry' : 'entries'}
+              </span>
+            )}
           </div>
+
+          {userAssessments.length > 0 ? (
+            <div className="space-y-4">
+              {userAssessments.map((assessment, idx) => {
+                const date = new Date(assessment.createdAt).toLocaleDateString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric'
+                });
+                const variant = assessment.doshaTendency.primary.toLowerCase().includes('vata')
+                  ? 'vata'
+                  : assessment.doshaTendency.primary.toLowerCase().includes('kapha')
+                  ? 'kapha'
+                  : 'pitta';
+
+                return (
+                  <motion.div
+                    key={assessment.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.08, duration: 0.3 }}
+                    className="p-6 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-3 hover:border-brand-secondary/40 transition-colors"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-border-default/60">
+                      <div>
+                        <h3 className="font-display text-lg font-semibold text-text-primary">
+                          Observation • {date}
+                        </h3>
+                        <p className="text-caption text-text-tertiary font-mono">
+                          Record #{assessment.id.slice(0, 8)}
+                        </p>
+                      </div>
+                      <SkinBadge label={`${assessment.doshaTendency.primary} Balance`} variant={variant} size="sm" />
+                    </div>
+
+                    <div className="space-y-2">
+                      <p className="text-body-md text-text-secondary leading-relaxed">
+                        <strong className="text-text-primary font-medium">Observation: </strong>
+                        {assessment.summary}
+                      </p>
+                      {assessment.remedies && assessment.remedies.length > 0 && (
+                        <p className="text-caption text-text-tertiary">
+                          <strong className="text-text-secondary font-medium">Recommended Rituals: </strong>
+                          {assessment.remedies.map(r => r.name).join(' • ')}
+                        </p>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          ) : (
+            /* Truthful Editorial Zero State */
+            <div className="p-8 sm:p-12 rounded-lg bg-background-surface border border-border-default text-center space-y-6 max-w-xl mx-auto my-6 shadow-sm">
+              <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-border-default mx-auto bg-background-subtle shadow-xs">
+                <img 
+                  src="/images/2.jpg" 
+                  alt="Ayurvedic oil ritual" 
+                  className="w-full h-full object-cover opacity-85"
+                />
+              </div>
+              <div className="space-y-2">
+                <span className="text-caption uppercase tracking-wider font-semibold text-brand-accent">
+                  LONGITUDINAL JOURNAL
+                </span>
+                <h2 className="font-display text-2xl sm:text-3xl font-semibold text-text-primary">
+                  Beginning Your Longitudinal Journey
+                </h2>
+                <p className="text-body-md text-text-secondary leading-relaxed max-w-md mx-auto">
+                  Longitudinal reflections develop organically over weeks and seasonal rhythms. Complete your first skin scan to begin building your personal observational log.
+                </p>
+              </div>
+              <div className="pt-2">
+                <button
+                  onClick={() => navigate('/scan')}
+                  className="inline-flex items-center justify-center gap-2.5 bg-brand-primary text-text-inverse px-7 py-3 min-h-[44px] rounded-md font-body font-semibold text-body-md hover:bg-brand-primary-hover transition-all shadow-sm cursor-pointer"
+                >
+                  <Camera className="w-4 h-4 text-brand-accent" />
+                  Start Your First Observation
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
       </div>

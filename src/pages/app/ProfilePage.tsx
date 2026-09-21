@@ -1,6 +1,5 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, Settings, ShieldCheck, HelpCircle, LogOut, Camera, Calendar, Bookmark } from 'lucide-react';
+import { ChevronRight, Settings, ShieldCheck, HelpCircle, Camera, Calendar, Bookmark } from 'lucide-react';
 import PageWrapper from '@/components/layout/PageWrapper';
 import { useAuth } from '@/contexts/AuthContext';
 import SkinBadge from '@/components/common/SkinBadge';
@@ -8,8 +7,7 @@ import { getUserAssessments } from '@/lib/assessmentStore';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { user } = useAuth();
 
   const userAssessments = user?.id ? getUserAssessments(user.id) : [];
   
@@ -36,19 +34,6 @@ export default function ProfilePage() {
     : (user?.skin_type ? `${user.skin_type.charAt(0).toUpperCase() + user.skin_type.slice(1)} Skin Type` : 'Constitutional Balance');
 
   const doshaVariant = (user?.dosha as any) || (user?.skin_type as any) || 'default';
-
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    try {
-      await signOut();
-      window.location.replace('/');
-    } catch (e) {
-      console.error('Logout error:', e);
-      window.location.replace('/');
-    } finally {
-      setIsLoggingOut(false);
-    }
-  };
 
   return (
     <PageWrapper>
@@ -183,11 +168,11 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Settings and Account Navigation (All Working Routes) */}
+        {/* Settings and Account Navigation (Clean Pointer to Settings) */}
         <div className="bg-background-surface rounded-lg border border-border-default shadow-sm overflow-hidden divide-y divide-border-default">
           <button 
             onClick={() => navigate('/profile/edit')} 
-            className="w-full flex items-center justify-between p-4 hover:bg-background-subtle transition-colors text-left cursor-pointer"
+            className="w-full flex items-center justify-between p-4 hover:bg-background-subtle transition-colors text-left cursor-pointer min-h-[44px]"
           >
             <div className="flex items-center gap-3 text-text-primary">
               <Settings className="w-5 h-5 text-text-secondary" />
@@ -201,13 +186,13 @@ export default function ProfilePage() {
 
           <button 
             onClick={() => navigate('/settings')} 
-            className="w-full flex items-center justify-between p-4 hover:bg-background-subtle transition-colors text-left cursor-pointer"
+            className="w-full flex items-center justify-between p-4 hover:bg-background-subtle transition-colors text-left cursor-pointer min-h-[44px]"
           >
             <div className="flex items-center gap-3 text-text-primary">
               <ShieldCheck className="w-5 h-5 text-text-secondary" />
               <div>
                 <p className="text-body-md font-medium">Preferences & Privacy Controls</p>
-                <p className="text-caption text-text-tertiary">Ritual reminders, client-side session storage, and data controls</p>
+                <p className="text-caption text-text-tertiary">Ritual reminders, notification preferences, and session controls</p>
               </div>
             </div>
             <ChevronRight className="w-4 h-4 text-text-tertiary" />
@@ -215,7 +200,7 @@ export default function ProfilePage() {
 
           <button 
             onClick={() => navigate('/')} 
-            className="w-full flex items-center justify-between p-4 hover:bg-background-subtle transition-colors text-left cursor-pointer"
+            className="w-full flex items-center justify-between p-4 hover:bg-background-subtle transition-colors text-left cursor-pointer min-h-[44px]"
           >
             <div className="flex items-center gap-3 text-text-primary">
               <HelpCircle className="w-5 h-5 text-text-secondary" />
@@ -227,16 +212,6 @@ export default function ProfilePage() {
             <ChevronRight className="w-4 h-4 text-text-tertiary" />
           </button>
         </div>
-
-        {/* Sign Out Action */}
-        <button 
-          onClick={handleLogout}
-          disabled={isLoggingOut}
-          className="w-full flex items-center justify-center gap-2 py-3.5 border border-red-200 text-red-800 bg-red-50/50 hover:bg-red-100/70 rounded-md font-body font-medium text-body-md transition-colors cursor-pointer disabled:opacity-50"
-        >
-          <LogOut className="w-4 h-4" />
-          {isLoggingOut ? 'Signing out...' : 'Sign Out of Account'}
-        </button>
 
       </div>
     </PageWrapper>
