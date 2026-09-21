@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Shield, Search, ArrowRight, MessageSquare, ChevronLeft, Calendar, Info } from 'lucide-react';
+import { Shield, Search, ArrowRight, MessageSquare, ChevronLeft, Calendar, Info, Sparkles } from 'lucide-react';
 import PageWrapper from '@/components/layout/PageWrapper';
 import SkinBadge from '@/components/common/SkinBadge';
 import SafetyNotice from '@/components/common/SafetyNotice';
@@ -74,30 +74,27 @@ export default function ResultsPage() {
     minute: '2-digit'
   });
 
-  const doshaBadgeVariant = useMemo(() => {
-    const primary = (assessment?.doshaTendency?.primary || '').toLowerCase();
-    if (primary.includes('vata')) return 'vata';
-    if (primary.includes('kapha')) return 'kapha';
-    if (primary.includes('pitta')) return 'pitta';
-    return 'default';
-  }, [assessment?.doshaTendency?.primary]);
+  const primaryDosha = (assessment?.doshaTendency?.primary || '').toLowerCase();
 
-  const interpretationText = useMemo(() => {
-    if (assessment?.doshaTendency?.description && !assessment.doshaTendency.description.includes('baseline balance recorded')) {
-      return assessment.doshaTendency.description;
-    }
-    const primary = (assessment?.doshaTendency?.primary || '').toLowerCase();
-    if (primary.includes('pitta')) {
-      return 'Cutaneous warmth and localized reactive tendencies indicate active Pitta (fire-water) principles. Shastric balancing emphasizes soothing cooling Lepas, pure Chandana (Sandalwood), distilled rosewater, and gentle non-abrasive barrier protection.';
-    }
-    if (primary.includes('vata')) {
-      return 'Moisture depletion and subtle surface roughness reflect Vata (air-ether) characteristics. Nurturing rituals with warm Kumkumadi or sweet almond tailam provide grounding lipid protection and hydration.';
-    }
-    if (primary.includes('kapha')) {
-      return 'Supple sebum presence and dense tissue tone correspond to Kapha (earth-water) influence. Clarifying clay lepas, Triphala cleansing, and light hydration support natural clarity and unclogged pores.';
-    }
-    return assessment?.doshaTendency?.description || 'Harmonious constitutional balance recorded during observation, reflecting steady cutaneous equilibrium.';
-  }, [assessment?.doshaTendency]);
+  const doshaBadgeVariant = primaryDosha.includes('vata')
+    ? 'vata'
+    : primaryDosha.includes('kapha')
+    ? 'kapha'
+    : primaryDosha.includes('pitta')
+    ? 'pitta'
+    : 'default';
+
+  // Truthful Shastric Archetype (Prototype Baseline Guidance - Non-CV Inference)
+  let interpretationText = '';
+  if (primaryDosha.includes('pitta')) {
+    interpretationText = 'In classical Ayurveda (Charaka Samhita), a Pitta-predominant constitution is governed by Agni (fire) and Jala (water). When balancing this constitution, classical Ayurvedic literature emphasizes cooling Lepas, pure Chandana (Sandalwood), distilled rosewater, and gentle barrier preservation to moderate thermal sensitivity. In this transitional release, this text provides a baseline Shastric archetype aligned with your profile, not computer-vision facial inference.';
+  } else if (primaryDosha.includes('vata')) {
+    interpretationText = 'In classical Ayurveda, a Vata-predominant constitution is governed by Vayu (air) and Akasha (space). When balancing this constitution, classical Ayurvedic literature highlights grounding lipid nourishment—such as warm Kumkumadi or sweet almond tailam—to reinforce epidermal suppleness and comfort. This represents baseline Shastric guidance aligned with your recorded profile, not computer-vision facial inference.';
+  } else if (primaryDosha.includes('kapha')) {
+    interpretationText = 'In classical Ayurveda, a Kapha-predominant constitution is governed by Prithvi (earth) and Jala (water). When balancing this constitution, classical Ayurvedic literature prioritizes clarifying botanicals—such as Triphala cleansing and gentle clay applications—to promote balanced circulation without pore occlusion. This represents baseline Shastric guidance aligned with your recorded profile, not computer-vision facial inference.';
+  } else {
+    interpretationText = 'In classical Ayurveda, a balanced or multi-doshic constitution maintains equilibrium across Vata, Pitta, and Kapha principles according to season and lifestyle. In this transitional release, guidance centers on gentle daily dinacharya rituals to support steady barrier vitality, hydration, and seasonal harmony. This represents baseline Shastric guidance aligned with your recorded profile, not computer-vision facial inference.';
+  }
 
   const displayCauses = (assessment?.causes && assessment.causes.length > 0)
     ? assessment.causes
@@ -168,17 +165,41 @@ export default function ResultsPage() {
           </div>
         )}
 
+        {/* Transitional Assessment Architecture — Clear Layer Separation */}
+        <div className="p-4 sm:p-5 rounded-lg bg-background-surface border border-border-default shadow-xs space-y-3 font-body">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-brand-accent shrink-0" />
+            <h2 className="text-caption font-semibold uppercase tracking-wider text-text-primary">
+              Transitional Assessment Architecture
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-caption text-text-secondary pt-0.5">
+            <div className="p-3 rounded-md bg-background-subtle border border-border-default/60 space-y-1">
+              <span className="font-semibold text-text-primary block">1. Stored Profile Context</span>
+              <p>Constitutional focus ({assessment.doshaTendency.primary}) is aligned with your recorded user profile settings.</p>
+            </div>
+            <div className="p-3 rounded-md bg-background-subtle border border-border-default/60 space-y-1">
+              <span className="font-semibold text-text-primary block">2. Prototype Guidance</span>
+              <p>Botanical lepas and dinacharya reflect traditional Shastric archetypes rather than automated diagnosis.</p>
+            </div>
+            <div className="p-3 rounded-md bg-background-subtle border border-border-default/60 space-y-1">
+              <span className="font-semibold text-text-primary block">3. Future CV / AI Inference</span>
+              <p>Facial frame is archived. Automated biometric feature detection (erythema, sebum, pore texture) begins in Phase 08.</p>
+            </div>
+          </div>
+        </div>
+
         {/* ======================================================== */}
-        {/* TIER 1: OBSERVED — Visual Characteristics from Capture   */}
+        {/* TIER 1: OBSERVED — Visual Frame & Stored Profile Context */}
         {/* ======================================================== */}
         <motion.div variants={itemVariants} initial="hidden" animate="visible" className="space-y-4">
           <div className="flex items-center gap-2">
             <span className="text-caption font-semibold uppercase tracking-wider text-brand-accent flex items-center gap-1.5 font-body">
               <span className="w-2 h-2 rounded-full bg-brand-accent" />
-              01 OBSERVED
+              01 CAPTURE RECORD
             </span>
             <span className="text-border-default">•</span>
-            <span className="text-caption text-text-tertiary">Visual Features in Frame</span>
+            <span className="text-caption text-text-tertiary">Archived Frame &amp; Stored Profile Context</span>
           </div>
 
           <div className="p-6 sm:p-8 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-6">
@@ -190,13 +211,13 @@ export default function ResultsPage() {
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute bottom-1 right-1 bg-black/60 backdrop-blur-xs text-text-inverse text-[10px] px-1.5 py-0.5 rounded font-mono">
-                  {isDemo ? 'Sample' : 'Live Frame'}
+                  {isDemo ? 'Sample Reference' : 'Archived Frame'}
                 </div>
               </div>
 
               <div className="space-y-3 flex-1 text-center sm:text-left">
                 <div className="inline-flex items-center gap-2 text-caption font-medium text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                  Observation Recorded
+                  Observation Frame Archived
                 </div>
 
                 <h1 className="font-display text-2xl sm:text-3xl font-semibold text-text-primary leading-tight">
@@ -214,6 +235,11 @@ export default function ResultsPage() {
                   <Calendar size={13} />
                   Recorded on {formattedDate}
                 </p>
+
+                <p className="text-caption text-text-secondary bg-background-subtle p-2.5 rounded border border-border-default/60">
+                  <strong className="text-text-primary font-medium">Capture Status: </strong>
+                  Facial frame archived securely in your personal session journal. Automated biometric/CV feature detection is scheduled for Phase 08.
+                </p>
               </div>
             </div>
           </div>
@@ -226,20 +252,20 @@ export default function ResultsPage() {
           <div className="flex items-center gap-2">
             <span className="text-caption font-semibold uppercase tracking-wider text-brand-primary flex items-center gap-1.5 font-body">
               <span className="w-2 h-2 rounded-full bg-brand-primary" />
-              02 INTERPRETED
+              02 PROTOTYPE GUIDANCE
             </span>
             <span className="text-border-default">•</span>
-            <span className="text-caption text-text-tertiary">Classical Ayurvedic Doshic Rationale</span>
+            <span className="text-caption text-text-tertiary">Classical Ayurvedic Constitutional Archetype</span>
           </div>
 
           <div className="space-y-4">
             {/* Primary Doshic Tendency */}
             <div className="p-6 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-2">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-brand-accent font-body">
-                Constitutional Reflection
+                Constitutional Archetype (Non-CV Inference)
               </span>
               <h2 className="font-display text-xl sm:text-2xl font-semibold text-text-primary">
-                {assessment.doshaTendency.primary} Tendency
+                {assessment.doshaTendency.primary} Focus
               </h2>
               <p className="text-body-md text-text-secondary leading-relaxed font-normal">
                 {interpretationText}
@@ -250,8 +276,11 @@ export default function ResultsPage() {
             <div className="p-6 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-4">
               <h3 className="font-display text-lg font-semibold text-text-primary flex items-center gap-2">
                 <Search className="w-4.5 h-4.5 text-brand-accent" />
-                Observable Environmental &amp; Doshic Factors
+                Seasonal &amp; Environmental Factors (Classical Etiology)
               </h3>
+              <p className="text-caption text-text-secondary -mt-2">
+                General external factors identified in Ayurvedic texts that affect cutaneous harmony:
+              </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
                 {displayCauses.map((cause, i) => (
                   <div key={i} className="p-4 rounded-md bg-background-primary/70 border border-border-default flex items-start gap-3">
@@ -273,19 +302,19 @@ export default function ResultsPage() {
           <div className="flex items-center gap-2">
             <span className="text-caption font-semibold uppercase tracking-wider text-emerald-800 flex items-center gap-1.5 font-body">
               <span className="w-2 h-2 rounded-full bg-emerald-700" />
-              03 GUIDANCE
+              03 BOTANICAL REGIMENS
             </span>
             <span className="text-border-default">•</span>
-            <span className="text-caption text-text-tertiary">Grounded Botanical Care &amp; Precautions</span>
+            <span className="text-caption text-text-tertiary">Grounded Care &amp; Safety Precautions</span>
           </div>
 
           <div className="p-6 sm:p-8 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-6">
             <div>
               <h2 className="font-display text-2xl font-semibold text-text-primary">
-                Targeted Botanical Regimens
+                Targeted Botanical Regimens (Prototype Reference)
               </h2>
               <p className="text-body-md text-text-secondary">
-                Grounded topical Lepas and cooling herbal applications aligned with your observed tendency
+                Grounded topical Lepas and daily dinacharya aligned with your constitutional focus
               </p>
             </div>
 

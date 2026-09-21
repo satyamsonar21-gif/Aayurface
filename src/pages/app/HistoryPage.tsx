@@ -96,7 +96,9 @@ export default function HistoryPage() {
                             ? 'vata'
                             : assessment.doshaTendency?.primary?.toLowerCase().includes('kapha')
                             ? 'kapha'
-                            : 'pitta'
+                            : assessment.doshaTendency?.primary?.toLowerCase().includes('pitta')
+                            ? 'pitta'
+                            : 'default'
                         } 
                         size="sm" 
                       />

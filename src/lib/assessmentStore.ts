@@ -79,7 +79,7 @@ export function createAssessment(
 
   const primaryDosha = userProfile?.dosha
     ? userProfile.dosha.charAt(0).toUpperCase() + userProfile.dosha.slice(1)
-    : 'Vata-Pitta';
+    : 'Tridosha Balance';
 
   const skinTypeLabel = userProfile?.skin_type
     ? userProfile.skin_type.charAt(0).toUpperCase() + userProfile.skin_type.slice(1)

@@ -11,9 +11,18 @@ export default function ProgressPage() {
   const { user } = useAuth();
   const userAssessments = user?.id ? getUserAssessments(user.id) : [];
 
-  const dominantDosha = user?.dosha 
-    ? `${user.dosha.charAt(0).toUpperCase() + user.dosha.slice(1)} Pacification`
-    : 'Pitta Pacification';
+  const hasVerifiedDosha = Boolean(user?.dosha);
+  const dominantDosha = hasVerifiedDosha
+    ? `${user!.dosha!.charAt(0).toUpperCase() + user!.dosha!.slice(1)} Pacification`
+    : 'Constitutional focus not established';
+
+  const dominantDoshaDesc = hasVerifiedDosha
+    ? user?.dosha?.toLowerCase().includes('vata')
+      ? 'Nourishing oils & barrier restoration'
+      : user?.dosha?.toLowerCase().includes('kapha')
+      ? 'Clarifying herbs & gentle circulation'
+      : 'Cooling botanicals & hydration'
+    : 'An assessment or profile setup is required to establish your focus.';
 
   return (
     <PageWrapper>
@@ -77,13 +86,24 @@ export default function ProgressPage() {
             </p>
           </div>
 
-          <div className="p-5 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-1">
+          <div 
+            onClick={() => {
+              if (!hasVerifiedDosha) {
+                navigate('/profile');
+              }
+            }}
+            className={`p-5 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-1 ${!hasVerifiedDosha ? 'hover:border-brand-primary/40 transition-colors cursor-pointer' : ''}`}
+          >
             <div className="flex items-center gap-2 text-text-tertiary text-caption font-medium">
               <Compass className="w-4 h-4 text-emerald-700" />
               Dominant Focus
             </div>
-            <p className="font-display text-2xl font-semibold text-text-primary">{dominantDosha}</p>
-            <p className="text-caption text-text-secondary">Cooling botanicals & hydration</p>
+            <p className="font-display text-xl sm:text-2xl font-semibold text-text-primary leading-snug">
+              {dominantDosha}
+            </p>
+            <p className="text-caption text-text-secondary">
+              {dominantDoshaDesc}
+            </p>
           </div>
         </div>
 
@@ -108,11 +128,14 @@ export default function ProgressPage() {
                   day: 'numeric',
                   year: 'numeric'
                 });
-                const variant = assessment.doshaTendency.primary.toLowerCase().includes('vata')
+                const primary = (assessment.doshaTendency?.primary || '').toLowerCase();
+                const variant = primary.includes('vata')
                   ? 'vata'
-                  : assessment.doshaTendency.primary.toLowerCase().includes('kapha')
+                  : primary.includes('kapha')
                   ? 'kapha'
-                  : 'pitta';
+                  : primary.includes('pitta')
+                  ? 'pitta'
+                  : 'default';
 
                 return (
                   <motion.div
