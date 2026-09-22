@@ -135,13 +135,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const signUp = useCallback(async (email: string, password: string, fullName: string) => {
+  const signUp = useCallback(async (email: string, password: string, fullName?: string): Promise<User | null> => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
-          full_name: fullName,
+          full_name: fullName?.trim() || '',
+          onboarding_completed: false,
         },
       },
     });
@@ -153,10 +154,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (data.session?.user) {
       const resolved = await resolveUserProfile(data.session.user);
       setUser(resolved);
+      return resolved;
     }
+    return null;
   }, []);
 
-  const signIn = useCallback(async (email: string, password: string) => {
+  const signIn = useCallback(async (email: string, password: string): Promise<User | null> => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -169,7 +172,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (data.session?.user) {
       const resolved = await resolveUserProfile(data.session.user);
       setUser(resolved);
+      return resolved;
     }
+    return null;
   }, []);
 
   const signInWithGoogle = useCallback(async () => {
@@ -186,10 +191,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
-    const { error } = await supabase.auth.signOut();
-    setUser(null);
-    if (error) {
-      console.error('[AuthContext] Error signing out:', error.message);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('[AuthContext] Error from Supabase signOut:', error.message);
+      }
+    } catch (err) {
+      console.error('[AuthContext] Exception during signOut:', err);
+    } finally {
+      setUser(null);
+      setIsLoading(false);
+      // Purge client storage to prevent cross-account leakage
+      try {
+        const keysToRemove: string[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (key.startsWith('sb-') || key.startsWith('aayurface_'))) {
+            // Remove auth token and non-scoped temporary keys
+            if (key.includes('auth-token') || key === 'aayurface_session') {
+              keysToRemove.push(key);
+            }
+          }
+        }
+        keysToRemove.forEach((k) => localStorage.removeItem(k));
+      } catch (e) {
+        console.warn('[AuthContext] Failed to purge storage on signOut:', e);
+      }
     }
   }, []);
 

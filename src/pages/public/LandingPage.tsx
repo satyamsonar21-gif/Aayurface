@@ -29,17 +29,22 @@ const fadeInUp = {
 
 const staggerContainer = {
   hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1
-    }
+  visible: { 
+    opacity: 1, 
+    transition: { 
+      staggerChildren: 0.1 
+    } 
   }
 };
 
 export default function LandingPage() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleLogout = async () => {
+    await signOut();
+    window.location.replace('/');
+  };
 
   return (
     <PageTransition>
@@ -68,16 +73,25 @@ export default function LandingPage() {
               <a href="#contact" className="hover:text-[#1E3A2F] transition-colors py-1">Contact</a>
             </nav>
 
-            {/* RIGHT: Login & Get Started CTA */}
-            <div className="hidden sm:flex items-center gap-6">
+            {/* RIGHT: Login & Get Started CTA / Authenticated Controls */}
+            <div className="hidden sm:flex items-center gap-4">
               {isAuthenticated ? (
-                <Link 
-                  to="/dashboard" 
-                  className="bg-[#1E3A2F] text-white px-5 py-2.5 rounded-md text-sm font-medium hover:bg-[#152B23] transition-all shadow-xs flex items-center gap-2 cursor-pointer group"
-                >
-                  <span>Dashboard</span>
-                  <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
-                </Link>
+                <>
+                  <Link 
+                    to={user?.onboarding_completed ? "/dashboard" : "/onboarding"} 
+                    className="bg-[#1E3A2F] text-white px-5 py-2.5 rounded-md text-sm font-medium hover:bg-[#152B23] transition-all shadow-xs flex items-center gap-2 cursor-pointer group"
+                  >
+                    <span>{user?.onboarding_completed ? "Enter Dashboard" : "Continue Onboarding"}</span>
+                    <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="text-sm font-medium text-[#5C6660] hover:text-red-700 transition-colors px-2 py-1 cursor-pointer"
+                  >
+                    Sign Out
+                  </button>
+                </>
               ) : (
                 <>
                   <Link 
@@ -156,14 +170,26 @@ export default function LandingPage() {
                 </a>
                 <div className="pt-4 border-t border-[#E6DFD5] flex flex-col gap-3">
                   {isAuthenticated ? (
-                    <Link 
-                      to="/dashboard" 
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="bg-[#1E3A2F] text-white text-center py-3 rounded-md text-sm font-medium hover:bg-[#152B23] transition-colors flex items-center justify-center gap-2"
-                    >
-                      <span>Dashboard</span>
-                      <ArrowRight size={14} />
-                    </Link>
+                    <>
+                      <Link 
+                        to={user?.onboarding_completed ? "/dashboard" : "/onboarding"} 
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="bg-[#1E3A2F] text-white text-center py-3 rounded-md text-sm font-medium hover:bg-[#152B23] transition-colors flex items-center justify-center gap-2"
+                      >
+                        <span>{user?.onboarding_completed ? "Enter Dashboard" : "Continue Onboarding"}</span>
+                        <ArrowRight size={14} />
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          handleLogout();
+                        }}
+                        className="text-center py-2 text-sm font-medium text-red-700 hover:text-red-800 cursor-pointer"
+                      >
+                        Sign Out
+                      </button>
+                    </>
                   ) : (
                     <>
                       <Link 
@@ -234,10 +260,10 @@ export default function LandingPage() {
                 className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2 w-full sm:w-auto"
               >
                 <Link 
-                  to={isAuthenticated ? "/dashboard" : "/signin"} 
+                  to={isAuthenticated ? (user?.onboarding_completed ? "/dashboard" : "/onboarding") : "/signin"} 
                   className="bg-[#1E3A2F] text-white px-7 py-3.5 rounded-md text-sm sm:text-base font-medium hover:bg-[#152B23] transition-all shadow-xs text-center flex items-center justify-center gap-2 cursor-pointer group"
                 >
-                  <span>{isAuthenticated ? "Enter Dashboard" : "Start Your Journey"}</span>
+                  <span>{isAuthenticated ? (user?.onboarding_completed ? "Enter Dashboard" : "Continue Onboarding") : "Start Your Journey"}</span>
                   <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <a 
@@ -738,10 +764,10 @@ export default function LandingPage() {
 
               <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link 
-                  to={isAuthenticated ? "/dashboard" : "/signin"} 
+                  to={isAuthenticated ? (user?.onboarding_completed ? "/dashboard" : "/onboarding") : "/signin"} 
                   className="w-full sm:w-auto bg-[#C5A059] text-[#1E3A2F] font-body font-semibold px-8 py-4 rounded-md hover:bg-[#C5A059]/90 transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer group"
                 >
-                  <span>{isAuthenticated ? "Enter Dashboard" : "Enter AayurFace"}</span>
+                  <span>{isAuthenticated ? (user?.onboarding_completed ? "Enter Dashboard" : "Continue Onboarding") : "Enter AayurFace"}</span>
                   <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <a 

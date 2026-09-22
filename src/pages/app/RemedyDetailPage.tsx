@@ -5,17 +5,20 @@ import PageWrapper from '@/components/layout/PageWrapper';
 import SkinBadge from '@/components/common/SkinBadge';
 import SafetyNotice from '@/components/common/SafetyNotice';
 import { MOCK_REMEDIES } from '@/lib/mockData';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function RemedyDetailPage() {
   const { remedyId, slug } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const param = slug || remedyId;
   
   const remedy = MOCK_REMEDIES.find(r => r.slug === param || r.id === param) || MOCK_REMEDIES[0];
+  const storageKey = user?.id ? `aayurface_saved_remedies_${user.id}` : 'aayurface_saved_remedies';
 
   const [isSaved, setIsSaved] = useState(() => {
     try {
-      const saved = localStorage.getItem('aayurface_saved_remedies');
+      const saved = localStorage.getItem(storageKey);
       const list = saved ? JSON.parse(saved) : [];
       return list.includes(remedy.id);
     } catch {
@@ -25,10 +28,10 @@ export default function RemedyDetailPage() {
 
   const toggleSave = () => {
     try {
-      const saved = localStorage.getItem('aayurface_saved_remedies');
+      const saved = localStorage.getItem(storageKey);
       const list: string[] = saved ? JSON.parse(saved) : [];
       const next = list.includes(remedy.id) ? list.filter(id => id !== remedy.id) : [...list, remedy.id];
-      localStorage.setItem('aayurface_saved_remedies', JSON.stringify(next));
+      localStorage.setItem(storageKey, JSON.stringify(next));
       setIsSaved(!isSaved);
     } catch {
       setIsSaved(!isSaved);

@@ -1,10 +1,10 @@
 // ============================================================
 // AayurFace — Scan Skin Module
-// Phase 06.7: Native Camera Engine + UI Repair
-// Strict Isolated Frontend Execution
+// Phase 09: Standardized Camera Capture Gateway
+// Strict Non-Diagnostic Quality Gated Flow
 // ============================================================
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, RefreshCw, ShieldCheck } from 'lucide-react';
 import { useCamera } from './scan/useCamera';
@@ -18,10 +18,19 @@ export default function ScanPage() {
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Strict route defense: Unauthenticated execution must never proceed
+  useEffect(() => {
+    if (!user?.id) {
+      navigate('/signin', { replace: true });
+    }
+  }, [user?.id, navigate]);
+
   const {
     state,
     error,
     capturedImage,
+    artifact,
+    quality,
     videoRef,
     capturePhoto,
     retakePhoto,
@@ -45,16 +54,26 @@ export default function ScanPage() {
   };
 
   const handleContinue = () => {
+    // Quality Gating Check: User must exist, image must exist, and quality must NOT be FAIL
     if (!capturedImage) return;
-    const userId = user?.id || 'anonymous-user';
-    const assessment = createAssessment(userId, capturedImage, {
-      dosha: user?.dosha,
-      skin_type: user?.skin_type,
-    });
+    if (state === 'qualityRejected' || quality?.status === 'FAIL') return;
+    if (!user?.id) {
+      navigate('/signin', { replace: true });
+      return;
+    }
+    const assessment = createAssessment(
+      user.id,
+      capturedImage,
+      {
+        dosha: user?.dosha,
+        skin_type: user?.skin_type,
+      },
+      artifact ?? undefined
+    );
     navigate(`/results/${assessment.id}`);
   };
 
-  const isReview = state === 'preview';
+  const isReview = state === 'preview' || state === 'qualityRejected';
 
   return (
     <div className="relative w-full h-[100dvh] bg-background-primary text-text-primary overflow-hidden flex flex-col font-body select-none">
@@ -114,6 +133,7 @@ export default function ScanPage() {
               state={state}
               error={error}
               capturedImage={capturedImage}
+              quality={quality}
               videoRef={videoRef}
               onRetry={retry}
               onUploadClick={handleUploadClick}
@@ -124,6 +144,7 @@ export default function ScanPage() {
         {/* Zone 2: Guidance & Action Controls */}
         <ScanGuidancePanel
           state={state}
+          quality={quality}
           onCapture={capturePhoto}
           onRetake={retakePhoto}
           onContinue={handleContinue}

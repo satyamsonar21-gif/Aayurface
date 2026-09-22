@@ -65,12 +65,17 @@ const TOTAL_STEPS = 6;
 
 export default function OnboardingPage() {
   const navigate = useNavigate();
-  const { user, completeOnboarding } = useAuth();
+  const { user, completeOnboarding, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    window.location.replace('/');
+  };
 
   const [currentStep, setCurrentStep] = useState(1);
 
   // Form State
-  const initialName = user?.full_name?.trim() || (user?.email ? user.email.split('@')[0] : '');
+  const initialName = user?.full_name?.trim() || '';
   const [fullName, setFullName] = useState(initialName);
   const [selectedSkinType, setSelectedSkinType] = useState<SkinType>(user?.skin_type || 'dry');
   const [selectedConcerns, setSelectedConcerns] = useState<string[]>(['Dryness & Flaking']);
@@ -182,9 +187,19 @@ export default function OnboardingPage() {
                 <Sprout size={15} />
                 Ayurvedic Intake Protocol
               </span>
-              <span className="text-text-tertiary">
-                Step {currentStep} of {TOTAL_STEPS}
-              </span>
+              <div className="flex items-center gap-3.5">
+                <span className="text-text-tertiary">
+                  Step {currentStep} of {TOTAL_STEPS}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="text-xs text-text-tertiary hover:text-red-700 transition-colors cursor-pointer"
+                  title="Sign Out of Session"
+                >
+                  Sign Out
+                </button>
+              </div>
             </div>
 
             {/* Visual Step Bar */}

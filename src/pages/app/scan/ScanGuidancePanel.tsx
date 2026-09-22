@@ -1,11 +1,11 @@
 // ============================================================
 // AayurFace — Scan Guidance Panel Component
-// Phase 06.7: Guidance Steps, Real-Time Status, Controls
+// Phase 09: Dynamic Quality Feedback, Gating Controls & Actionable Guidance
 // Luxury Editorial Ayurvedic Wellness Aesthetic
 // ============================================================
 
 import React from 'react';
-import type { CameraState } from './types';
+import type { CameraState, CaptureQualityResult } from './types';
 import { 
   Camera, 
   RotateCcw, 
@@ -15,11 +15,14 @@ import {
   Sparkles, 
   Maximize2, 
   ShieldCheck, 
-  CheckCircle2
+  CheckCircle2,
+  AlertCircle,
+  AlertTriangle
 } from 'lucide-react';
 
 interface ScanGuidancePanelProps {
   state: CameraState;
+  quality?: CaptureQualityResult | null;
   onCapture: () => void;
   onRetake: () => void;
   onContinue: () => void;
@@ -28,14 +31,18 @@ interface ScanGuidancePanelProps {
 
 export const ScanGuidancePanel: React.FC<ScanGuidancePanelProps> = ({
   state,
+  quality,
   onCapture,
   onRetake,
   onContinue,
   onUploadClick
 }) => {
-  const isPreview = state === 'preview';
+  const isRejected = state === 'qualityRejected' || quality?.status === 'FAIL';
+  const isWarn = state === 'preview' && quality?.status === 'WARN';
+  const isPass = state === 'preview' && quality?.status === 'PASS';
+  const isPreview = state === 'preview' || isRejected;
   const isReady = state === 'ready';
-  const isCapturing = state === 'capturing';
+  const isCapturing = state === 'capturing' || state === 'analyzingQuality';
 
   return (
     <aside 
@@ -49,55 +56,82 @@ export const ScanGuidancePanel: React.FC<ScanGuidancePanelProps> = ({
             PREMIUM WELLNESS CAPTURE
           </span>
           <h2 className="font-display text-xl sm:text-2xl font-semibold text-text-primary">
-            {isPreview ? 'Review Your Capture' : 'Facial Observation Guide'}
+            {isRejected
+              ? 'Capture Needs Improvement'
+              : isPreview 
+                ? 'Review Your Capture' 
+                : 'Facial Observation Guide'
+            }
           </h2>
           <p className="text-xs text-text-secondary leading-relaxed font-body">
-            {isPreview 
-              ? 'Ensure your face is clearly visible with even lighting before continuing.'
-              : 'Position your face inside the guide to capture a clear frame for assessment.'
+            {isRejected
+              ? 'One or more technical quality checks failed. Please review the guidance below and retake the photo.'
+              : isWarn
+                ? 'Lighting or focus is slightly below ideal parameters. You may proceed or retake for higher precision.'
+                : isPass
+                  ? 'Capture meets technical quality requirements. Inspect your photo before continuing.'
+                  : 'Position your face inside the guide to capture a clear frame for assessment.'
             }
           </p>
         </div>
 
         {/* 2. Real-time Status Card */}
-        <div className="p-3.5 rounded-xl bg-background-surface border border-border-default shadow-xs space-y-2">
+        <div className={`p-3.5 rounded-xl border shadow-xs space-y-2 ${
+          isRejected 
+            ? 'bg-rose-500/10 border-rose-500/30 text-rose-950 dark:text-rose-200' 
+            : isWarn 
+              ? 'bg-amber-500/10 border-amber-500/30' 
+              : 'bg-background-surface border-border-default'
+        }`}>
           <div className="flex items-center gap-2">
             <span 
               className={`w-2.5 h-2.5 rounded-full shrink-0 ${
-                isReady 
-                  ? 'bg-emerald-500' 
-                  : isPreview 
-                    ? 'bg-brand-accent' 
-                    : state === 'requesting' || isCapturing
-                      ? 'bg-brand-accent animate-pulse'
-                      : 'bg-amber-400'
+                isRejected
+                  ? 'bg-rose-500'
+                  : isWarn
+                    ? 'bg-amber-400'
+                    : isPass
+                      ? 'bg-emerald-500'
+                      : isReady 
+                        ? 'bg-emerald-500' 
+                        : isCapturing
+                          ? 'bg-brand-accent animate-pulse'
+                          : 'bg-amber-400'
               }`} 
             />
             <h3 className="font-display text-sm sm:text-base font-semibold text-text-primary">
-              {isReady && 'Camera Ready'}
+              {isRejected && 'Quality Check Rejected'}
+              {isWarn && 'Quality Notice (Review Recommended)'}
+              {isPass && 'Quality Verified (Pass)'}
+              {isReady && !isPreview && 'Camera Ready'}
               {state === 'requesting' && 'Requesting Camera Access…'}
-              {isCapturing && 'Capturing Frame…'}
-              {isPreview && 'Frame Ready for Review'}
+              {state === 'capturing' && 'Capturing Frame…'}
+              {state === 'analyzingQuality' && 'Evaluating Image Quality…'}
+              {state === 'preview' && !quality && 'Frame Ready for Review'}
               {state === 'permissionDenied' && 'Camera Permission Blocked'}
               {state === 'cameraUnavailable' && 'Camera Unavailable'}
-              {state === 'captureError' && 'Capture Failed'}
+              {state === 'captureError' && !isRejected && 'Capture Failed'}
               {state === 'idle' && 'Initializing…'}
             </h3>
           </div>
 
           <p className="text-[11px] sm:text-xs text-text-secondary leading-normal font-body">
-            {isReady && 'Live video is steady. Press Capture Photo when ready.'}
+            {isRejected && 'Technical quality is below the required baseline. Please retake following the prioritized steps below.'}
+            {isWarn && 'Sub-optimal lighting or resolution detected, but the image is decodable. You may proceed.'}
+            {isPass && 'Optimal exposure, resolution, and sharpness verified.'}
+            {isReady && !isPreview && 'Live video is steady. Press Capture Photo when ready.'}
             {state === 'requesting' && 'Waiting for browser camera authorization.'}
-            {isCapturing && 'Reading optical surface data from live video feed…'}
-            {isPreview && 'Inspect your photo. You can retake if needed or proceed.'}
+            {state === 'capturing' && 'Reading optical surface data from live video feed…'}
+            {state === 'analyzingQuality' && 'Measuring pixel luminance balance and edge sharpness…'}
+            {state === 'preview' && !quality && 'Inspect your photo. You can retake if needed or proceed.'}
             {state === 'permissionDenied' && 'Camera permission is required to stream live video.'}
             {state === 'cameraUnavailable' && 'No live video feed available on this device.'}
-            {state === 'captureError' && 'Unable to acquire video frame. Please try again.'}
+            {state === 'captureError' && !isRejected && 'Unable to acquire video frame. Please try again.'}
             {state === 'idle' && 'Preparing media devices…'}
           </p>
         </div>
 
-        {/* 3. Primary Controls (Unified, responsive, ergonomic placement) */}
+        {/* 3. Primary Controls (Gated by Quality Status) */}
         <div className="space-y-2.5 pt-1">
           {!isPreview ? (
             <>
@@ -112,7 +146,7 @@ export const ScanGuidancePanel: React.FC<ScanGuidancePanelProps> = ({
                 }`}
               >
                 <Camera className="w-4 h-4 text-brand-accent" />
-                {isCapturing ? 'Capturing…' : 'Capture Photo'}
+                {state === 'capturing' ? 'Capturing…' : state === 'analyzingQuality' ? 'Analyzing…' : 'Capture Photo'}
               </button>
 
               <button
@@ -124,6 +158,27 @@ export const ScanGuidancePanel: React.FC<ScanGuidancePanelProps> = ({
                 Or upload photo from device
               </button>
             </>
+          ) : isRejected ? (
+            <div className="space-y-2">
+              <button
+                onClick={onRetake}
+                aria-label="Retake photo"
+                className="w-full py-3.5 px-4 rounded-lg font-body font-semibold text-sm bg-brand-primary text-text-inverse hover:bg-brand-primary-hover border border-brand-accent/40 flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer active:scale-[0.99] min-h-[44px]"
+              >
+                <RotateCcw className="w-4 h-4 text-brand-accent" />
+                <span>Retake Photo</span>
+              </button>
+
+              <button
+                disabled
+                aria-disabled="true"
+                aria-label="Continue to skin wellness assessment (disabled due to quality failure)"
+                className="w-full py-3 px-4 rounded-lg font-body font-medium text-xs bg-neutral-100 dark:bg-neutral-800 text-neutral-400 border border-neutral-200 dark:border-neutral-700 flex items-center justify-center gap-2 cursor-not-allowed min-h-[44px]"
+              >
+                <span>Continue to Assessment (Quality Required)</span>
+                <ArrowRight className="w-3.5 h-3.5 text-neutral-400" />
+              </button>
+            </div>
           ) : (
             <div className="space-y-2">
               <button
@@ -131,7 +186,7 @@ export const ScanGuidancePanel: React.FC<ScanGuidancePanelProps> = ({
                 aria-label="Continue to skin wellness assessment"
                 className="w-full py-3.5 px-4 rounded-lg font-body font-semibold text-sm bg-brand-primary text-text-inverse hover:bg-brand-primary-hover border border-brand-accent/40 flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer active:scale-[0.99] min-h-[44px]"
               >
-                <span>Continue to Assessment</span>
+                <span>{isWarn ? 'Continue Anyway' : 'Continue to Assessment'}</span>
                 <ArrowRight className="w-4 h-4 text-brand-accent" />
               </button>
 
@@ -147,7 +202,7 @@ export const ScanGuidancePanel: React.FC<ScanGuidancePanelProps> = ({
           )}
         </div>
 
-        {/* 4. Guidance Protocol / Checklist */}
+        {/* 4. Guidance Protocol or Evaluated Quality Checklist */}
         {!isPreview ? (
           <div className="space-y-2 pt-1">
             <h4 className="text-[10px] font-semibold uppercase tracking-wider text-text-tertiary font-body">
@@ -180,25 +235,93 @@ export const ScanGuidancePanel: React.FC<ScanGuidancePanelProps> = ({
               </div>
             </div>
           </div>
+        ) : isRejected ? (
+          <div className="space-y-3 pt-1">
+            {/* Prioritized Guidance List */}
+            {quality && quality.prioritizedGuidance.length > 0 && (
+              <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 space-y-1.5">
+                <h4 className="text-xs font-semibold text-amber-900 dark:text-amber-200 font-body flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                  Prioritized Steps to Fix
+                </h4>
+                <ol className="list-decimal list-inside space-y-1 text-xs text-text-secondary font-body">
+                  {quality.prioritizedGuidance.map((step, idx) => (
+                    <li key={idx} className="leading-relaxed">
+                      {step}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+
+            {/* Individual Quality Checks */}
+            <h4 className="text-[10px] font-semibold uppercase tracking-wider text-text-tertiary font-body">
+              Quality Checks Breakdown
+            </h4>
+            <div className="space-y-1.5">
+              {quality?.checks.map((check) => (
+                <div 
+                  key={check.id}
+                  className={`flex items-start gap-2 text-xs p-2.5 rounded-lg border ${
+                    check.status === 'FAIL'
+                      ? 'bg-rose-500/10 border-rose-500/30 text-rose-950 dark:text-rose-200'
+                      : check.status === 'WARN'
+                        ? 'bg-amber-500/10 border-amber-500/30 text-amber-950 dark:text-amber-200'
+                        : 'bg-background-surface border-border-default text-text-primary'
+                  }`}
+                >
+                  {check.status === 'FAIL' ? (
+                    <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                  ) : check.status === 'WARN' ? (
+                    <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                  ) : (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  )}
+                  <div>
+                    <span className="font-semibold">{check.name}: </span>
+                    <span className="text-text-secondary">{check.message}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         ) : (
           <div className="space-y-2 pt-1">
             <h4 className="text-[10px] font-semibold uppercase tracking-wider text-text-tertiary font-body">
-              Capture Quality Checklist
+              Evaluated Quality Breakdown
             </h4>
 
             <div className="space-y-1.5">
-              <div className="flex items-center gap-2 text-xs text-text-primary bg-background-surface p-2.5 rounded-lg border border-border-default">
-                <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
-                <span>Facial features framed and visible</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-text-primary bg-background-surface p-2.5 rounded-lg border border-border-default">
-                <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
-                <span>Captured frame stored in memory</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-text-primary bg-background-surface p-2.5 rounded-lg border border-border-default">
-                <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
-                <span>Ready for Ayurvedic assessment</span>
-              </div>
+              {quality?.checks ? (
+                quality.checks.map((check) => (
+                  <div key={check.id} className="flex items-center gap-2 text-xs text-text-primary bg-background-surface p-2.5 rounded-lg border border-border-default">
+                    {check.status === 'WARN' ? (
+                      <AlertTriangle size={14} className="text-amber-500 shrink-0" />
+                    ) : (
+                      <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
+                    )}
+                    <div>
+                      <span className="font-medium">{check.name}: </span>
+                      <span className="text-text-secondary">{check.message}</span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 text-xs text-text-primary bg-background-surface p-2.5 rounded-lg border border-border-default">
+                    <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
+                    <span>Facial features framed and visible</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-text-primary bg-background-surface p-2.5 rounded-lg border border-border-default">
+                    <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
+                    <span>Captured frame stored in memory</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-text-primary bg-background-surface p-2.5 rounded-lg border border-border-default">
+                    <CheckCircle2 size={14} className="text-emerald-600 shrink-0" />
+                    <span>Ready for Ayurvedic assessment</span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}

@@ -34,8 +34,15 @@ const LoginPage = () => {
     setIsLoading(true);
     setErrorMsg('');
     try {
-      await signIn(data.email, data.password);
-      navigate(from, { replace: true });
+      const signedInUser = await signIn(data.email, data.password);
+      // Canonical Existing User Routing:
+      // If user has NOT completed onboarding, strictly route to /onboarding
+      // If user has completed onboarding, proceed to intended destination or /dashboard
+      if (signedInUser && !signedInUser.onboarding_completed) {
+        navigate('/onboarding', { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
     } catch {
       setErrorMsg('Invalid email or password. Please check your credentials.');
     } finally {

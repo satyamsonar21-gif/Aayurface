@@ -12,10 +12,12 @@ import {
   User, 
   Settings, 
   X,
-  Globe 
+  Globe,
+  LogOut 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface NavItem {
   path: string;
@@ -44,6 +46,7 @@ const drawerNavItems = [
 
 const BottomNav: React.FC = () => {
   const location = useLocation();
+  const { signOut } = useAuth();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const isDrawerActive = drawerNavItems.some((item) =>
@@ -219,6 +222,27 @@ const BottomNav: React.FC = () => {
                     </Link>
                   );
                 })}
+              </div>
+
+              {/* Drawer Sign Out Button */}
+              <div className="pt-3 mt-2 border-t border-border-default/60">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setIsDrawerOpen(false);
+                    await signOut();
+                    window.location.replace('/');
+                  }}
+                  className="w-full flex items-center gap-3.5 px-3 py-2.5 rounded-lg text-red-700 hover:bg-red-50 transition-colors text-left cursor-pointer"
+                >
+                  <div className="w-9 h-9 rounded-md flex items-center justify-center shrink-0 bg-red-50 text-red-700">
+                    <LogOut className="w-4.5 h-4.5" />
+                  </div>
+                  <div>
+                    <p className="font-body text-body-md font-medium text-red-700">Sign Out</p>
+                    <p className="text-caption text-red-500 truncate">Terminate active session</p>
+                  </div>
+                </button>
               </div>
             </motion.div>
           </>

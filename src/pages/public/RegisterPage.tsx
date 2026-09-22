@@ -9,7 +9,6 @@ import AuthLayout from '@/components/layout/AuthLayout';
 import { useAuth } from '@/contexts/AuthContext';
 
 const registerSchema = z.object({
-  fullName: z.string().min(2, 'Full Name is required'),
   email: z.string().email('Please enter a valid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   confirmPassword: z.string()
@@ -36,8 +35,9 @@ const RegisterPage = () => {
     setIsLoading(true);
     setErrorMsg('');
     try {
-      await signUp(data.email, data.password, data.fullName);
-      navigate('/dashboard', { replace: true });
+      await signUp(data.email, data.password);
+      // Canonical New User Flow: Route strictly to 6-step onboarding
+      navigate('/onboarding', { replace: true });
     } catch {
       setErrorMsg('Failed to create account. Please try again.');
     } finally {
@@ -50,7 +50,8 @@ const RegisterPage = () => {
     setErrorMsg('');
     try {
       await signInWithGoogle();
-      navigate('/dashboard', { replace: true });
+      // Canonical New User Flow: Route strictly to 6-step onboarding
+      navigate('/onboarding', { replace: true });
     } catch {
       setErrorMsg('Google sign in could not be completed.');
     } finally {
@@ -60,8 +61,8 @@ const RegisterPage = () => {
 
   return (
     <AuthLayout
-      title="Begin your journey"
-      subtitle="Create your personal AayurFace account."
+      title="Create your AayurFace account"
+      subtitle="Your personalized wellness journey begins after account creation."
     >
       <div className="w-full">
         {errorMsg && (
@@ -71,24 +72,6 @@ const RegisterPage = () => {
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-4">
-          <div className="space-y-1.5">
-            <label htmlFor="register-fullName" className="block text-caption font-body font-medium text-text-secondary uppercase tracking-wider">
-              Full Name
-            </label>
-            <input
-              {...register('fullName')}
-              id="register-fullName"
-              type="text"
-              autoComplete="name"
-              placeholder="e.g. Namrata Sen"
-              aria-describedby={errors.fullName ? 'fullName-error' : undefined}
-              className="w-full rounded-md border border-border-default bg-background-surface px-4 py-3 font-body text-body-md text-text-primary placeholder:text-text-tertiary focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/15 outline-none transition-all min-h-[44px]"
-            />
-            {errors.fullName && (
-              <p id="fullName-error" role="alert" className="text-red-700 text-caption font-body pl-0.5">{errors.fullName.message}</p>
-            )}
-          </div>
-
           <div className="space-y-1.5">
             <label htmlFor="register-email" className="block text-caption font-body font-medium text-text-secondary uppercase tracking-wider">
               Email Address
@@ -194,7 +177,11 @@ const RegisterPage = () => {
           Continue with Google
         </motion.button>
 
-        <p className="mt-8 text-center text-body-md text-text-secondary font-body">
+        <p className="mt-6 text-center text-caption text-text-tertiary font-body">
+          Your personalized wellness profile is created in the next step.
+        </p>
+
+        <p className="mt-4 text-center text-body-md text-text-secondary font-body">
           Already have an account?{' '}
           <Link to="/signin" className="text-brand-primary font-semibold hover:underline">
             Sign In

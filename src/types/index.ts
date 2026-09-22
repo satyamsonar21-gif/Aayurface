@@ -47,7 +47,10 @@ export interface Assessment {
   causes: ScanCause[];
   remedies: ScanRemedy[];
   preventionTips: PreventionTip[];
+  captureArtifact?: import('./capture').CaptureArtifact;
 }
+
+export * from './capture';
 
 export interface ScanCause {
   icon: string;
@@ -168,8 +171,8 @@ export interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  signUp: (email: string, password: string, fullName: string) => Promise<void>;
-  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, fullName?: string) => Promise<User | null>;
+  signIn: (email: string, password: string) => Promise<User | null>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;

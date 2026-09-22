@@ -1,11 +1,18 @@
 // ============================================================
 // AayurFace — Custom Browser Camera Engine
-// Phase 06.7: useCamera Hook
+// Phase 09: Standardized Camera Capture Gateway Hook
 // Strict Isolated Execution with Full Lifecycle & Cleanup
 // ============================================================
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import type { CameraState, CameraErrorDetails } from './types';
+import type {
+  CameraState,
+  CameraErrorDetails,
+  CaptureArtifact,
+  CaptureQualityResult
+} from '@/types/capture';
+import { standardizeCanvas, createCaptureArtifact } from '@/lib/capture/standardization';
+import { evaluateRasterQuality } from '@/lib/capture/qualityEngine';
 
 export interface UseCameraOptions {
   autoStart?: boolean;
@@ -15,6 +22,8 @@ export interface UseCameraReturn {
   state: CameraState;
   error: CameraErrorDetails | null;
   capturedImage: string | null;
+  artifact: CaptureArtifact | null;
+  quality: CaptureQualityResult | null;
   videoRef: React.RefObject<HTMLVideoElement | null>;
   startCamera: () => Promise<void>;
   stopCamera: () => void;
@@ -28,6 +37,8 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
   const [state, setState] = useState<CameraState>('idle');
   const [error, setError] = useState<CameraErrorDetails | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [artifact, setArtifact] = useState<CaptureArtifact | null>(null);
+  const [quality, setQuality] = useState<CaptureQualityResult | null>(null);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -60,7 +71,7 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
     const video = videoRef.current;
     if (!video) return;
 
-    // Mandatory Correction 6: Evidence that camera is ready
+    // Genuine Readiness: Stream attached + non-zero dimensions + readyState >= 2 + playing
     const isStreamAttached = video.srcObject === stream;
     const hasDimensions = video.videoWidth > 0 && video.videoHeight > 0;
     const hasData = video.readyState >= 2; // HTMLMediaElement.HAVE_CURRENT_DATA or higher
@@ -77,8 +88,10 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
     stopStream();
     setError(null);
     setCapturedImage(null);
+    setArtifact(null);
+    setQuality(null);
 
-    // Mandatory Correction 2: Check MediaDevices availability
+    // Check MediaDevices availability
     if (
       typeof navigator === 'undefined' ||
       !navigator.mediaDevices ||
@@ -125,14 +138,12 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
           console.warn(`[Camera Engine] Constraint failed (${errorName}), falling back to generic video constraint.`);
           stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         } else {
-          // NotFoundError, NotAllowedError, etc. are passed directly to outer error taxonomy
           throw firstErr;
         }
       }
 
-      // Mandatory Correction 1: Strict Mode + Stale Stream Protection
+      // Strict Mode + Stale Stream Protection
       if (!isMountedRef.current || activeRequestIdRef.current !== requestId) {
-        // Component unmounted or another request was triggered while getUserMedia was resolving
         if (stream) {
           stream.getTracks().forEach((track) => track.stop());
         }
@@ -140,12 +151,6 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
       }
 
       streamRef.current = stream;
-
-      stream.getVideoTracks().forEach(track => {
-        track.onended = () => {
-          console.log('[Camera Engine] Track onended fired! track.id:', track.id, 'readyState:', track.readyState);
-        };
-      });
 
       const video = videoRef.current;
       if (video) {
@@ -182,7 +187,6 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
         }, 400);
       }
     } catch (err: unknown) {
-      // Mandatory Correction 1: Stale check on error branch too
       if (!isMountedRef.current || activeRequestIdRef.current !== requestId) {
         if (stream) {
           stream.getTracks().forEach((track) => track.stop());
@@ -193,7 +197,7 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
       const errorName = err instanceof Error ? err.name : String(err);
       console.warn('[Camera Engine] Access failure:', errorName, err);
 
-      // Mandatory Correction 9: Error Taxonomy
+      // Error Taxonomy Mapping
       if (errorName === 'NotAllowedError' || errorName === 'PermissionDeniedError') {
         setState('permissionDenied');
         setError({
@@ -246,7 +250,7 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
     }
   }, [stopStream, checkReadiness]);
 
-  // Capture frame from active video
+  // Capture frame from active video, execute standardization & quality gate
   const capturePhoto = useCallback((): string | null => {
     const video = videoRef.current;
     if (!video) {
@@ -258,7 +262,7 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
       return null;
     }
 
-    // Mandatory Correction 7: Verify real video readiness before capture
+    // Verify real video readiness before capture
     if (video.readyState < 2 || video.videoWidth === 0 || video.videoHeight === 0) {
       setState('captureError');
       setError({
@@ -271,21 +275,46 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
     setState('capturing');
 
     try {
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
+      const rawCanvas = document.createElement('canvas');
+      rawCanvas.width = video.videoWidth;
+      rawCanvas.height = video.videoHeight;
+      const rawCtx = rawCanvas.getContext('2d');
+      if (!rawCtx) {
         throw new Error('Could not obtain 2D canvas rendering context.');
       }
 
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+      rawCtx.drawImage(video, 0, 0, rawCanvas.width, rawCanvas.height);
 
-      setCapturedImage(dataUrl);
-      setState('preview');
-      setError(null);
-      return dataUrl;
+      // 1. Run Pure Standardization Pipeline
+      const standardized = standardizeCanvas(rawCanvas);
+
+      // 2. Run Pure Image Quality Engine
+      const { result: qualityResult } = evaluateRasterQuality(rawCanvas);
+
+      // 3. Build Canonical Capture Artifact
+      const newArtifact = createCaptureArtifact({
+        source: 'camera',
+        captureMode: 'manual',
+        standardized,
+        quality: qualityResult
+      });
+
+      setCapturedImage(newArtifact.image);
+      setArtifact(newArtifact);
+      setQuality(qualityResult);
+
+      if (qualityResult.status === 'FAIL') {
+        setState('qualityRejected');
+        setError({
+          type: 'captureError',
+          message: qualityResult.checks.find((c) => c.status === 'FAIL')?.message || 'Captured image quality is below the required threshold.'
+        });
+      } else {
+        setState('preview');
+        setError(null);
+      }
+
+      return newArtifact.image;
     } catch (captureErr) {
       console.error('[Camera Engine] Frame capture failed:', captureErr);
       setState('captureError');
@@ -300,6 +329,8 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
   // Retake photo: discard captured frame and restore ready camera
   const retakePhoto = useCallback(() => {
     setCapturedImage(null);
+    setArtifact(null);
+    setQuality(null);
     setError(null);
 
     const video = videoRef.current;
@@ -318,38 +349,129 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
     }
   }, [startCamera]);
 
-  // File upload fallback (Mandatory Correction 4)
+  // File upload fallback with full validation & identical standardization/quality pipeline
   const uploadPhoto = useCallback((file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
-      if (!file.type.startsWith('image/')) {
-        const msg = 'Please select a valid image file (JPEG, PNG, WEBP).';
-        setError({
-          type: 'captureError',
-          message: msg
-        });
+      // Security Check: Reject SVG explicitly
+      if (
+        file.type === 'image/svg+xml' ||
+        file.name.toLowerCase().endsWith('.svg')
+      ) {
+        const msg = 'SVG files are prohibited for security reasons. Please select a JPEG, PNG, or WebP photo.';
+        setState('captureError');
+        setError({ type: 'captureError', message: msg });
         reject(new Error(msg));
         return;
       }
 
+      // Security Check: Strict MIME whitelist
+      const allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!allowedMimes.includes(file.type)) {
+        const msg = 'Please select a valid image file (JPEG, PNG, or WebP).';
+        setState('captureError');
+        setError({ type: 'captureError', message: msg });
+        reject(new Error(msg));
+        return;
+      }
+
+      // Security Check: Maximum 15 MB
+      const maxSizeBytes = 15 * 1024 * 1024;
+      if (file.size > maxSizeBytes) {
+        const msg = 'File size exceeds 15 MB limit. Please upload a smaller image file.';
+        setState('captureError');
+        setError({ type: 'captureError', message: msg });
+        reject(new Error(msg));
+        return;
+      }
+
+      setState('capturing');
+
       const reader = new FileReader();
       reader.onload = (e) => {
-        const result = e.target?.result as string;
-        if (result) {
-          setCapturedImage(result);
-          setState('preview');
-          setError(null);
-          resolve(result);
-        } else {
+        const rawDataUrl = e.target?.result as string;
+        if (!rawDataUrl) {
           const msg = 'Failed to read the selected image.';
+          setState('captureError');
           setError({ type: 'captureError', message: msg });
           reject(new Error(msg));
+          return;
         }
+
+        // Decode raster in Image object to verify raster decodability
+        const img = new Image();
+        img.onload = () => {
+          try {
+            const width = img.naturalWidth || img.width;
+            const height = img.naturalHeight || img.height;
+
+            if (width <= 0 || height <= 0) {
+              throw new Error('Image decoded with invalid dimensions.');
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+              throw new Error('Could not obtain canvas context for uploaded image.');
+            }
+            ctx.drawImage(img, 0, 0);
+
+            // Run exact same standardization pipeline
+            const standardized = standardizeCanvas(canvas);
+
+            // Run exact same quality engine
+            const { result: qualityResult } = evaluateRasterQuality(canvas);
+
+            // Emit versioned CaptureArtifact
+            const newArtifact = createCaptureArtifact({
+              source: 'upload',
+              captureMode: 'upload',
+              standardized,
+              quality: qualityResult
+            });
+
+            setCapturedImage(newArtifact.image);
+            setArtifact(newArtifact);
+            setQuality(qualityResult);
+
+            if (qualityResult.status === 'FAIL') {
+              setState('qualityRejected');
+              setError({
+                type: 'captureError',
+                message: qualityResult.checks.find((c) => c.status === 'FAIL')?.message || 'Uploaded image quality is below the required threshold.'
+              });
+            } else {
+              setState('preview');
+              setError(null);
+            }
+
+            resolve(newArtifact.image);
+          } catch (decodeErr) {
+            const msg = decodeErr instanceof Error ? decodeErr.message : 'Error decoding uploaded image raster.';
+            setState('captureError');
+            setError({ type: 'captureError', message: msg });
+            reject(new Error(msg));
+          }
+        };
+
+        img.onerror = () => {
+          const msg = 'Corrupt or unreadable image file. Please upload a valid photo.';
+          setState('captureError');
+          setError({ type: 'captureError', message: msg });
+          reject(new Error(msg));
+        };
+
+        img.src = rawDataUrl;
       };
+
       reader.onerror = () => {
         const msg = 'Error reading the uploaded file.';
+        setState('captureError');
         setError({ type: 'captureError', message: msg });
         reject(new Error(msg));
       };
+
       reader.readAsDataURL(file);
     });
   }, []);
@@ -375,6 +497,8 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
     state,
     error,
     capturedImage,
+    artifact,
+    quality,
     videoRef,
     startCamera,
     stopCamera: stopStream,

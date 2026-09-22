@@ -9,6 +9,7 @@ import { render, screen, act } from '@testing-library/react';
 import { renderHook } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
+import * as assessmentStore from '@/lib/assessmentStore';
 import ScanPage from '../ScanPage';
 import { useCamera } from './useCamera';
 
@@ -457,4 +458,159 @@ describe('Phase 06.7: Scan Skin Engine & Camera Lifecycle Tests', () => {
     expect(screen.queryByText('Aligned')).not.toBeInTheDocument();
     expect(screen.queryByText('Dosha detected')).not.toBeInTheDocument();
   });
+
+  // -------------------------------------------------------------
+  // 13. Phase 09: CaptureArtifact Emission & Standardization
+  // -------------------------------------------------------------
+  it('emits a valid versioned CaptureArtifact conforming to canonical contract', async () => {
+    const mockStream = createMockStream();
+    Object.defineProperty(navigator, 'mediaDevices', {
+      value: { getUserMedia: vi.fn().mockResolvedValue(mockStream) },
+      writable: true,
+      configurable: true,
+    });
+
+    const { result } = renderHook(() => useCamera({ autoStart: false }));
+
+    const mockVideo = document.createElement('video');
+    Object.defineProperty(mockVideo, 'readyState', { value: 4, writable: true });
+    Object.defineProperty(mockVideo, 'videoWidth', { value: 1280, writable: true });
+    Object.defineProperty(mockVideo, 'videoHeight', { value: 720, writable: true });
+    Object.defineProperty(mockVideo, 'paused', { value: false, writable: true });
+    Object.defineProperty(mockVideo, 'ended', { value: false, writable: true });
+    mockVideo.play = vi.fn().mockResolvedValue(undefined);
+    (result.current.videoRef as any).current = mockVideo;
+
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
+      drawImage: vi.fn(),
+      imageSmoothingEnabled: true,
+    } as unknown as CanvasRenderingContext2D);
+    vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue('data:image/jpeg;base64,standardizedImageData');
+
+    await act(async () => {
+      await result.current.startCamera();
+    });
+
+    let dataUrl: string | null = null;
+    act(() => {
+      dataUrl = result.current.capturePhoto();
+    });
+
+    expect(dataUrl).toBe('data:image/jpeg;base64,standardizedImageData');
+    expect(result.current.artifact).not.toBeNull();
+    expect(result.current.artifact?.schemaVersion).toBe('capture-schema-v1');
+    expect(result.current.artifact?.gatewayVersion).toBe('gateway-v1');
+    expect(result.current.artifact?.source).toBe('camera');
+    expect(result.current.artifact?.captureMode).toBe('manual');
+    expect(result.current.artifact?.mimeType).toBe('image/jpeg');
+    expect(result.current.artifact?.standardizedWidth).toBe(1280);
+    expect(result.current.artifact?.standardizedHeight).toBe(720);
+    expect(result.current.quality).not.toBeNull();
+    expect(result.current.quality?.ruleVersion).toBe('v1-heuristic');
+  });
+
+  // -------------------------------------------------------------
+  // 14. Phase 09: File Upload Fallback Security - Prohibit SVG
+  // -------------------------------------------------------------
+  it('strictly rejects malicious SVG upload for security protection', async () => {
+    const { result } = renderHook(() => useCamera({ autoStart: false }));
+
+    const svgFile = new File(['<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>'], 'exploit.svg', {
+      type: 'image/svg+xml'
+    });
+
+    await act(async () => {
+      try {
+        await result.current.uploadPhoto(svgFile);
+      } catch {
+        // expected rejection
+      }
+    });
+
+    expect(result.current.state).toBe('captureError');
+    expect(result.current.error?.message).toContain('SVG files are prohibited');
+  });
+
+  // -------------------------------------------------------------
+  // 15. Phase 09: File Upload Fallback Security - Reject > 15MB
+  // -------------------------------------------------------------
+  it('rejects oversized files exceeding 15 MB limit', async () => {
+    const { result } = renderHook(() => useCamera({ autoStart: false }));
+
+    const hugeFile = new File([new Uint8Array(16 * 1024 * 1024)], 'giant.jpg', {
+      type: 'image/jpeg'
+    });
+
+    await act(async () => {
+      try {
+        await result.current.uploadPhoto(hugeFile);
+      } catch {
+        // expected rejection
+      }
+    });
+
+    expect(result.current.state).toBe('captureError');
+    expect(result.current.error?.message).toContain('exceeds 15 MB limit');
+  });
+
+  // -------------------------------------------------------------
+  // 16. Phase 09: File Upload Fallback Security - Prohibit Non-Images
+  // -------------------------------------------------------------
+  it('rejects non-image files such as executables or pdfs', async () => {
+    const { result } = renderHook(() => useCamera({ autoStart: false }));
+
+    const pdfFile = new File(['%PDF-1.4'], 'document.pdf', {
+      type: 'application/pdf'
+    });
+
+    await act(async () => {
+      try {
+        await result.current.uploadPhoto(pdfFile);
+      } catch {
+        // expected rejection
+      }
+    });
+
+    expect(result.current.state).toBe('captureError');
+  });
+
+  // -------------------------------------------------------------
+  // 17. Phase 09: Assessment Store Receives CaptureArtifact
+  // -------------------------------------------------------------
+  it('persists CaptureArtifact into assessment when continue is executed', () => {
+    const mockArtifact: import('@/types/capture').CaptureArtifact = {
+      id: 'test-artifact-123',
+      source: 'camera',
+      image: 'data:image/jpeg;base64,cleanImage',
+      originalWidth: 1280,
+      originalHeight: 720,
+      standardizedWidth: 1280,
+      standardizedHeight: 720,
+      mimeType: 'image/jpeg',
+      capturedAt: new Date().toISOString(),
+      captureMode: 'manual',
+      quality: {
+        status: 'PASS',
+        checks: [],
+        prioritizedGuidance: [],
+        evaluatedAt: new Date().toISOString(),
+        ruleVersion: 'v1-heuristic'
+      },
+      schemaVersion: 'capture-schema-v1',
+      gatewayVersion: 'gateway-v1'
+    };
+
+    const assessment = assessmentStore.createAssessment(
+      'user-test-456',
+      mockArtifact.image,
+      { dosha: 'pitta', skin_type: 'combination' },
+      mockArtifact
+    );
+
+    expect(assessment.captureArtifact).toBeDefined();
+    expect(assessment.captureArtifact?.id).toBe('test-artifact-123');
+    expect(assessment.captureArtifact?.gatewayVersion).toBe('gateway-v1');
+    expect(assessment.captureArtifact?.quality.status).toBe('PASS');
+  });
 });
+

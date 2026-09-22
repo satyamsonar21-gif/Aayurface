@@ -47,9 +47,11 @@ export default function SettingsPage() {
     setIsUpdatingConsent(false);
   };
 
+  const notificationKey = user?.id ? `aayurface_notification_settings_${user.id}` : 'aayurface_notification_settings';
+
   const [notifications, setNotifications] = useState<NotificationSettings>(() => {
     try {
-      const raw = localStorage.getItem('aayurface_notification_settings');
+      const raw = localStorage.getItem(notificationKey);
       return raw ? (JSON.parse(raw) as NotificationSettings) : DEFAULT_NOTIFICATIONS;
     } catch {
       return DEFAULT_NOTIFICATIONS;
@@ -60,7 +62,7 @@ export default function SettingsPage() {
     setNotifications((prev: NotificationSettings) => {
       const next: NotificationSettings = { ...prev, [key]: val };
       try {
-        localStorage.setItem('aayurface_notification_settings', JSON.stringify(next));
+        localStorage.setItem(notificationKey, JSON.stringify(next));
       } catch {
         // Ignore storage error
       }

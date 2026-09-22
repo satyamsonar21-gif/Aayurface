@@ -1,17 +1,18 @@
 // ============================================================
 // AayurFace — Camera Viewfinder Component
-// Phase 06.7: Native Video Element, Framing Guide & Preview
+// Phase 09: Native Video Element, Framing Guide & Standardized Preview
 // Luxury Editorial Ayurvedic Wellness Aesthetic
 // ============================================================
 
 import React from 'react';
-import type { CameraState, CameraErrorDetails } from './types';
-import { AlertCircle, ShieldAlert, RefreshCw, Upload } from 'lucide-react';
+import type { CameraState, CameraErrorDetails, CaptureQualityResult } from './types';
+import { AlertCircle, ShieldAlert, RefreshCw, Upload, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 interface CameraViewfinderProps {
   state: CameraState;
   error: CameraErrorDetails | null;
   capturedImage: string | null;
+  quality?: CaptureQualityResult | null;
   videoRef: React.RefObject<HTMLVideoElement | null>;
   onRetry: () => void;
   onUploadClick: () => void;
@@ -21,12 +22,13 @@ export const CameraViewfinder: React.FC<CameraViewfinderProps> = ({
   state,
   error,
   capturedImage,
+  quality,
   videoRef,
   onRetry,
   onUploadClick
 }) => {
   const isErrorState = state === 'permissionDenied' || state === 'cameraUnavailable';
-  const isPreviewState = state === 'preview' && !!capturedImage;
+  const isPreviewState = (state === 'preview' || state === 'qualityRejected') && !!capturedImage;
 
   return (
     <div 
@@ -63,11 +65,23 @@ export const CameraViewfinder: React.FC<CameraViewfinderProps> = ({
             alt="Captured facial wellness frame"
             className="w-full h-full object-cover"
           />
-          {/* Subtle Review Badge */}
-          <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#C5A059]" />
-            <span className="text-xs font-medium text-white/90 font-body">Captured Frame</span>
-          </div>
+          {/* Quality Status Badge */}
+          {state === 'qualityRejected' ? (
+            <div className="absolute top-4 left-4 bg-rose-950/85 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-rose-500/40 flex items-center gap-2 shadow-sm">
+              <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+              <span className="text-xs font-semibold text-rose-200 font-body">Quality Check: Rejected</span>
+            </div>
+          ) : quality?.status === 'WARN' ? (
+            <div className="absolute top-4 left-4 bg-amber-950/85 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-amber-500/40 flex items-center gap-2 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+              <span className="text-xs font-medium text-amber-200 font-body">Quality Notice: Below Target</span>
+            </div>
+          ) : (
+            <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 flex items-center gap-2">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="text-xs font-medium text-white/90 font-body">Quality Verified (Pass)</span>
+            </div>
+          )}
         </div>
       )}
 
@@ -105,7 +119,20 @@ export const CameraViewfinder: React.FC<CameraViewfinderProps> = ({
         </div>
       )}
 
-      {/* 4. Error State Displays */}
+      {/* 4. Analyzing Quality Overlay */}
+      {state === 'analyzingQuality' && (
+        <div className="absolute inset-0 z-25 flex flex-col items-center justify-center bg-[#151D19]/80 backdrop-blur-sm text-white p-6 text-center">
+          <div className="w-12 h-12 rounded-full border-2 border-[#C5A059]/30 border-t-[#C5A059] animate-spin mb-4" />
+          <p className="text-sm font-medium font-body text-white/90">
+            Checking image quality…
+          </p>
+          <p className="text-xs text-white/60 font-body mt-1 max-w-xs">
+            Evaluating lighting balance, resolution, and sharpness.
+          </p>
+        </div>
+      )}
+
+      {/* 5. Error State Displays */}
       {state === 'permissionDenied' && (
         <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-6 text-center bg-[#151D19] text-white">
           <div className="w-14 h-14 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-4">
@@ -166,7 +193,7 @@ export const CameraViewfinder: React.FC<CameraViewfinderProps> = ({
         </div>
       )}
 
-      {/* 5. Requesting State Overlay */}
+      {/* 6. Requesting State Overlay */}
       {state === 'requesting' && (
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#151D19]/80 backdrop-blur-sm text-white p-6 text-center">
           <div className="w-12 h-12 rounded-full border-2 border-[#C5A059]/30 border-t-[#C5A059] animate-spin mb-4" />
@@ -179,7 +206,7 @@ export const CameraViewfinder: React.FC<CameraViewfinderProps> = ({
         </div>
       )}
 
-      {/* 6. Capture Error Overlay */}
+      {/* 7. Capture Error Overlay */}
       {state === 'captureError' && (
         <div className="absolute bottom-4 inset-x-4 z-30 p-3 rounded-lg bg-rose-950/90 border border-rose-500/40 text-rose-200 text-xs font-body flex items-center justify-between">
           <span>{error?.message || 'Capture failed. Please try again.'}</span>

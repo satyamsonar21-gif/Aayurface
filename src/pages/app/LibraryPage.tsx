@@ -6,20 +6,24 @@ import PageWrapper from '@/components/layout/PageWrapper';
 import SkinBadge from '@/components/common/SkinBadge';
 import { SKIN_CONCERNS } from '@/types';
 import { filterRemedies, MOCK_REMEDIES } from '@/lib/mockData';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LibraryPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeConcern, setActiveConcern] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'saved'>('all');
   
+  const storageKey = user?.id ? `aayurface_saved_remedies_${user.id}` : 'aayurface_saved_remedies';
+
   // Local state for saved bookmarks
   const [savedIds, setSavedIds] = useState<string[]>(() => {
     try {
-      const saved = localStorage.getItem('aayurface_saved_remedies');
-      return saved ? JSON.parse(saved) : ['r1', 'r3'];
+      const saved = localStorage.getItem(storageKey);
+      return saved ? JSON.parse(saved) : [];
     } catch {
-      return ['r1', 'r3'];
+      return [];
     }
   });
 
@@ -28,7 +32,7 @@ export default function LibraryPage() {
     const next = savedIds.includes(id) ? savedIds.filter(item => item !== id) : [...savedIds, id];
     setSavedIds(next);
     try {
-      localStorage.setItem('aayurface_saved_remedies', JSON.stringify(next));
+      localStorage.setItem(storageKey, JSON.stringify(next));
     } catch {
       // Ignore
     }

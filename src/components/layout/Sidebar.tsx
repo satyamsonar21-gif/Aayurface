@@ -12,7 +12,8 @@ import {
   Settings, 
   ChevronLeft, 
   ChevronRight,
-  Globe 
+  Globe,
+  LogOut 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -35,13 +36,13 @@ const navigationGroups: NavGroup[] = [
     items: [
       { path: '/home', label: 'Home', icon: Home },
       { path: '/scan', label: 'Scan Skin', icon: Camera },
-      { path: '/chat', label: 'Chat with Ayurveda', icon: MessageSquare },
+      { path: '/chat', label: 'Consultation', icon: MessageSquare },
     ],
   },
   {
     group: 'JOURNEY',
     items: [
-      { path: '/history', label: 'My History', icon: Clock },
+      { path: '/history', label: 'History', icon: Clock },
       { path: '/remedies', label: 'Remedies', icon: BookOpen },
       { path: '/routine', label: 'Daily Routine', icon: Sun },
       { path: '/progress', label: 'Progress', icon: Compass },
@@ -59,7 +60,12 @@ const navigationGroups: NavGroup[] = [
 const Sidebar: React.FC = () => {
   const location = useLocation();
   const { sidebarCollapsed: isCollapsed, toggleSidebar } = useUI();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    window.location.replace('/');
+  };
 
   const userName = user?.full_name || 'My Profile';
 
@@ -222,6 +228,31 @@ const Sidebar: React.FC = () => {
             )}
           </AnimatePresence>
         </Link>
+
+        {/* Sign Out Action */}
+        <button
+          type="button"
+          onClick={handleSignOut}
+          title={isCollapsed ? "Sign Out" : undefined}
+          className={cn(
+            'w-full flex items-center rounded-md p-2 transition-colors text-text-tertiary hover:text-red-700 hover:bg-red-50/50 group text-xs font-medium cursor-pointer',
+            isCollapsed ? 'justify-center' : 'gap-2.5 px-3'
+          )}
+        >
+          <LogOut className="w-4 h-4 shrink-0 text-text-tertiary group-hover:text-red-700 transition-colors" />
+          <AnimatePresence mode="popLayout">
+            {!isCollapsed && (
+              <motion.span
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: 'auto' }}
+                exit={{ opacity: 0, width: 0 }}
+                className="truncate whitespace-nowrap"
+              >
+                Sign Out
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </button>
       </div>
     </motion.aside>
   );

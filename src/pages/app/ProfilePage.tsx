@@ -19,10 +19,11 @@ export default function ProfilePage() {
     ? new Date(user.created_at).getFullYear() 
     : 2026;
 
-  // Real saved remedies count from localStorage
+  // Real saved remedies count from user-scoped localStorage
   const savedLepasCount = (() => {
     try {
-      const saved = localStorage.getItem('aayurface_saved_remedies');
+      const storageKey = user?.id ? `aayurface_saved_remedies_${user.id}` : 'aayurface_saved_remedies';
+      const saved = localStorage.getItem(storageKey);
       return saved ? JSON.parse(saved).length : 0;
     } catch {
       return 0;

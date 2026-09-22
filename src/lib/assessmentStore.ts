@@ -4,7 +4,7 @@
 // Transitional architecture prior to backend RLS integration
 // ============================================================
 
-import type { Assessment, ScanCause, ScanRemedy, PreventionTip } from '@/types';
+import type { Assessment, ScanCause, ScanRemedy, PreventionTip, CaptureArtifact } from '@/types';
 
 const STORAGE_PREFIX = 'aayurface_assessments_';
 
@@ -68,10 +68,11 @@ const BASELINE_PREVENTION_TIPS: PreventionTip[] = [
 export function createAssessment(
   userId: string,
   capturedImage: string,
-  userProfile?: { dosha?: string | null; skin_type?: string | null }
+  userProfile?: { dosha?: string | null; skin_type?: string | null },
+  captureArtifact?: CaptureArtifact
 ): Assessment {
-  if (!userId) {
-    throw new Error('Cannot create assessment without an authenticated user ID.');
+  if (!userId || userId === 'anonymous-user') {
+    throw new Error('Cannot create assessment without a valid authenticated user ID.');
   }
   if (!capturedImage) {
     throw new Error('Cannot create assessment without a captured image.');
@@ -100,6 +101,7 @@ export function createAssessment(
     causes: BASELINE_CAUSES,
     remedies: BASELINE_REMEDIES,
     preventionTips: BASELINE_PREVENTION_TIPS,
+    ...(captureArtifact ? { captureArtifact } : {})
   };
 
   saveAssessment(userId, newAssessment);

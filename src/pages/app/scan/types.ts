@@ -1,27 +1,18 @@
-﻿// ============================================================
+// ============================================================
 // AayurFace — Scan Skin Engine Types
-// Phase 06.7: Camera State Machine & Guidance Types
+// Phase 09: Standardized Camera Gateway State Machine & Guidance
 // ============================================================
 
-export type CameraState =
-  | 'idle'
-  | 'requesting'
-  | 'ready'
-  | 'capturing'
-  | 'preview'
-  | 'permissionDenied'
-  | 'cameraUnavailable'
-  | 'captureError';
-
-export interface CameraErrorDetails {
-  type: 'permissionDenied' | 'cameraUnavailable' | 'captureError';
-  message: string;
-  suggestedAction?: string;
-  rawErrorName?: string;
-}
-
-export interface GuidanceItem {
-  id: string;
-  title: string;
-  description: string;
-}
+export type {
+  CameraState,
+  CameraErrorDetails,
+  GuidanceItem,
+  CaptureArtifact,
+  CaptureSource,
+  CaptureMode,
+  QualityStatus,
+  QualityCheckId,
+  QualityCheck,
+  CaptureQualityResult,
+  StandardizedImageResult
+} from '@/types/capture';
