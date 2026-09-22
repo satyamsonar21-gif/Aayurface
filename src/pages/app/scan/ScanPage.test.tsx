@@ -45,6 +45,74 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
+vi.mock('@/lib/cv/cvReadinessEngine', async () => {
+  const actual = await vi.importActual<any>('@/lib/cv/cvReadinessEngine');
+  return {
+    ...actual,
+    evaluateArtifactFaceReadiness: vi.fn().mockImplementation((artifact: any) => Promise.resolve({
+      schemaVersion: 'cv-schema-v1',
+      artifactId: artifact?.id || 'mock-artifact-id',
+      provider: 'mock-deterministic',
+      providerVersion: '1.0.0',
+      modelVersion: '1.0.0',
+      analyzedAt: new Date().toISOString(),
+      faceDetection: {
+        status: 'SINGLE_FACE',
+        faceCount: 1,
+        confidence: 0.98,
+        allFaces: []
+      },
+      primaryFace: {
+        confidence: 0.98,
+        boundingBox: { x: 300, y: 150, width: 400, height: 500 },
+        quality: {
+          luminanceMean: 120,
+          luminanceMedian: 120,
+          clippingRatio: 0.01,
+          sharpnessScore: 45
+        },
+        framing: {
+          faceAreaRatio: 0.25,
+          faceCentroid: { x: 0.5, y: 0.5 },
+          touchesBoundary: false,
+          horizontalOffsetRatio: 0.02,
+          verticalOffsetRatio: 0.02
+        },
+        pose: { yaw: 2, pitch: 1, roll: 0 },
+        occlusion: { mouthCovered: false, eyesCovered: false }
+      },
+      faceQuality: {
+        luminanceMean: 120,
+        luminanceMedian: 120,
+        clippingRatio: 0.01,
+        sharpnessScore: 45
+      },
+      pose: { yaw: 2, pitch: 1, roll: 0 },
+      occlusion: { mouthCovered: false, eyesCovered: false },
+      framing: {
+        faceAreaRatio: 0.25,
+        faceCentroid: { x: 0.5, y: 0.5 },
+        touchesBoundary: false,
+        horizontalOffsetRatio: 0.02,
+        verticalOffsetRatio: 0.02
+      },
+      readiness: {
+        status: 'READY',
+        reasons: [],
+        warnings: [],
+        actionableGuidance: [],
+        ruleVersion: 'v1-heuristic'
+      }
+    })),
+    evaluateLiveVideoFaceReadiness: vi.fn().mockResolvedValue({
+      faceCount: 1,
+      isReady: true,
+      guidanceText: 'Position your face inside the guide',
+      status: 'READY'
+    })
+  };
+});
+
 describe('Phase 06.7: Scan Skin Engine & Camera Lifecycle Tests', () => {
   let originalMediaDevices: MediaDevices | undefined;
 
@@ -274,8 +342,8 @@ describe('Phase 06.7: Scan Skin Engine & Camera Lifecycle Tests', () => {
     });
 
     let dataUrl: string | null = null;
-    act(() => {
-      dataUrl = result.current.capturePhoto();
+    await act(async () => {
+      dataUrl = await result.current.capturePhoto();
     });
 
     expect(mockDrawImage).toHaveBeenCalledWith(mockVideo, 0, 0, 1280, 720);
@@ -287,7 +355,7 @@ describe('Phase 06.7: Scan Skin Engine & Camera Lifecycle Tests', () => {
   // -------------------------------------------------------------
   // 8. Capture Rejection when Video Not Ready
   // -------------------------------------------------------------
-  it('rejects capture and sets captureError when video is not ready', () => {
+  it('rejects capture and sets captureError when video is not ready', async () => {
     const { result } = renderHook(() => useCamera({ autoStart: false }));
 
     const mockVideo = document.createElement('video');
@@ -297,8 +365,8 @@ describe('Phase 06.7: Scan Skin Engine & Camera Lifecycle Tests', () => {
     (result.current.videoRef as any).current = mockVideo;
 
     let res: string | null = null;
-    act(() => {
-      res = result.current.capturePhoto();
+    await act(async () => {
+      res = await result.current.capturePhoto();
     });
 
     expect(res).toBeNull();
@@ -339,8 +407,8 @@ describe('Phase 06.7: Scan Skin Engine & Camera Lifecycle Tests', () => {
       await result.current.startCamera();
     });
 
-    act(() => {
-      result.current.capturePhoto();
+    await act(async () => {
+      await result.current.capturePhoto();
     });
     expect(result.current.state).toBe('preview');
 
@@ -492,8 +560,8 @@ describe('Phase 06.7: Scan Skin Engine & Camera Lifecycle Tests', () => {
     });
 
     let dataUrl: string | null = null;
-    act(() => {
-      dataUrl = result.current.capturePhoto();
+    await act(async () => {
+      dataUrl = await result.current.capturePhoto();
     });
 
     expect(dataUrl).toBe('data:image/jpeg;base64,standardizedImageData');
@@ -611,6 +679,171 @@ describe('Phase 06.7: Scan Skin Engine & Camera Lifecycle Tests', () => {
     expect(assessment.captureArtifact?.id).toBe('test-artifact-123');
     expect(assessment.captureArtifact?.gatewayVersion).toBe('gateway-v1');
     expect(assessment.captureArtifact?.quality.status).toBe('PASS');
+  });
+
+  // -------------------------------------------------------------
+  // 18. Phase 10: Face Readiness REJECTED Transitions to qualityRejected
+  // -------------------------------------------------------------
+  it('transitions state to qualityRejected when face CV readiness fails', async () => {
+    const cvEngine = await import('@/lib/cv/cvReadinessEngine');
+    vi.mocked(cvEngine.evaluateArtifactFaceReadiness).mockResolvedValueOnce({
+      schemaVersion: 'cv-schema-v1',
+      artifactId: 'artifact-fail-face',
+      provider: 'mock-deterministic',
+      providerVersion: '1.0.0',
+      modelVersion: '1.0.0',
+      analyzedAt: new Date().toISOString(),
+      faceDetection: {
+        status: 'NO_FACE',
+        faceCount: 0,
+        confidence: null,
+        allFaces: []
+      },
+      primaryFace: null,
+      faceQuality: null,
+      pose: null,
+      occlusion: null,
+      framing: null,
+      readiness: {
+        status: 'REJECTED',
+        reasons: [
+          {
+            code: 'NO_FACE',
+            severity: 'REJECT',
+            message: 'No face detected in the captured image.',
+            actionableGuidance: 'Position your face clearly inside the framing guide.'
+          }
+        ],
+        warnings: [],
+        actionableGuidance: ['Position your face clearly inside the framing guide.'],
+        ruleVersion: 'face-readiness-v1-heuristic'
+      }
+    });
+
+    const mockStream = createMockStream();
+    Object.defineProperty(navigator, 'mediaDevices', {
+      value: { getUserMedia: vi.fn().mockResolvedValue(mockStream) },
+      writable: true,
+      configurable: true,
+    });
+
+    const { result } = renderHook(() => useCamera({ autoStart: false }));
+
+    const mockVideo = document.createElement('video');
+    Object.defineProperty(mockVideo, 'readyState', { value: 4, writable: true });
+    Object.defineProperty(mockVideo, 'videoWidth', { value: 1280, writable: true });
+    Object.defineProperty(mockVideo, 'videoHeight', { value: 720, writable: true });
+    Object.defineProperty(mockVideo, 'paused', { value: false, writable: true });
+    Object.defineProperty(mockVideo, 'ended', { value: false, writable: true });
+    mockVideo.play = vi.fn().mockResolvedValue(undefined);
+    (result.current.videoRef as any).current = mockVideo;
+
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
+      drawImage: vi.fn(),
+      imageSmoothingEnabled: true,
+    } as unknown as CanvasRenderingContext2D);
+    vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue('data:image/jpeg;base64,frameWithoutFace');
+
+    await act(async () => {
+      await result.current.startCamera();
+    });
+
+    await act(async () => {
+      await result.current.capturePhoto();
+    });
+
+    expect(result.current.state).toBe('qualityRejected');
+    expect(result.current.cvResult).not.toBeNull();
+    expect(result.current.cvResult?.readiness.status).toBe('REJECTED');
+    expect(result.current.error?.message).toContain('No face detected');
+  });
+
+  // -------------------------------------------------------------
+  // 19. Phase 10: Assessment Store Receives CVResult
+  // -------------------------------------------------------------
+  it('persists CVResult into assessment store alongside CaptureArtifact', () => {
+    const mockArtifact: import('@/types/capture').CaptureArtifact = {
+      id: 'test-artifact-cv',
+      source: 'camera',
+      image: 'data:image/jpeg;base64,cleanImage',
+      originalWidth: 1280,
+      originalHeight: 720,
+      standardizedWidth: 1280,
+      standardizedHeight: 720,
+      mimeType: 'image/jpeg',
+      capturedAt: new Date().toISOString(),
+      captureMode: 'manual',
+      quality: {
+        status: 'PASS',
+        checks: [],
+        prioritizedGuidance: [],
+        evaluatedAt: new Date().toISOString(),
+        ruleVersion: 'v1-heuristic'
+      },
+      schemaVersion: 'capture-schema-v1',
+      gatewayVersion: 'gateway-v1'
+    };
+
+    const mockCVResult: import('@/types/cv').CVResult = {
+      schemaVersion: 'cv-schema-v1',
+      artifactId: 'test-artifact-cv',
+      provider: 'deterministic-raster',
+      providerVersion: '1.0.0',
+      modelVersion: '1.0.0',
+      analyzedAt: new Date().toISOString(),
+      faceDetection: {
+        status: 'SINGLE_FACE',
+        faceCount: 1,
+        confidence: 0.96,
+        allFaces: []
+      },
+      primaryFace: {
+        id: 'mock-face-1',
+        confidence: 0.96,
+        boundingBox: { x: 320, y: 160, width: 380, height: 480 },
+        normalizedBoundingBox: { x: 320 / 1280, y: 160 / 720, width: 380 / 1280, height: 480 / 720 },
+        areaRatio: 0.22,
+        center: { x: 0.5, y: 0.5 }
+      },
+      faceQuality: {
+        meanLuminance: 115,
+        medianLuminance: 115,
+        shadowClippingRatio: 0.01,
+        highlightClippingRatio: 0.01,
+        sharpnessVariance: 38,
+        localContrast: 25,
+        status: 'PASS',
+        confidence: 0.95
+      },
+      framing: {
+        status: 'CENTERED',
+        areaRatio: 0.22,
+        centerOffsetDistance: 0.02,
+        confidence: 0.95
+      },
+      pose: { yaw: 2, pitch: 0, roll: 0, status: 'ACCEPTABLE', confidence: 0.95 },
+      occlusion: { status: 'CLEAR', confidence: 0.95 },
+      readiness: {
+        status: 'READY',
+        reasons: [],
+        warnings: [],
+        actionableGuidance: [],
+        ruleVersion: 'face-readiness-v1-heuristic'
+      }
+    };
+
+    const assessment = assessmentStore.createAssessment(
+      'user-cv-user',
+      mockArtifact.image,
+      { dosha: 'kapha', skin_type: 'oily' },
+      mockArtifact,
+      mockCVResult
+    );
+
+    expect(assessment.cvResult).toBeDefined();
+    expect(assessment.cvResult?.artifactId).toBe('test-artifact-cv');
+    expect(assessment.cvResult?.readiness.status).toBe('READY');
+    expect(assessment.cvResult?.faceDetection.faceCount).toBe(1);
   });
 });
 

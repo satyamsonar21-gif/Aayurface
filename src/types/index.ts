@@ -48,9 +48,11 @@ export interface Assessment {
   remedies: ScanRemedy[];
   preventionTips: PreventionTip[];
   captureArtifact?: import('./capture').CaptureArtifact;
+  cvResult?: import('./cv').CVResult;
 }
 
 export * from './capture';
+export * from './cv';
 
 export interface ScanCause {
   icon: string;

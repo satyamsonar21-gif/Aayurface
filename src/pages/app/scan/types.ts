@@ -16,3 +16,12 @@ export type {
   CaptureQualityResult,
   StandardizedImageResult
 } from '@/types/capture';
+
+export type {
+  CVResult,
+  CVReadinessStatus,
+  CVReadinessDecision,
+  CVReadinessReason,
+  DetectedFace
+} from '@/types/cv';
+

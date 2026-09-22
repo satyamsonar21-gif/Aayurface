@@ -11,8 +11,13 @@ import type {
   CaptureArtifact,
   CaptureQualityResult
 } from '@/types/capture';
+import type { CVResult } from '@/types/cv';
 import { standardizeCanvas, createCaptureArtifact } from '@/lib/capture/standardization';
 import { evaluateRasterQuality } from '@/lib/capture/qualityEngine';
+import {
+  evaluateArtifactFaceReadiness,
+  evaluateLiveVideoFaceReadiness
+} from '@/lib/cv/cvReadinessEngine';
 
 export interface UseCameraOptions {
   autoStart?: boolean;
@@ -24,10 +29,14 @@ export interface UseCameraReturn {
   capturedImage: string | null;
   artifact: CaptureArtifact | null;
   quality: CaptureQualityResult | null;
+  cvResult: CVResult | null;
+  liveGuidance: string | null;
+  liveFaceCount: number;
+  isLiveFaceReady: boolean;
   videoRef: React.RefObject<HTMLVideoElement | null>;
   startCamera: () => Promise<void>;
   stopCamera: () => void;
-  capturePhoto: () => string | null;
+  capturePhoto: () => Promise<string | null>;
   retakePhoto: () => void;
   uploadPhoto: (file: File) => Promise<string>;
   retry: () => Promise<void>;
@@ -39,6 +48,10 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [artifact, setArtifact] = useState<CaptureArtifact | null>(null);
   const [quality, setQuality] = useState<CaptureQualityResult | null>(null);
+  const [cvResult, setCvResult] = useState<CVResult | null>(null);
+  const [liveGuidance, setLiveGuidance] = useState<string | null>(null);
+  const [liveFaceCount, setLiveFaceCount] = useState<number>(0);
+  const [isLiveFaceReady, setIsLiveFaceReady] = useState<boolean>(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -90,6 +103,10 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
     setCapturedImage(null);
     setArtifact(null);
     setQuality(null);
+    setCvResult(null);
+    setLiveGuidance(null);
+    setLiveFaceCount(0);
+    setIsLiveFaceReady(false);
 
     // Check MediaDevices availability
     if (
@@ -251,7 +268,8 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
   }, [stopStream, checkReadiness]);
 
   // Capture frame from active video, execute standardization & quality gate
-  const capturePhoto = useCallback((): string | null => {
+  // Capture frame from active video, execute standardization, quality gate & Face CV readiness gate
+  const capturePhoto = useCallback(async (): Promise<string | null> => {
     const video = videoRef.current;
     if (!video) {
       setState('captureError');
@@ -288,7 +306,7 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
       // 1. Run Pure Standardization Pipeline
       const standardized = standardizeCanvas(rawCanvas);
 
-      // 2. Run Pure Image Quality Engine
+      // 2. Run Pure Image Quality Engine (Gate 1 - Phase 09 Global Raster Quality)
       const { result: qualityResult } = evaluateRasterQuality(rawCanvas);
 
       // 3. Build Canonical Capture Artifact
@@ -303,11 +321,26 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
       setArtifact(newArtifact);
       setQuality(qualityResult);
 
+      // Phase 09 Gate: Hard rejection on technical image quality failure
       if (qualityResult.status === 'FAIL') {
         setState('qualityRejected');
         setError({
           type: 'captureError',
           message: qualityResult.checks.find((c) => c.status === 'FAIL')?.message || 'Captured image quality is below the required threshold.'
+        });
+        return newArtifact.image;
+      }
+
+      // 4. Run Phase 10 Face-Aware CV Readiness Gate (Gate 2 - Face ROI, Size, Framing, Lighting, Sharpness)
+      setState('analyzingQuality');
+      const cv = await evaluateArtifactFaceReadiness(newArtifact, { canvas: rawCanvas });
+      setCvResult(cv);
+
+      if (cv.readiness.status === 'REJECTED') {
+        setState('qualityRejected');
+        setError({
+          type: 'captureError',
+          message: cv.readiness.reasons[0]?.message || 'Face analysis readiness check failed.'
         });
       } else {
         setState('preview');
@@ -331,6 +364,7 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
     setCapturedImage(null);
     setArtifact(null);
     setQuality(null);
+    setCvResult(null);
     setError(null);
 
     const video = videoRef.current;
@@ -420,7 +454,7 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
             // Run exact same standardization pipeline
             const standardized = standardizeCanvas(canvas);
 
-            // Run exact same quality engine
+            // Run exact same quality engine (Gate 1 - Global Quality)
             const { result: qualityResult } = evaluateRasterQuality(canvas);
 
             // Emit versioned CaptureArtifact
@@ -441,40 +475,99 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
                 type: 'captureError',
                 message: qualityResult.checks.find((c) => c.status === 'FAIL')?.message || 'Uploaded image quality is below the required threshold.'
               });
-            } else {
-              setState('preview');
-              setError(null);
+              resolve(newArtifact.image);
+              return;
             }
 
-            resolve(newArtifact.image);
+            // Phase 10: Run Face-Aware CV Readiness Gate (Gate 2)
+            setState('analyzingQuality');
+            evaluateArtifactFaceReadiness(newArtifact, { canvas })
+              .then((cv) => {
+                setCvResult(cv);
+                if (cv.readiness.status === 'REJECTED') {
+                  setState('qualityRejected');
+                  setError({
+                    type: 'captureError',
+                    message: cv.readiness.reasons[0]?.message || 'Uploaded image failed face readiness evaluation.'
+                  });
+                } else {
+                  setState('preview');
+                  setError(null);
+                }
+                resolve(newArtifact.image);
+              })
+              .catch((cvErr) => {
+                console.error('[Upload CV] Face evaluation error:', cvErr);
+                setState('qualityRejected');
+                setError({
+                  type: 'captureError',
+                  message: 'Face readiness evaluation failed. Please try a different photo.'
+                });
+                resolve(newArtifact.image);
+              });
           } catch (decodeErr) {
-            const msg = decodeErr instanceof Error ? decodeErr.message : 'Error decoding uploaded image raster.';
+            console.error('[Upload] Image decode failed:', decodeErr);
             setState('captureError');
-            setError({ type: 'captureError', message: msg });
-            reject(new Error(msg));
+            setError({
+              type: 'captureError',
+              message: 'Corrupt or unreadable image file. Please upload a standard photo.'
+            });
+            reject(decodeErr);
           }
         };
-
-        img.onerror = () => {
-          const msg = 'Corrupt or unreadable image file. Please upload a valid photo.';
+        img.onerror = (err) => {
           setState('captureError');
-          setError({ type: 'captureError', message: msg });
-          reject(new Error(msg));
+          setError({
+            type: 'captureError',
+            message: 'Corrupt or unreadable image file. Please select a valid photo.'
+          });
+          reject(err);
         };
-
         img.src = rawDataUrl;
       };
-
-      reader.onerror = () => {
-        const msg = 'Error reading the uploaded file.';
+      reader.onerror = (readErr) => {
         setState('captureError');
-        setError({ type: 'captureError', message: msg });
-        reject(new Error(msg));
+        setError({
+          type: 'captureError',
+          message: 'Error reading selected file from device.'
+        });
+        reject(readErr);
       };
-
       reader.readAsDataURL(file);
     });
   }, []);
+
+  // Gate 1: Live face-aware precheck
+  useEffect(() => {
+    if (state !== 'ready') {
+      setLiveFaceCount(0);
+      setIsLiveFaceReady(false);
+      setLiveGuidance(null);
+      return;
+    }
+
+    let isSubscribed = true;
+    const interval = setInterval(async () => {
+      const video = videoRef.current;
+      if (!video || video.readyState < 2 || video.paused) return;
+
+      try {
+        const live = await evaluateLiveVideoFaceReadiness(video);
+        if (isSubscribed) {
+          setLiveFaceCount(live.faceCount);
+          setIsLiveFaceReady(live.isReady);
+          setLiveGuidance(live.guidanceText);
+        }
+      } catch {
+        // Non-blocking live precheck
+      }
+    }, 400);
+
+    return () => {
+      isSubscribed = false;
+      clearInterval(interval);
+    };
+  }, [state]);
 
   // Lifecycle effect: autoStart on mount, cleanup on unmount
   useEffect(() => {
@@ -499,6 +592,10 @@ export function useCamera(options: UseCameraOptions = { autoStart: true }): UseC
     capturedImage,
     artifact,
     quality,
+    cvResult,
+    liveGuidance,
+    liveFaceCount,
+    isLiveFaceReady,
     videoRef,
     startCamera,
     stopCamera: stopStream,

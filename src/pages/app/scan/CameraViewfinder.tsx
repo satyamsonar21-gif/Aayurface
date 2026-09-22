@@ -5,7 +5,7 @@
 // ============================================================
 
 import React from 'react';
-import type { CameraState, CameraErrorDetails, CaptureQualityResult } from './types';
+import type { CameraState, CameraErrorDetails, CaptureQualityResult, CVResult } from './types';
 import { AlertCircle, ShieldAlert, RefreshCw, Upload, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 interface CameraViewfinderProps {
@@ -13,6 +13,10 @@ interface CameraViewfinderProps {
   error: CameraErrorDetails | null;
   capturedImage: string | null;
   quality?: CaptureQualityResult | null;
+  cvResult?: CVResult | null;
+  liveGuidance?: string | null;
+  liveFaceCount?: number;
+  isLiveFaceReady?: boolean;
   videoRef: React.RefObject<HTMLVideoElement | null>;
   onRetry: () => void;
   onUploadClick: () => void;
@@ -23,6 +27,10 @@ export const CameraViewfinder: React.FC<CameraViewfinderProps> = ({
   error,
   capturedImage,
   quality,
+  cvResult,
+  liveGuidance,
+  liveFaceCount = 0,
+  isLiveFaceReady = false,
   videoRef,
   onRetry,
   onUploadClick
@@ -65,21 +73,31 @@ export const CameraViewfinder: React.FC<CameraViewfinderProps> = ({
             alt="Captured facial wellness frame"
             className="w-full h-full object-cover"
           />
-          {/* Quality Status Badge */}
-          {state === 'qualityRejected' ? (
+          {/* Quality & Face Status Badge */}
+          {state === 'qualityRejected' || cvResult?.readiness.status === 'REJECTED' ? (
             <div className="absolute top-4 left-4 bg-rose-950/85 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-rose-500/40 flex items-center gap-2 shadow-sm">
               <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
-              <span className="text-xs font-semibold text-rose-200 font-body">Quality Check: Rejected</span>
+              <span className="text-xs font-semibold text-rose-200 font-body">
+                {cvResult?.readiness.status === 'REJECTED'
+                  ? `Face Check: ${cvResult.readiness.reasons[0]?.message || 'Needs Improvement'}`
+                  : 'Quality Check: Rejected'}
+              </span>
             </div>
-          ) : quality?.status === 'WARN' ? (
+          ) : cvResult?.readiness.status === 'WARNING' || quality?.status === 'WARN' ? (
             <div className="absolute top-4 left-4 bg-amber-950/85 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-amber-500/40 flex items-center gap-2 shadow-sm">
               <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-              <span className="text-xs font-medium text-amber-200 font-body">Quality Notice: Below Target</span>
+              <span className="text-xs font-medium text-amber-200 font-body">
+                {cvResult?.readiness.status === 'WARNING'
+                  ? `Face Notice: ${cvResult.readiness.reasons[0]?.message || 'Below Target'}`
+                  : 'Quality Notice: Below Target'}
+              </span>
             </div>
           ) : (
             <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 flex items-center gap-2">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="text-xs font-medium text-white/90 font-body">Quality Verified (Pass)</span>
+              <span className="text-xs font-medium text-white/90 font-body">
+                {cvResult?.readiness.status === 'READY' ? 'Face Verified • Ready' : 'Quality Verified (Pass)'}
+              </span>
             </div>
           )}
         </div>
@@ -88,32 +106,54 @@ export const CameraViewfinder: React.FC<CameraViewfinderProps> = ({
       {/* 3. Visual Framing Guide (When live & ready or requesting) */}
       {!isPreviewState && !isErrorState && (
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none p-4 sm:p-6 z-10">
+          {/* Top Multiple Faces Warning Banner */}
+          {liveFaceCount > 1 && (
+            <div className="absolute top-4 inset-x-4 flex justify-center pointer-events-none">
+              <div className="bg-rose-950/90 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-rose-500/50 flex items-center gap-2 shadow-lg animate-bounce">
+                <AlertCircle className="w-4 h-4 text-rose-400" />
+                <span className="text-xs font-semibold text-rose-100 font-body">
+                  Multiple Faces Detected ({liveFaceCount}) — Single Subject Required
+                </span>
+              </div>
+            </div>
+          )}
+
           <div 
             className={`w-[220px] sm:w-[260px] lg:w-[280px] xl:w-[320px] h-[290px] sm:h-[340px] lg:h-[380px] rounded-[140px] border-2 border-dashed transition-all duration-500 relative flex items-center justify-center ${
-              state === 'ready' 
-                ? 'border-[#C5A059] shadow-[0_0_20px_rgba(197,160,89,0.2)]' 
-                : 'border-[#6B8E7D]/50 animate-pulse'
+              state === 'ready' && isLiveFaceReady
+                ? 'border-emerald-500 shadow-[0_0_24px_rgba(16,185,129,0.35)]'
+                : state === 'ready' && liveFaceCount > 1
+                  ? 'border-rose-500 shadow-[0_0_24px_rgba(239,68,68,0.35)]'
+                  : state === 'ready' 
+                    ? 'border-[#C5A059] shadow-[0_0_20px_rgba(197,160,89,0.2)]' 
+                    : 'border-[#6B8E7D]/50 animate-pulse'
             }`}
           >
             {/* 4 Antique Gold Corner Alignment Brackets */}
-            <div className="absolute top-4 left-4 w-3.5 h-3.5 border-t-2 border-l-2 border-[#C5A059]" />
-            <div className="absolute top-4 right-4 w-3.5 h-3.5 border-t-2 border-r-2 border-[#C5A059]" />
-            <div className="absolute bottom-4 left-4 w-3.5 h-3.5 border-b-2 border-l-2 border-[#C5A059]" />
-            <div className="absolute bottom-4 right-4 w-3.5 h-3.5 border-b-2 border-r-2 border-[#C5A059]" />
+            <div className={`absolute top-4 left-4 w-3.5 h-3.5 border-t-2 border-l-2 ${isLiveFaceReady ? 'border-emerald-400' : liveFaceCount > 1 ? 'border-rose-400' : 'border-[#C5A059]'}`} />
+            <div className={`absolute top-4 right-4 w-3.5 h-3.5 border-t-2 border-r-2 ${isLiveFaceReady ? 'border-emerald-400' : liveFaceCount > 1 ? 'border-rose-400' : 'border-[#C5A059]'}`} />
+            <div className={`absolute bottom-4 left-4 w-3.5 h-3.5 border-b-2 border-l-2 ${isLiveFaceReady ? 'border-emerald-400' : liveFaceCount > 1 ? 'border-rose-400' : 'border-[#C5A059]'}`} />
+            <div className={`absolute bottom-4 right-4 w-3.5 h-3.5 border-b-2 border-r-2 ${isLiveFaceReady ? 'border-emerald-400' : liveFaceCount > 1 ? 'border-rose-400' : 'border-[#C5A059]'}`} />
 
             {/* Subtle Horizon / Alignment Center Point */}
-            <div className="w-1.5 h-1.5 rounded-full bg-[#C5A059]/60" />
+            <div className={`w-1.5 h-1.5 rounded-full ${isLiveFaceReady ? 'bg-emerald-400' : liveFaceCount > 1 ? 'bg-rose-400' : 'bg-[#C5A059]/60'}`} />
           </div>
 
-          {/* Floating Guidance Badge (Truthful framing guidance only) */}
+          {/* Floating Guidance Badge (Truthful live face-aware guidance) */}
           <div className="mt-4">
             <span className="px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-xs font-medium text-white/80 font-body flex items-center gap-2">
               <span 
                 className={`w-2 h-2 rounded-full ${
-                  state === 'ready' ? 'bg-emerald-400' : 'bg-[#C5A059] animate-pulse'
+                  isLiveFaceReady 
+                    ? 'bg-emerald-400' 
+                    : liveFaceCount > 1 
+                      ? 'bg-rose-400 animate-pulse' 
+                      : state === 'ready' 
+                        ? 'bg-[#C5A059]' 
+                        : 'bg-[#C5A059] animate-pulse'
                 }`} 
               />
-              {state === 'ready' ? 'Position your face inside the guide' : 'Connecting to camera…'}
+              {liveGuidance || (state === 'ready' ? 'Position your face inside the guide' : 'Connecting to camera…')}
             </span>
           </div>
         </div>

@@ -31,6 +31,10 @@ export default function ScanPage() {
     capturedImage,
     artifact,
     quality,
+    cvResult,
+    liveGuidance,
+    liveFaceCount,
+    isLiveFaceReady,
     videoRef,
     capturePhoto,
     retakePhoto,
@@ -54,9 +58,10 @@ export default function ScanPage() {
   };
 
   const handleContinue = () => {
-    // Quality Gating Check: User must exist, image must exist, and quality must NOT be FAIL
+    // Quality & Face-Aware CV Readiness Gating Check:
     if (!capturedImage) return;
     if (state === 'qualityRejected' || quality?.status === 'FAIL') return;
+    if (cvResult?.readiness.status === 'REJECTED') return;
     if (!user?.id) {
       navigate('/signin', { replace: true });
       return;
@@ -68,7 +73,8 @@ export default function ScanPage() {
         dosha: user?.dosha,
         skin_type: user?.skin_type,
       },
-      artifact ?? undefined
+      artifact ?? undefined,
+      cvResult ?? undefined
     );
     navigate(`/results/${assessment.id}`);
   };
@@ -134,6 +140,10 @@ export default function ScanPage() {
               error={error}
               capturedImage={capturedImage}
               quality={quality}
+              cvResult={cvResult}
+              liveGuidance={liveGuidance}
+              liveFaceCount={liveFaceCount}
+              isLiveFaceReady={isLiveFaceReady}
               videoRef={videoRef}
               onRetry={retry}
               onUploadClick={handleUploadClick}
@@ -145,6 +155,10 @@ export default function ScanPage() {
         <ScanGuidancePanel
           state={state}
           quality={quality}
+          cvResult={cvResult}
+          liveGuidance={liveGuidance}
+          liveFaceCount={liveFaceCount}
+          isLiveFaceReady={isLiveFaceReady}
           onCapture={capturePhoto}
           onRetake={retakePhoto}
           onContinue={handleContinue}

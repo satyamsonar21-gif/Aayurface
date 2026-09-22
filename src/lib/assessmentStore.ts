@@ -69,7 +69,8 @@ export function createAssessment(
   userId: string,
   capturedImage: string,
   userProfile?: { dosha?: string | null; skin_type?: string | null },
-  captureArtifact?: CaptureArtifact
+  captureArtifact?: CaptureArtifact,
+  cvResult?: import('@/types/cv').CVResult
 ): Assessment {
   if (!userId || userId === 'anonymous-user') {
     throw new Error('Cannot create assessment without a valid authenticated user ID.');
@@ -101,7 +102,8 @@ export function createAssessment(
     causes: BASELINE_CAUSES,
     remedies: BASELINE_REMEDIES,
     preventionTips: BASELINE_PREVENTION_TIPS,
-    ...(captureArtifact ? { captureArtifact } : {})
+    ...(captureArtifact ? { captureArtifact } : {}),
+    ...(cvResult ? { cvResult } : {})
   };
 
   saveAssessment(userId, newAssessment);
