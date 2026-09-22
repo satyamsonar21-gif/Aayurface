@@ -37,7 +37,7 @@ export default function ContextMattersSection() {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col items-center text-center max-w-3xl mx-auto mb-20"
         >
@@ -60,7 +60,7 @@ export default function ContextMattersSection() {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
             className="w-full lg:w-[60%] mx-auto relative z-10"
           >
@@ -99,7 +99,7 @@ export default function ContextMattersSection() {
                   key={factor.title}
                   initial={{ opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
+                  viewport={{ once: true, amount: 0.1 }}
                   transition={{ duration: 0.8, delay: 0.3 + (idx * 0.1), ease: [0.16, 1, 0.3, 1] }}
                   className={`absolute flex flex-col gap-2 z-20 ${positions[idx]}`}
                 >
@@ -129,7 +129,7 @@ export default function ContextMattersSection() {
                   key={factor.title}
                   initial={{ opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
+                  viewport={{ once: true, amount: 0.1 }}
                   transition={{ duration: 0.8, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
                   className="flex flex-col items-center text-center gap-2"
                 >

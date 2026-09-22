@@ -16,7 +16,7 @@ export default function AyurvedaTechSection() {
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
           className="relative h-[600px] w-full lg:order-1 order-2"
         >
@@ -37,7 +37,7 @@ export default function AyurvedaTechSection() {
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             className="font-editorial text-4xl sm:text-5xl lg:text-6xl leading-[1.1] mb-12"
           >
@@ -53,7 +53,7 @@ export default function AyurvedaTechSection() {
                 key={step}
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
+                viewport={{ once: true, amount: 0.1 }}
                 transition={{ duration: 0.8, delay: idx * 0.15, ease: [0.16, 1, 0.3, 1] }}
                 className="flex items-center gap-6 relative"
               >
@@ -68,7 +68,7 @@ export default function AyurvedaTechSection() {
           <motion.p 
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 1, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="text-base text-[#8A948E] font-body leading-relaxed max-w-md mt-12"
           >

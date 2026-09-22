@@ -53,7 +53,7 @@ export default function MultimodalSignalSection() {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           className="text-center max-w-3xl mx-auto mb-20"
         >
@@ -83,7 +83,7 @@ export default function MultimodalSignalSection() {
                     key={item.title}
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, margin: "-50px" }}
+                    viewport={{ once: true, amount: 0.1 }}
                     transition={{ duration: 0.7, delay: idx * 0.15, ease: [0.16, 1, 0.3, 1] }}
                     className="p-5 bg-white border border-[#E6DFD5] shadow-xs text-left"
                   >
@@ -110,7 +110,7 @@ export default function MultimodalSignalSection() {
             <motion.div 
               initial={{ opacity: 0, scale: 0.96 }}
               whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, margin: "-80px" }}
+              viewport={{ once: true, amount: 0.1 }}
               transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
               className="lg:col-span-6 relative flex flex-col items-center order-1 lg:order-2"
             >
@@ -146,7 +146,7 @@ export default function MultimodalSignalSection() {
                     key={item.title}
                     initial={{ opacity: 0, x: 20 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, margin: "-50px" }}
+                    viewport={{ once: true, amount: 0.1 }}
                     transition={{ duration: 0.7, delay: idx * 0.15, ease: [0.16, 1, 0.3, 1] }}
                     className="p-5 bg-white border border-[#E6DFD5] shadow-xs text-left"
                   >

@@ -57,7 +57,7 @@ export default function PersonalizationSection() {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20 border-b border-[#E6DFD5] pb-12"
         >
@@ -65,7 +65,7 @@ export default function PersonalizationSection() {
             <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#C5A059] block mb-4">
               Contextual Care
             </span>
-            <h2 className="font-editorial text-4xl sm:text-5xl lg:text-6xl text-[#1A1F1C] leading-[1.12]">
+            <h2 className="font-display font-serif text-4xl sm:text-5xl lg:text-6xl text-[#1A1F1C] leading-[1.12]">
               Guidance is contextual. <br/>
               <span className="italic text-[#6B8E7D] font-normal">Never a one-size-fits-all formula.</span>
             </h2>
@@ -89,9 +89,9 @@ export default function PersonalizationSection() {
                   key={item.period}
                   initial={{ opacity: 0, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
+                  viewport={{ once: true, amount: 0.1 }}
                   transition={{ duration: 0.7, delay: idx * 0.12, ease: [0.16, 1, 0.3, 1] }}
-                  className="p-8 bg-white border border-[#E6DFD5] flex flex-col justify-between hover:border-[#C5A059] transition-colors"
+                  className="p-8 bg-white border border-[#E6DFD5] flex flex-col justify-between hover:border-[#C5A059] transition-colors rounded-sm shadow-xs"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-6 pb-3 border-b border-[#E6DFD5]">
@@ -103,7 +103,7 @@ export default function PersonalizationSection() {
                       </div>
                     </div>
 
-                    <h3 className="font-editorial text-2xl text-[#1A1F1C] mb-2">
+                    <h3 className="font-display font-serif text-2xl text-[#1A1F1C] mb-2 font-medium">
                       {item.title}
                     </h3>
                     
@@ -126,7 +126,7 @@ export default function PersonalizationSection() {
         </div>
 
         {/* Botanical Knowledge System (Dravyaguna) */}
-        <div className="p-8 sm:p-10 bg-white border border-[#E6DFD5] mb-12">
+        <div className="p-8 sm:p-10 bg-white border border-[#E6DFD5] mb-12 rounded-sm shadow-xs">
           <div className="flex items-center gap-2 mb-6">
             <Sparkles size={16} className="text-[#C5A059]" />
             <span className="text-xs font-mono uppercase tracking-widest text-[#1E3A2F] font-semibold">
@@ -136,8 +136,8 @@ export default function PersonalizationSection() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {botanicalKnowledge.map(botanical => (
-              <div key={botanical.name} className="p-4 bg-[#FAF8F5] border border-[#E6DFD5]">
-                <h4 className="font-editorial text-xl text-[#1E3A2F] mb-1">{botanical.name}</h4>
+              <div key={botanical.name} className="p-4 bg-[#FAF8F5] border border-[#E6DFD5] rounded-sm">
+                <h4 className="font-display font-serif text-xl text-[#1E3A2F] mb-1 font-medium">{botanical.name}</h4>
                 <span className="text-[10px] font-mono text-[#C5A059] uppercase block mb-2">{botanical.role}</span>
                 <p className="text-xs text-[#5C6660] leading-relaxed">{botanical.context}</p>
               </div>

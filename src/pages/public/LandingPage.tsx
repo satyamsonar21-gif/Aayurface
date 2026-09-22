@@ -1,20 +1,23 @@
 import PageTransition from '@/components/layout/PageTransition';
 import LandingNav from '@/components/landing/LandingNav';
 import HeroSection from '@/components/landing/HeroSection';
-import PositioningStrip from '@/components/landing/PositioningStrip';
+import WhatIsAayurFaceSection from '@/components/landing/WhatIsAayurFaceSection';
+import PhilosophySection from '@/components/landing/PhilosophySection';
 import BeyondTheSelfieSection from '@/components/landing/BeyondTheSelfieSection';
-import ConstitutionalSystemSection from '@/components/landing/ConstitutionalSystemSection';
-import MultimodalSignalSection from '@/components/landing/MultimodalSignalSection';
+import JourneySection from '@/components/landing/JourneySection';
 import ScanExperienceSection from '@/components/landing/ScanExperienceSection';
-import ComputerVisionSection from '@/components/landing/ComputerVisionSection';
 import KnowledgeEngineSection from '@/components/landing/KnowledgeEngineSection';
+import ConstitutionalSystemSection from '@/components/landing/ConstitutionalSystemSection';
 import MultimodalFusionSection from '@/components/landing/MultimodalFusionSection';
 import ConfidenceAwareSection from '@/components/landing/ConfidenceAwareSection';
 import ExplainabilitySection from '@/components/landing/ExplainabilitySection';
+import ProductPreviewSection from '@/components/landing/ProductPreviewSection';
 import PersonalizationSection from '@/components/landing/PersonalizationSection';
 import ProgressSection from '@/components/landing/ProgressSection';
 import ResearchValidationSection from '@/components/landing/ResearchValidationSection';
-import ResponsibleAISafetySection from '@/components/landing/ResponsibleAISafetySection';
+import ResponsibleDevelopmentSection from '@/components/landing/ResponsibleDevelopmentSection';
+import PrivacyTrustSection from '@/components/landing/PrivacyTrustSection';
+import FAQSection from '@/components/landing/FAQSection';
 import FinalCTASection from '@/components/landing/FinalCTASection';
 import LandingFooter from '@/components/landing/LandingFooter';
 
@@ -31,60 +34,69 @@ export default function LandingPage() {
   return (
     <PageTransition>
       <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-[#1A1F1C] font-body selection:bg-[#C5A059]/25 selection:text-[#1E3A2F] relative overflow-x-hidden">
-        {/* Navigation Bar */}
+        {/* 01. Navigation Bar */}
         <LandingNav />
 
         <main className="flex-1 flex flex-col relative z-10">
-          {/* 01. Hero: Editorial statement & 4 converging signals */}
+          {/* 02. Hero: "Your skin is visible. Your context is not." + Start Skin Analysis */}
           <HeroSection />
 
-          {/* 02. Philosophy: "Skin is visible. Context is not." */}
-          <PositioningStrip />
+          {/* 03. What is AayurFace? Simple 6-step visual flow (<15 sec comprehension) */}
+          <WhatIsAayurFaceSection />
 
-          {/* 03. Beyond the Selfie: Conventional snapshot vs AayurFace multimodal paradigm */}
+          {/* 04. Philosophy: "A face can show you something. It cannot tell you everything." */}
+          <PhilosophySection />
+
+          {/* 05. Beyond the Selfie: 4 Signals (Visual, Prakriti, Lifestyle, Ayurvedic Knowledge) */}
           <BeyondTheSelfieSection />
 
-          {/* 04. Prakriti & Tridosha: Whole-person Ayurvedic context (respectful & non-deterministic) */}
-          <ConstitutionalSystemSection />
+          {/* 06. Your AayurFace Journey: 7-stage visual storytelling flow */}
+          <JourneySection />
 
-          {/* 05. The Face Is One Signal: Central portrait with radiating contextual pillars */}
-          <MultimodalSignalSection />
-
-          {/* 06. Standardized Capture: "Better input. More meaningful observation." */}
+          {/* 07. Standardized Capture: "Better input. More meaningful observation." */}
           <ScanExperienceSection />
 
-          {/* 07. Seeing the Details: Structured visual observation & colorimetric decoupling */}
-          <ComputerVisionSection />
-
-          {/* 08. Knowledge Should Have Roots: Classical Ayurvedic Samhitas grounding */}
+          {/* 08. Ayurvedic Intelligence: "Knowledge with roots." + Botanical Ingredients Still-Life */}
           <KnowledgeEngineSection />
 
-          {/* 09. Multimodal Intelligence: Evidence convergence and reasoning synthesis */}
+          {/* 09. Prakriti / Tridosha: "Prakriti is personal." + Non-Deterministic Principle */}
+          <ConstitutionalSystemSection />
+
+          {/* 10. Multimodal Intelligence: "Intelligence that knows context matters." */}
           <MultimodalFusionSection />
 
-          {/* 10. Confidence: High agreement vs signal divergence and honest uncertainty */}
+          {/* 11. Confidence & Uncertainty: "Good intelligence knows when signals disagree." */}
           <ConfidenceAwareSection />
 
-          {/* 11. Explainable AI: 5-stage transparent reasoning chain */}
+          {/* 12. Explainability: "Don't just give an answer. Show the reasoning." */}
           <ExplainabilitySection />
 
-          {/* 12. Personalized Care: Contextual Dinacharya daily rhythms & botanicals */}
+          {/* 13. Real Product Preview: "What your AayurFace experience looks like." */}
+          <ProductPreviewSection />
+
+          {/* 14. Personalized Wellness: Dinacharya circadian rhythms & patch-test protocol */}
           <PersonalizationSection />
 
-          {/* 13. Longitudinal Journey: Baseline ──► Observe ──► Compare ──► Reflect */}
+          {/* 15. Longitudinal Journey: "Skin wellness is a journey, not a snapshot." (Day 01–90) */}
           <ProgressSection />
 
-          {/* 14. Research Direction: Current Capabilities vs Active Research Roadmap */}
+          {/* 16. Research & Trust: "Built with a research mindset." (Current vs Roadmap) */}
           <ResearchValidationSection />
 
-          {/* 15. Responsible AI: "Technology should know its limits." */}
-          <ResponsibleAISafetySection />
+          {/* 17. Indian-Skin Representation & Responsible Development */}
+          <ResponsibleDevelopmentSection />
 
-          {/* 16. Final Closing CTA: Begin Your AayurFace Journey */}
+          {/* 18. Privacy & Data Ethics: "Your face is personal." */}
+          <PrivacyTrustSection />
+
+          {/* 19. Frequently Asked Questions */}
+          <FAQSection />
+
+          {/* 20. Final Call to Action: "Begin with what you can see." + Start Skin Analysis */}
           <FinalCTASection />
         </main>
 
-        {/* Multi-Column Editorial Footer */}
+        {/* 21. Multi-Column Editorial Footer */}
         <LandingFooter />
       </div>
     </PageTransition>

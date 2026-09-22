@@ -43,28 +43,25 @@ export default function LandingNav() {
           </Link>
         </div>
 
-        {/* Center: Editorial Navigation Links */}
+        {/* Center: Minimal Editorial Navigation Links */}
         <nav
           className="hidden lg:flex items-center gap-7 text-[13px] font-medium text-[#5C6660]"
           aria-label="Main Navigation"
         >
-          <a href="#philosophy" className="hover:text-[#1E3A2F] transition-colors py-1">
-            Philosophy
+          <a href="#what-is-aayurface" className="hover:text-[#1E3A2F] transition-colors py-1">
+            Why AayurFace
           </a>
-          <a href="#beyond-selfie" className="hover:text-[#1E3A2F] transition-colors py-1">
-            Beyond the Selfie
+          <a href="#how-it-works" className="hover:text-[#1E3A2F] transition-colors py-1">
+            How It Works
           </a>
-          <a href="#prakriti" className="hover:text-[#1E3A2F] transition-colors py-1">
-            Prakriti &amp; Context
+          <a href="#ayurvedic-intelligence" className="hover:text-[#1E3A2F] transition-colors py-1">
+            Ayurvedic Intelligence
           </a>
-          <a href="#multimodal" className="hover:text-[#1E3A2F] transition-colors py-1">
-            Multimodal Reasoning
-          </a>
-          <a href="#confidence" className="hover:text-[#1E3A2F] transition-colors py-1">
-            Confidence &amp; XAI
+          <a href="#methodology" className="hover:text-[#1E3A2F] transition-colors py-1">
+            Methodology
           </a>
           <a href="#research" className="hover:text-[#1E3A2F] transition-colors py-1">
-            Research &amp; Limits
+            Research
           </a>
         </nav>
 
@@ -99,9 +96,10 @@ export default function LandingNav() {
               </Link>
               <Link
                 to="/register"
+                aria-label="Get Started"
                 className="bg-[#1E3A2F] text-white px-5 py-2.5 rounded-md text-sm font-medium hover:bg-[#152B23] transition-all shadow-xs flex items-center gap-2 cursor-pointer group"
               >
-                <span>Get Started</span>
+                <span>Start Skin Analysis</span>
                 <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
               </Link>
             </>
@@ -131,46 +129,39 @@ export default function LandingNav() {
             className="lg:hidden bg-[#FAF8F5] border-b border-[#E6DFD5] px-6 py-6 flex flex-col gap-4 shadow-sm"
           >
             <a
-              href="#philosophy"
+              href="#what-is-aayurface"
               onClick={() => setMobileMenuOpen(false)}
               className="text-base font-medium text-[#1A1F1C] hover:text-[#1E3A2F] py-1"
             >
-              Philosophy
+              Why AayurFace
             </a>
             <a
-              href="#beyond-selfie"
+              href="#how-it-works"
               onClick={() => setMobileMenuOpen(false)}
               className="text-base font-medium text-[#1A1F1C] hover:text-[#1E3A2F] py-1"
             >
-              Beyond the Selfie
+              How It Works
             </a>
             <a
-              href="#prakriti"
+              href="#ayurvedic-intelligence"
               onClick={() => setMobileMenuOpen(false)}
               className="text-base font-medium text-[#1A1F1C] hover:text-[#1E3A2F] py-1"
             >
-              Prakriti &amp; Context
+              Ayurvedic Intelligence
             </a>
             <a
-              href="#multimodal"
+              href="#methodology"
               onClick={() => setMobileMenuOpen(false)}
               className="text-base font-medium text-[#1A1F1C] hover:text-[#1E3A2F] py-1"
             >
-              Multimodal Reasoning
-            </a>
-            <a
-              href="#confidence"
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-base font-medium text-[#1A1F1C] hover:text-[#1E3A2F] py-1"
-            >
-              Confidence &amp; XAI
+              Methodology
             </a>
             <a
               href="#research"
               onClick={() => setMobileMenuOpen(false)}
               className="text-base font-medium text-[#1A1F1C] hover:text-[#1E3A2F] py-1"
             >
-              Research &amp; Limits
+              Research
             </a>
 
             <div className="pt-4 border-t border-[#E6DFD5] flex flex-col gap-3">
@@ -208,10 +199,11 @@ export default function LandingNav() {
                   </Link>
                   <Link
                     to="/register"
+                    aria-label="Get Started"
                     onClick={() => setMobileMenuOpen(false)}
                     className="bg-[#1E3A2F] text-white text-center py-3 rounded-md text-sm font-medium hover:bg-[#152B23] transition-colors flex items-center justify-center gap-2"
                   >
-                    <span>Get Started</span>
+                    <span>Start Skin Analysis</span>
                     <ArrowRight size={14} />
                   </Link>
                 </>

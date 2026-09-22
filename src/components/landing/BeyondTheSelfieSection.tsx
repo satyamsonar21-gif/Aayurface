@@ -1,174 +1,126 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, Layers, Eye, ShieldCheck, Clock, BookOpen, User } from 'lucide-react';
+import { Eye, User, Clock, BookOpen, Layers, ShieldCheck, ArrowRight } from 'lucide-react';
 
 export default function BeyondTheSelfieSection() {
+  const fourSignals = [
+    {
+      num: '01',
+      title: 'Visual Observation',
+      desc: 'What can be observed from the captured image under standardized light and framing.',
+      icon: Eye,
+    },
+    {
+      num: '02',
+      title: 'Prakriti',
+      desc: 'Personal constitutional context and elemental tendencies (Vata, Pitta, Kapha).',
+      icon: User,
+    },
+    {
+      num: '03',
+      title: 'Lifestyle',
+      desc: 'Everyday habits, sleep quality, diurnal rhythms, and seasonal environmental shifts.',
+      icon: Clock,
+    },
+    {
+      num: '04',
+      title: 'Ayurvedic Knowledge',
+      desc: 'Classical and structured knowledge from the Samhitas used to provide medical context.',
+      icon: BookOpen,
+    },
+  ];
+
   return (
-    <section id="beyond-selfie" className="w-full bg-[#FAF8F5] py-24 sm:py-32 px-6 sm:px-10 overflow-hidden">
+    <section id="beyond-selfie" className="w-full bg-[#FAF8F5] py-24 sm:py-32 px-6 sm:px-10 overflow-hidden border-b border-[#E6DFD5]">
       <div className="max-w-7xl mx-auto">
         
-        {/* Section Header */}
+        {/* Section Header with Exact Required Narrative */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           className="text-center max-w-3xl mx-auto mb-20"
         >
-          <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#C5A059] block mb-4">
-            The Core Differentiator
+          <span className="text-[11px] font-mono uppercase tracking-[0.25em] text-[#C5A059] block mb-4 font-semibold">
+            The Core Concept
           </span>
-          <h2 className="font-editorial text-4xl sm:text-5xl lg:text-6xl text-[#1A1F1C] leading-[1.12] mb-6">
-            Beyond the selfie. <br/>
-            <span className="italic text-[#6B8E7D] font-normal">A deeper architecture of understanding.</span>
+          <h2 className="font-display font-serif text-4xl sm:text-5xl lg:text-6xl text-[#1A1F1C] leading-[1.12] mb-6">
+            Beyond the selfie.
           </h2>
-          <p className="text-base sm:text-lg text-[#5C6660] font-body leading-relaxed">
-            Most digital wellness tools reduce a person's skin to a quick camera snapshot. AayurFace is built around a multimodal idea: visual observation becomes truly meaningful only when combined with constitutional and lived context.
+          <p className="text-xl sm:text-2xl text-[#1E3A2F] font-display font-serif italic mb-4">
+            "A selfie captures a moment. AayurFace looks at the context around that moment."
+          </p>
+          <p className="text-base sm:text-lg text-[#5C6660] font-body leading-relaxed max-w-2xl mx-auto">
+            Conventional camera apps attempt to jump from a single uncalibrated snapshot directly to a cosmetic diagnosis. AayurFace brings four interconnected signals together to understand the whole picture.
           </p>
         </motion.div>
 
-        {/* Visual Architecture Comparison */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-          
-          {/* Card 1: Conventional Experience */}
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-4 bg-white/70 border border-[#E6DFD5] p-8 sm:p-10 flex flex-col justify-between"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-8 pb-4 border-b border-[#E6DFD5]">
-                <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-[#8A948E]">
-                  Conventional Model
-                </span>
-                <span className="text-[10px] font-mono text-[#8A948E]">Single-Signal</span>
-              </div>
-
-              <h3 className="font-editorial text-2xl text-[#1A1F1C] mb-4">
-                Surface Snapshot
-              </h3>
-              <p className="text-sm text-[#5C6660] leading-relaxed mb-8">
-                A single image taken under uncontrolled lighting is treated as the entire story, attempting to jump directly from surface appearance to a generic conclusion.
-              </p>
-
-              {/* Simplified Step Flow */}
-              <div className="space-y-4">
-                <div className="p-3.5 bg-[#FAF8F5] border border-[#E6DFD5] flex items-center gap-3">
-                  <Eye size={16} className="text-[#8A948E]" />
-                  <span className="text-xs font-mono uppercase tracking-wider text-[#1A1F1C]">
-                    Single Image Capture
-                  </span>
-                </div>
-                <div className="flex justify-center text-[#8A948E]">
-                  <ArrowRight size={16} className="rotate-90 lg:rotate-0" />
-                </div>
-                <div className="p-3.5 bg-[#FAF8F5] border border-[#E6DFD5] flex items-center gap-3">
-                  <Sparkles size={16} className="text-[#8A948E]" />
-                  <span className="text-xs font-mono uppercase tracking-wider text-[#8A948E]">
-                    Simplified Result
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-8 pt-6 border-t border-[#E6DFD5] text-[11px] font-body text-[#8A948E] italic">
-              Context, constitution, and uncertainty remain invisible.
-            </div>
-          </motion.div>
-
-          {/* Card 2: AayurFace Multimodal Paradigm */}
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-8 bg-[#FAF8F5] border-2 border-[#1E3A2F]/20 p-8 sm:p-12 relative overflow-hidden flex flex-col justify-between shadow-xs"
-          >
-            {/* Subtle Accent Glow */}
-            <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-radial from-[#C5A059]/10 to-transparent pointer-events-none" />
-
-            <div>
-              <div className="flex items-center justify-between mb-8 pb-4 border-b border-[#E6DFD5]">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-[#1E3A2F]" />
-                  <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-[#1E3A2F] font-semibold">
-                    The AayurFace Multimodal Paradigm
-                  </span>
-                </div>
-                <span className="text-[10px] font-mono text-[#C5A059] uppercase tracking-wider font-semibold">
-                  Evidence-Grounded
-                </span>
-              </div>
-
-              <h3 className="font-editorial text-3xl sm:text-4xl text-[#1E3A2F] mb-4">
-                Multimodal Synthesis &amp; Longitudinal Context
-              </h3>
-              <p className="text-sm sm:text-base text-[#5C6660] leading-relaxed max-w-2xl mb-8">
-                We bring together physical observation with your constitutional profile, daily habits, and classical Ayurvedic knowledge. Uncertainty is acknowledged, reasoning is explained, and progress is observed over time.
-              </p>
-
-              {/* Multimodal Integrated Progression */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                <div className="p-3.5 bg-white border border-[#E6DFD5] flex flex-col gap-1.5">
-                  <span className="text-[9px] font-mono text-[#C5A059] uppercase tracking-wider">Input 01</span>
-                  <div className="flex items-center gap-2">
-                    <Eye size={14} className="text-[#1E3A2F]" />
-                    <span className="text-xs font-mono uppercase text-[#1A1F1C]">Standardized Observation</span>
+        {/* The 4 Signals Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {fourSignals.map((signal, idx) => {
+            const Icon = signal.icon;
+            return (
+              <motion.div
+                key={signal.num}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                className="bg-white border border-[#E6DFD5] p-6 sm:p-8 flex flex-col justify-between hover:border-[#C5A059] transition-all rounded-sm shadow-xs group"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-6">
+                    <span className="font-mono text-sm font-semibold text-[#C5A059]">
+                      {signal.num}
+                    </span>
+                    <div className="p-2.5 rounded-full bg-[#FAF8F5] border border-[#E6DFD5] text-[#1E3A2F] group-hover:bg-[#1E3A2F] group-hover:text-white transition-all">
+                      <Icon size={16} />
+                    </div>
                   </div>
-                  <span className="text-[11px] text-[#5C6660] leading-tight">Controlled daylight &amp; centering</span>
+                  <h3 className="font-display font-serif text-2xl text-[#1A1F1C] mb-3 font-medium">
+                    {signal.title}
+                  </h3>
+                  <p className="text-sm text-[#5C6660] font-body leading-relaxed">
+                    {signal.desc}
+                  </p>
                 </div>
 
-                <div className="p-3.5 bg-white border border-[#E6DFD5] flex flex-col gap-1.5">
-                  <span className="text-[9px] font-mono text-[#C5A059] uppercase tracking-wider">Input 02</span>
-                  <div className="flex items-center gap-2">
-                    <User size={14} className="text-[#1E3A2F]" />
-                    <span className="text-xs font-mono uppercase text-[#1A1F1C]">Prakriti Context</span>
-                  </div>
-                  <span className="text-[11px] text-[#5C6660] leading-tight">Constitutional baseline intake</span>
+                <div className="mt-6 pt-4 border-t border-[#E6DFD5]/70 flex items-center gap-1.5 text-[11px] font-mono text-[#8A948E]">
+                  <span>Connected Signal</span>
+                  <ArrowRight size={11} className="text-[#C5A059]" />
                 </div>
-
-                <div className="p-3.5 bg-white border border-[#E6DFD5] flex flex-col gap-1.5">
-                  <span className="text-[9px] font-mono text-[#C5A059] uppercase tracking-wider">Input 03</span>
-                  <div className="flex items-center gap-2">
-                    <Clock size={14} className="text-[#1E3A2F]" />
-                    <span className="text-xs font-mono uppercase text-[#1A1F1C]">Daily Lifestyle</span>
-                  </div>
-                  <span className="text-[11px] text-[#5C6660] leading-tight">Sleep rhythm &amp; season</span>
-                </div>
-
-                <div className="p-3.5 bg-white border border-[#E6DFD5] flex flex-col gap-1.5">
-                  <span className="text-[9px] font-mono text-[#C5A059] uppercase tracking-wider">Input 04</span>
-                  <div className="flex items-center gap-2">
-                    <BookOpen size={14} className="text-[#1E3A2F]" />
-                    <span className="text-xs font-mono uppercase text-[#1A1F1C]">Classical Sources</span>
-                  </div>
-                  <span className="text-[11px] text-[#5C6660] leading-tight">Charaka &amp; Sushruta grounding</span>
-                </div>
-              </div>
-
-              {/* Synthesis Bar */}
-              <div className="p-4 bg-[#1E3A2F] text-white flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <Layers size={18} className="text-[#C5A059]" />
-                  <span className="text-xs font-mono tracking-widest uppercase font-semibold">
-                    Multimodal Interpretation ──► Calibrated Confidence ──► Explainable Guidance
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 text-[11px] font-mono text-[#C8B89A]">
-                  <ShieldCheck size={14} />
-                  <span>Longitudinal Reflection</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-8 pt-4 border-t border-[#E6DFD5] flex items-center justify-between text-[11px] font-mono text-[#5C6660]">
-              <span>Grounded in classical Ayurvedic thinking</span>
-              <span>Modern observation as an enabler</span>
-            </div>
-          </motion.div>
-
+              </motion.div>
+            );
+          })}
         </div>
+
+        {/* Synthesis Banner: Together, these signals create a more meaningful picture */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="p-6 sm:p-8 bg-[#1E3A2F] text-[#FAF8F5] rounded-sm border border-[#C5A059]/40 flex flex-col md:flex-row items-center justify-between gap-6 shadow-md"
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-full bg-white/10 text-[#C5A059]">
+              <Layers size={22} />
+            </div>
+            <div>
+              <h4 className="font-display font-serif text-2xl sm:text-3xl text-white font-medium">
+                Together, these signals create a more meaningful picture.
+              </h4>
+              <p className="text-xs sm:text-sm text-[#FAF8F5]/80 font-body mt-1">
+                AayurFace does not imply that facial appearance alone determines Prakriti or Dosha.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-xs font-mono text-[#C5A059] uppercase tracking-wider whitespace-nowrap bg-black/30 px-4 py-2 rounded-sm border border-[#C5A059]/30">
+            <ShieldCheck size={14} />
+            <span>Non-Deterministic</span>
+          </div>
+        </motion.div>
+
       </div>
     </section>
   );

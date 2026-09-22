@@ -16,7 +16,7 @@ export default function WhySection() {
         <motion.div 
           initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           className="relative h-[600px] w-full"
         >
@@ -43,7 +43,7 @@ export default function WhySection() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           >
             <h2 className="font-editorial text-4xl sm:text-5xl text-[#1A1F1C] leading-[1.15] mb-6">
@@ -58,7 +58,7 @@ export default function WhySection() {
           <motion.div 
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
+            viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-col gap-6 pt-4 border-t border-[#E6DFD5]"
           >

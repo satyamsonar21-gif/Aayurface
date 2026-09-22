@@ -1,204 +1,171 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Wind, Flame, Mountain, Info, Compass } from 'lucide-react';
+import { Wind, Flame, Mountain, ShieldAlert } from 'lucide-react';
 
 export default function ConstitutionalSystemSection() {
   const [activeTab, setActiveTab] = useState<'all' | 'vata' | 'pitta' | 'kapha'>('all');
 
-  const doshaProfiles = [
+  const doshas = [
     {
       id: 'vata',
       name: 'Vata',
       sanskrit: 'वात',
-      elements: 'Air & Space (Vayu & Akasha)',
+      elements: 'Air + Space',
+      essence: 'Movement, lightness, variability',
       icon: Wind,
-      accentColor: '#5B7B88',
-      qualities: 'Light, dry, mobile, subtle, cool',
-      contextRole: 'Governs circulation, cellular movement, and sensory transmission across the body.',
-      observationalConsiderations: 'May show susceptibility to dry winds, environmental moisture loss, and fluctuations in surface barrier feel under cold or erratic conditions.',
-      ayurvedicGuidanceConcept: 'Supports warming nourishment, gentle daily grounding rituals, and shielding the barrier from dry seasonal air.'
+      color: '#5B7B88',
+      desc: 'Governs micro-circulation, sensory transmission, and moisture movement across tissues. When out of balance through erratic schedules or cold winds, skin may feel rough or depleted.',
+      guidance: 'Nourishing, warming oils (such as sesame), consistent circadian sleep, and barrier protection against dry air.',
     },
     {
       id: 'pitta',
       name: 'Pitta',
       sanskrit: 'पित्त',
-      elements: 'Fire & Water (Tejas & Jala)',
+      elements: 'Fire + Water',
+      essence: 'Heat, intensity, transformation',
       icon: Flame,
-      accentColor: '#C86D51',
-      qualities: 'Hot, sharp, light, slightly oily, intense',
-      contextRole: 'Governs biochemical transformation, metabolic energy, skin warmth, and cellular assimilation.',
-      observationalConsiderations: 'May exhibit heightened sensitivity to direct thermal exposure, sharp changes in diet, and temporary micro-vascular flush under intense sunlight or stress.',
-      ayurvedicGuidanceConcept: 'Prioritizes thermal pacification, gentle cooling floral preparations, and shielding from solar intensity.'
+      color: '#C86D51',
+      desc: 'Governs metabolic transformation, digestion (Agni), and cutaneous warmth. When agitated by spicy food, stress, or solar heat, skin may experience transient warmth or reactivity.',
+      guidance: 'Cooling botanicals (sandalwood, vetiver, rose), shade during peak solar hours, and calming evening rituals.',
     },
     {
       id: 'kapha',
       name: 'Kapha',
       sanskrit: 'कफ',
-      elements: 'Earth & Water (Prithvi & Jala)',
+      elements: 'Earth + Water',
+      essence: 'Stability, structure, moisture',
       icon: Mountain,
-      accentColor: '#5C7C5A',
-      qualities: 'Heavy, slow, cool, oily, smooth, stable',
-      contextRole: 'Governs structural integrity, lipid equilibrium, deep cutaneous hydration, and tissue cohesion.',
-      observationalConsiderations: 'Naturally preserves sustained barrier moisture; may reflect sluggish microcirculation or heavier surface lipid sheen in humid environments.',
-      ayurvedicGuidanceConcept: 'Focuses on gentle invigoration, clarifying botanical preparations, and maintaining natural lymphatic flow.'
-    }
+      color: '#5C7C5A',
+      desc: 'Governs deep tissue lubrication, cellular cohesion, and lipid equilibrium. When stagnant due to damp weather or inactivity, skin microcirculation may become sluggish.',
+      guidance: 'Clarifying preparations (neem, triphala), gentle dry massage (Garshana), and light, invigoration-focused hydration.',
+    },
   ];
 
   const displayedDoshas = activeTab === 'all' 
-    ? doshaProfiles 
-    : doshaProfiles.filter(d => d.id === activeTab);
+    ? doshas 
+    : doshas.filter(d => d.id === activeTab);
 
   return (
-    <section id="prakriti" className="w-full bg-[#FFFFFF] border-y border-[#E6DFD5] py-24 sm:py-32 px-6 sm:px-10 overflow-hidden">
+    <section id="prakriti" className="w-full bg-[#FFFFFF] border-b border-[#E6DFD5] py-24 sm:py-32 px-6 sm:px-10 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         
-        {/* Section Header */}
+        {/* Section Header with Exact Required Title */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           className="text-center max-w-3xl mx-auto mb-16"
         >
-          <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#C5A059] block mb-4">
-            Constitutional Individuality
+          <span className="text-[11px] font-mono uppercase tracking-[0.25em] text-[#C5A059] block mb-3 font-semibold">
+            Constitutional Foundations
           </span>
-          <h2 className="font-editorial text-4xl sm:text-5xl lg:text-6xl text-[#1A1F1C] leading-[1.12] mb-6">
-            Prakriti: understanding <br/>
-            <span className="italic text-[#6B8E7D] font-normal">the person before the skin.</span>
+          <h2 className="font-display font-serif text-4xl sm:text-5xl lg:text-6xl text-[#1A1F1C] leading-[1.12] mb-6">
+            Prakriti is personal.
           </h2>
-          <p className="text-base sm:text-lg text-[#5C6660] font-body leading-relaxed">
-            In classical Ayurveda, each individual possesses a distinct constitutional baseline known as <em>Prakriti</em>, formed by the equilibrium of three governing functional principles: Vata, Pitta, and Kapha.
+          <p className="text-base sm:text-lg text-[#5C6660] font-body leading-relaxed max-w-2xl mx-auto">
+            Ayurveda does not reduce people into rigid boxes. Your Prakriti is your inherent elemental blueprint, while your Vikriti reflects dynamic shifts in response to daily life, climate, and stress.
           </p>
         </motion.div>
 
-        {/* CRITICAL ETHICAL INVARIANT STATEMENT BANNER */}
-        <motion.div 
+        {/* Explicit Anti-Deterministic Architectural Principle Banner */}
+        <motion.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-4xl mx-auto mb-16 bg-[#FAF8F5] border border-[#E6DFD5] p-5 sm:p-6 flex items-start gap-4"
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="p-6 bg-[#FAF8F5] border border-[#C5A059]/50 rounded-sm mb-16 max-w-4xl mx-auto flex items-start gap-4 shadow-xs"
         >
-          <Info size={20} className="text-[#C5A059] flex-shrink-0 mt-0.5" />
-          <div className="text-xs sm:text-sm text-[#5C6660] leading-relaxed">
-            <strong className="text-[#1E3A2F] font-semibold block mb-1">
-              AayurFace Architectural Principle:
-            </strong>
-            Facial appearance alone is not treated as a complete representation of constitutional individuality. Ayurvedic constitutional context is one component of a broader understanding, informed by structured personal context, observation, and daily lifestyle rhythms.
+          <div className="p-2 rounded-full bg-[#1E3A2F] text-[#C5A059] shrink-0 mt-0.5">
+            <ShieldAlert size={18} />
+          </div>
+          <div>
+            <h3 className="font-display font-serif text-xl text-[#1E3A2F] font-semibold mb-1">
+              Core Architectural Principle
+            </h3>
+            <p className="text-sm text-[#1A1F1C] font-body leading-relaxed">
+              <strong>AayurFace does not define your constitution from your face alone.</strong> Prakriti is understood through broader personal context, questionnaire introspection, lifestyle habits, and metabolic tendencies. Facial observation is merely one dynamic signal in a larger constitutional conversation.
+            </p>
           </div>
         </motion.div>
 
-        {/* Tab Filter */}
-        <div className="flex justify-center gap-2 mb-12">
-          <button
-            onClick={() => setActiveTab('all')}
-            className={`px-4 py-2 text-xs font-mono uppercase tracking-wider transition-all border ${
-              activeTab === 'all'
-                ? 'bg-[#1E3A2F] text-white border-[#1E3A2F]'
-                : 'bg-white text-[#5C6660] border-[#E6DFD5] hover:border-[#C5A059]'
-            }`}
-          >
-            All Three Principles
-          </button>
-          {doshaProfiles.map(dosha => (
-            <button
-              key={dosha.id}
-              onClick={() => setActiveTab(dosha.id as any)}
-              className={`px-4 py-2 text-xs font-mono uppercase tracking-wider transition-all border ${
-                activeTab === dosha.id
-                  ? 'bg-[#1E3A2F] text-white border-[#1E3A2F]'
-                  : 'bg-white text-[#5C6660] border-[#E6DFD5] hover:border-[#C5A059]'
-              }`}
-            >
-              {dosha.name} ({dosha.sanskrit})
-            </button>
-          ))}
+        {/* Dosha Filter Tabs */}
+        <div className="flex justify-center mb-12">
+          <div className="inline-flex p-1 bg-[#FAF8F5] border border-[#E6DFD5] rounded-sm">
+            {(['all', 'vata', 'pitta', 'kapha'] as const).map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setActiveTab(tab)}
+                className={`px-6 py-2 text-xs font-mono uppercase tracking-wider rounded-xs transition-all cursor-pointer ${
+                  activeTab === tab
+                    ? 'bg-[#1E3A2F] text-white shadow-xs'
+                    : 'text-[#5C6660] hover:text-[#1A1F1C]'
+                }`}
+              >
+                {tab === 'all' ? 'All Archetypes' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Dosha Cards Grid */}
-        <div className={`grid grid-cols-1 ${activeTab === 'all' ? 'lg:grid-cols-3' : 'max-w-2xl mx-auto'} gap-8`}>
-          {displayedDoshas.map((dosha, idx) => {
-            const Icon = dosha.icon;
+        {/* Doshas Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {displayedDoshas.map((d, idx) => {
+            const Icon = d.icon;
             return (
               <motion.div
-                key={dosha.id}
+                key={d.id}
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-40px" }}
-                transition={{ duration: 0.7, delay: idx * 0.12, ease: [0.16, 1, 0.3, 1] }}
-                className="bg-[#FAF8F5] border border-[#E6DFD5] p-8 sm:p-10 flex flex-col justify-between relative group hover:border-[#C5A059]/60 transition-colors"
+                viewport={{ once: true }}
+                transition={{ duration: 0.7, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                className="p-8 bg-[#FAF8F5] border border-[#E6DFD5] rounded-sm hover:border-[#C5A059] transition-all flex flex-col justify-between shadow-xs"
               >
                 <div>
-                  {/* Card Header */}
                   <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#E6DFD5]">
-                    <div className="flex items-center gap-3">
-                      <div 
-                        className="w-9 h-9 rounded-full flex items-center justify-center text-white"
-                        style={{ backgroundColor: dosha.accentColor }}
-                      >
-                        <Icon size={18} strokeWidth={1.5} />
-                      </div>
-                      <div>
-                        <h3 className="font-editorial text-2xl text-[#1A1F1C]">
-                          {dosha.name}
-                        </h3>
-                        <span className="text-[10px] font-mono text-[#8A948E] block">
-                          {dosha.sanskrit}
-                        </span>
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-[#C5A059]">
-                      Principle
-                    </span>
-                  </div>
-
-                  {/* Primary Elements */}
-                  <div className="mb-6">
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-[#8A948E] block mb-1">
-                      Elemental Composition
-                    </span>
-                    <p className="text-xs font-mono text-[#1E3A2F] font-semibold">
-                      {dosha.elements}
-                    </p>
-                  </div>
-
-                  {/* Lived Role */}
-                  <div className="mb-6">
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-[#8A948E] block mb-1">
-                      Physiological &amp; Skin Role
-                    </span>
-                    <p className="text-xs text-[#5C6660] leading-relaxed">
-                      {dosha.contextRole}
-                    </p>
-                  </div>
-
-                  {/* Observational Considerations */}
-                  <div className="mb-6">
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-[#8A948E] block mb-1">
-                      Contextual Observation
-                    </span>
-                    <p className="text-xs text-[#5C6660] leading-relaxed">
-                      {dosha.observationalConsiderations}
-                    </p>
-                  </div>
-
-                  {/* Ayurvedic Guidance Concept */}
-                  <div className="p-4 bg-white border border-[#E6DFD5]">
-                    <div className="flex items-center gap-1.5 mb-1 text-[#1E3A2F]">
-                      <Compass size={13} className="text-[#C5A059]" />
-                      <span className="text-[10px] font-mono uppercase tracking-wider font-semibold">
-                        Wellness Direction
+                    <div>
+                      <h3 className="font-display font-serif text-3xl text-[#1A1F1C] font-medium">
+                        {d.name}
+                      </h3>
+                      <span className="text-xs font-mono text-[#C5A059]">
+                        {d.sanskrit} · {d.elements}
                       </span>
                     </div>
-                    <p className="text-xs text-[#5C6660] leading-relaxed">
-                      {dosha.ayurvedicGuidanceConcept}
+                    <div 
+                      className="p-3 rounded-full text-white"
+                      style={{ backgroundColor: d.color }}
+                    >
+                      <Icon size={18} />
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-[#8A948E] block mb-1 font-semibold">
+                      Elemental Essence
+                    </span>
+                    <p className="text-sm font-medium text-[#1E3A2F] font-body">
+                      {d.essence}
+                    </p>
+                  </div>
+
+                  <div className="mb-6">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-[#8A948E] block mb-1 font-semibold">
+                      Constitutional Expression
+                    </span>
+                    <p className="text-xs text-[#5C6660] font-body leading-relaxed">
+                      {d.desc}
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-8 pt-4 border-t border-[#E6DFD5] text-[10px] font-mono text-[#8A948E]">
-                  Constitutional archetype · Lived context
+                <div className="pt-4 border-t border-[#E6DFD5] bg-white/60 p-3 rounded-xs">
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-[#C5A059] block mb-1 font-semibold">
+                    Harmonizing Care Concept
+                  </span>
+                  <p className="text-xs text-[#1E3A2F] font-body leading-relaxed">
+                    {d.guidance}
+                  </p>
                 </div>
               </motion.div>
             );

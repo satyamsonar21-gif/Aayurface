@@ -1,129 +1,122 @@
 import { motion } from 'framer-motion';
-import { Sparkles, Eye, GitCompare, Compass } from 'lucide-react';
+import { Calendar, Compass, RefreshCw, Sparkles, CheckCircle2 } from 'lucide-react';
 
 export default function ProgressSection() {
   const milestones = [
     {
       day: 'DAY 01',
-      title: 'Baseline Checkpoint',
-      icon: Sparkles,
-      phase: 'BASELINE',
-      desc: 'First standardized facial observation captures initial surface characteristics, paired with your constitutional intake.'
+      title: 'Baseline',
+      tag: 'Initial Mapping',
+      desc: 'First standardized capture and comprehensive Prakriti context intake establish your personal reference point.',
+      icon: Compass,
     },
     {
       day: 'DAY 30',
-      title: 'Initial Observation',
-      icon: Eye,
-      phase: 'OBSERVE',
-      desc: 'Reviewing daily routine consistency and noting subtle shifts in morning hydration feel and environmental comfort.'
+      title: 'Observe',
+      tag: 'Habit Formation',
+      desc: 'Track initial routine consistency, self-reported sensory experience, and morning barrier comfort.',
+      icon: Calendar,
     },
     {
       day: 'DAY 60',
-      title: 'Comparative Review',
-      icon: GitCompare,
-      phase: 'COMPARE',
-      desc: 'Comparing current observations against your Day 01 baseline as weather, sleep, and seasonal habits evolve.'
+      title: 'Compare',
+      tag: 'Longitudinal View',
+      desc: 'Side-by-side standardized comparisons reveal subtle shifts in tone evenness and hydration proxy under matching daylight.',
+      icon: RefreshCw,
     },
     {
       day: 'DAY 90',
-      title: 'Sustained Reflection',
-      icon: Compass,
-      phase: 'REFLECT',
-      desc: 'Deepening personal intuition and long-term self-awareness through continuous, calm longitudinal observation.'
-    }
+      title: 'Reflect',
+      tag: 'Seasonal Shift',
+      desc: 'Evaluate how your skin responded across seasonal climatic transitions, refining your personalized Dinacharya for the next cycle.',
+      icon: Sparkles,
+    },
   ];
 
   return (
-    <section id="progress" className="w-full bg-[#FFFFFF] border-y border-[#E6DFD5] py-24 sm:py-32 px-6 sm:px-10 overflow-hidden">
+    <section className="w-full bg-[#FFFFFF] py-24 sm:py-32 px-6 sm:px-10 overflow-hidden border-b border-[#E6DFD5]">
       <div className="max-w-7xl mx-auto">
         
-        {/* Section Header */}
+        {/* Section Header with Exact Required Headline */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           className="text-center max-w-3xl mx-auto mb-20"
         >
-          <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#C5A059] block mb-4">
-            Longitudinal Wellness
+          <span className="text-[11px] font-mono uppercase tracking-[0.25em] text-[#C5A059] block mb-3 font-semibold">
+            Longitudinal Tracking
           </span>
-          <h2 className="font-editorial text-4xl sm:text-5xl lg:text-6xl text-[#1A1F1C] leading-[1.12] mb-6">
-            A continuous journey. <br/>
-            <span className="italic text-[#6B8E7D] font-normal">Not a single snapshot.</span>
+          <h2 className="font-display font-serif text-4xl sm:text-5xl lg:text-6xl text-[#1A1F1C] leading-[1.12] mb-6">
+            Skin wellness is a journey, <br/>
+            <span className="italic text-[#1E3A2F] font-normal">not a snapshot.</span>
           </h2>
-          <p className="text-base sm:text-lg text-[#5C6660] font-body leading-relaxed">
-            True wellness unfolds over time. AayurFace moves away from transactional single scans, supporting thoughtful observation, routine consistency, and reflection across weeks and seasons.
+          <p className="text-base sm:text-lg text-[#5C6660] font-body leading-relaxed max-w-2xl mx-auto">
+            Skin is alive and responsive to seasonal, climatic, and circadian changes. AayurFace encourages calm, recurring observation over 90-day cycles rather than reactionary quick fixes.
           </p>
         </motion.div>
 
-        {/* Milestone Timeline */}
-        <div className="relative max-w-6xl mx-auto pt-6">
-          
-          {/* Connecting Hairline (Desktop) */}
-          <div className="hidden lg:block absolute top-[105px] left-[12%] right-[12%] h-[1px] bg-[#E6DFD5]" />
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 relative z-10">
-            {milestones.map((item, idx) => {
-              const Icon = item.icon;
-              return (
-                <motion.div 
-                  key={item.day}
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.7, delay: idx * 0.12, ease: [0.16, 1, 0.3, 1] }}
-                  className="flex flex-col items-center text-center p-6 bg-[#FAF8F5] border border-[#E6DFD5] hover:border-[#C5A059] transition-colors"
-                >
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-[#C5A059] font-semibold mb-4">
-                    {item.day}
-                  </span>
-                  
-                  {/* Circle Node */}
-                  <div className="w-14 h-14 rounded-full border border-[#E6DFD5] bg-white flex items-center justify-center mb-6 text-[#1E3A2F] shadow-xs">
-                    <Icon size={18} strokeWidth={1.5} />
+        {/* 4-Stage Visual Timeline */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          {milestones.map((m, idx) => {
+            const Icon = m.icon;
+            return (
+              <motion.div
+                key={m.day}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                className="bg-[#FAF8F5] border border-[#E6DFD5] p-6 sm:p-8 rounded-sm hover:border-[#C5A059] transition-all flex flex-col justify-between shadow-xs group"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-6 pb-3 border-b border-[#E6DFD5]">
+                    <span className="font-mono text-xs font-semibold text-[#C5A059]">
+                      {m.day}
+                    </span>
+                    <div className="p-2 rounded-full bg-white border border-[#E6DFD5] text-[#1E3A2F] group-hover:text-[#C5A059] transition-colors">
+                      <Icon size={16} />
+                    </div>
                   </div>
 
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-[#6B8E7D] mb-1 block font-semibold">
-                    {item.phase}
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-[#8A948E] block mb-1 font-semibold">
+                    {m.tag}
                   </span>
-                  
-                  <h3 className="font-editorial text-2xl text-[#1A1F1C] mb-3">
-                    {item.title}
+
+                  <h3 className="font-display font-serif text-2xl text-[#1A1F1C] mb-3 font-medium">
+                    {m.title}
                   </h3>
-                  
-                  <p className="text-xs text-[#5C6660] leading-relaxed">
-                    {item.desc}
+
+                  <p className="text-xs sm:text-sm text-[#5C6660] font-body leading-relaxed">
+                    {m.desc}
                   </p>
-                </motion.div>
-              );
-            })}
-          </div>
+                </div>
 
-          {/* What We Track vs What We Do Not Claim Banner */}
-          <div className="mt-16 p-6 bg-[#FAF8F5] border border-[#E6DFD5] max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs text-[#5C6660]">
+                <div className="mt-6 pt-4 border-t border-[#E6DFD5]/60 flex items-center gap-1.5 text-[11px] font-mono text-[#6B8E7D]">
+                  <CheckCircle2 size={12} />
+                  <span>Standardized Metric</span>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* What AayurFace Tracks Banner - Claim Discipline */}
+        <div className="p-6 bg-[#FAF8F5] border border-[#E6DFD5] rounded-sm max-w-4xl mx-auto">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <span className="font-mono text-[10px] uppercase tracking-wider text-[#1E3A2F] font-semibold block mb-2">
-                What We Observe Over Time:
-              </span>
-              <ul className="space-y-1.5 list-disc list-inside">
-                <li>Consistency in completing daily morning and evening rituals.</li>
-                <li>Self-reported comfort, rest, and environmental changes.</li>
-                <li>Relative shifts in standardized visual surface characteristics.</li>
-              </ul>
+              <h4 className="font-display font-serif text-lg text-[#1E3A2F] font-semibold mb-1">
+                What AayurFace Legitimately Tracks:
+              </h4>
+              <p className="text-xs text-[#5C6660] font-body leading-relaxed">
+                Objective colorimetric stability, daily routine consistency, self-reported hydration comfort, and seasonal adaptations. We do not make biological epidermal renewal promises or guarantee cosmetic transformations.
+              </p>
             </div>
-            <div>
-              <span className="font-mono text-[10px] uppercase tracking-wider text-[#8A948E] font-semibold block mb-2">
-                What We Never Claim:
-              </span>
-              <ul className="space-y-1.5 list-disc list-inside text-[#8A948E]">
-                <li>Never claims clinical cure of dermatological disease.</li>
-                <li>No fabricated percentage "improvement" scores.</li>
-                <li>Never replaces medical evaluation by a licensed physician.</li>
-              </ul>
+            <div className="text-[10px] font-mono text-[#8A948E] uppercase tracking-wider whitespace-nowrap px-3 py-1 bg-white border border-[#E6DFD5] rounded-xs shrink-0">
+              Ethical Claim Policy
             </div>
           </div>
-
         </div>
 
       </div>

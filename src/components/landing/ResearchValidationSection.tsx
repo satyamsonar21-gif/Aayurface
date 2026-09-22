@@ -1,128 +1,162 @@
 import { motion } from 'framer-motion';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Search } from 'lucide-react';
 
 export default function ResearchValidationSection() {
   const currentCapabilities = [
-    'In-browser standardized capture gateway with lighting checks',
-    'Structured non-diagnostic visual feature extraction',
-    'Constitutional intake and daily lifestyle context integration',
-    'Confidence calibration reflecting inter-modality agreement',
-    'Five-stage transparent reasoning and explainability ledger'
+    {
+      title: 'In-Browser Quality Gateway',
+      desc: 'Standardized ambient light, centered oval framing, and focus checks evaluated locally in your browser before observation.',
+    },
+    {
+      title: 'Objective Surface Feature Extraction',
+      desc: 'Perceptual colorimetry (CIELAB) and relative surface reflection proxies decoupled from changing device exposure.',
+    },
+    {
+      title: 'Classical Samhita Grounding',
+      desc: 'Topical guidance cross-referenced against authentic treatises (Charaka Samhita, Sushruta Samhita, Ashtanga Hridaya).',
+    },
+    {
+      title: 'Transparent 5-Stage Explainability',
+      desc: 'Every wellness suggestion exposes its observed inputs, contributing factors, and explicit non-diagnostic limits.',
+    },
   ];
 
-  const activeResearchDirections = [
+  const researchRoadmap = [
     {
-      title: 'Indian-Skin Representation & Validation',
-      summary: 'Skin-analysis systems require thorough validation across diverse skin tones, regional lighting variations, devices, and populations. AayurFace’s research roadmap explicitly prioritizes Indian skin representation, evaluating colorimetric models to ensure pigmentation is never conflated with vascular warmth.'
+      title: 'Indian Skin Representation Dataset',
+      desc: 'Ongoing protocol design to validate colorimetric variance across diverse Indian skin phenotypes and regional climates.',
     },
     {
-      title: 'Multi-Practitioner Consensus Methodology',
-      summary: 'Developing research protocols where independent Ayurvedic experts evaluate de-identified cases to establish objective, inter-rater benchmark datasets for algorithm calibration.'
+      title: 'Vaidya Expert Consensus Studies',
+      desc: 'Planned multi-practitioner concordance studies to evaluate inter-rater reliability between traditional Vaidyas and computational observation.',
     },
     {
-      title: 'Longitudinal Wellness Dynamics',
-      summary: 'Investigating how multi-week self-care consistency correlates with self-reported skin comfort across seasonal transitions (Ritucharya).'
-    }
+      title: 'Longitudinal Seasonal Cohorts',
+      desc: 'Investigating seasonal Ritucharya shifts over 12-month observational cycles across varying humidity and temperature zones.',
+    },
+    {
+      title: 'Peer-Reviewed Scientific Publications',
+      desc: 'Aiming to publish methodologies and validation findings openly in scientific and Ayurvedic informatics journals.',
+    },
   ];
 
   return (
-    <section id="research" className="w-full bg-[#FAF8F5] py-24 sm:py-32 px-6 sm:px-10 overflow-hidden">
+    <section id="research" className="w-full bg-[#FAF8F5] py-24 sm:py-32 px-6 sm:px-10 overflow-hidden border-b border-[#E6DFD5]">
       <div className="max-w-7xl mx-auto">
         
-        {/* Section Header */}
+        {/* Section Header with Exact Required Headline */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center max-w-3xl mx-auto mb-16"
+          className="text-center max-w-3xl mx-auto mb-20"
         >
-          <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#C5A059] block mb-4">
-            Scientific Responsibility
+          <span className="text-[11px] font-mono uppercase tracking-[0.25em] text-[#C5A059] block mb-3 font-semibold">
+            Trust &amp; Transparency
           </span>
-          <h2 className="font-editorial text-4xl sm:text-5xl lg:text-6xl text-[#1A1F1C] leading-[1.12] mb-6">
-            From digital wellness to <br/>
-            <span className="italic text-[#6B8E7D] font-normal">research-grade intelligence.</span>
+          <h2 className="font-display font-serif text-4xl sm:text-5xl lg:text-6xl text-[#1A1F1C] leading-[1.12] mb-6">
+            Built with a research mindset.
           </h2>
-          <p className="text-base sm:text-lg text-[#5C6660] font-body leading-relaxed">
-            Responsible innovation requires absolute transparency regarding what a platform accomplishes today and what it investigates for tomorrow. We explicitly separate our live platform capabilities from our ongoing research roadmap.
+          <p className="text-base sm:text-lg text-[#5C6660] font-body leading-relaxed max-w-2xl mx-auto">
+            Trust is earned through scientific honesty. We do not manufacture fake clinical trial claims or invent statistics. Here is the exact boundary between what works today and what we are investigating for tomorrow.
           </p>
         </motion.div>
 
-        {/* Clear Division: Current Capabilities vs Research Directions */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-12">
+        {/* Side-by-Side Architectural Split: Current vs Roadmap */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
           
-          {/* Left: Current Capabilities */}
+          {/* Left: Current Operational Capabilities */}
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-5 bg-white border border-[#E6DFD5] p-8 sm:p-10 shadow-xs"
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="bg-white border-2 border-emerald-900/20 p-8 sm:p-10 rounded-sm shadow-xs flex flex-col justify-between"
           >
-            <div className="flex items-center justify-between pb-4 mb-6 border-b border-[#E6DFD5]">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-[#1E3A2F] font-semibold">
-                Current Live Platform
-              </span>
-              <span className="inline-block px-2.5 py-0.5 bg-emerald-50 text-emerald-800 text-[10px] font-mono border border-emerald-200">
-                Operational
-              </span>
+            <div>
+              <div className="flex items-center justify-between mb-8 pb-4 border-b border-[#E6DFD5]">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
+                  <span className="text-xs font-mono uppercase tracking-widest text-[#1E3A2F] font-semibold">
+                    Current Operational Platform
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-sm border border-emerald-200">
+                  Live Today
+                </span>
+              </div>
+
+              <h3 className="font-display font-serif text-2xl sm:text-3xl text-[#1A1F1C] font-medium mb-6">
+                Operational Capabilities
+              </h3>
+
+              <div className="space-y-5">
+                {currentCapabilities.map((item) => (
+                  <div key={item.title} className="flex items-start gap-3">
+                    <CheckCircle2 size={16} className="text-emerald-600 shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-display font-serif text-lg text-[#1A1F1C] font-medium">
+                        {item.title}
+                      </h4>
+                      <p className="text-xs text-[#5C6660] font-body leading-relaxed mt-0.5">
+                        {item.desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <h3 className="font-editorial text-2xl text-[#1A1F1C] mb-4">
-              Validated Wellness Experience
-            </h3>
-
-            <p className="text-xs text-[#5C6660] leading-relaxed mb-6">
-              Our active release operates as a client-side, privacy-preserving wellness companion designed to bring classical Ayurvedic structure to everyday routines.
-            </p>
-
-            <ul className="space-y-3.5">
-              {currentCapabilities.map((item) => (
-                <li key={item} className="flex items-start gap-2.5 text-xs text-[#1A1F1C]">
-                  <CheckCircle2 size={15} className="text-emerald-600 flex-shrink-0 mt-0.5" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
+            <div className="mt-8 pt-6 border-t border-[#E6DFD5] text-[11px] font-mono text-[#5C6660]">
+              Verified in current production build · Privacy-first
+            </div>
           </motion.div>
 
-          {/* Right: Research Directions */}
+          {/* Right: Active Research Roadmap */}
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-7 bg-[#FAF8F5] border border-[#C5A059]/40 p-8 sm:p-10"
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="bg-white border-2 border-[#C5A059]/40 p-8 sm:p-10 rounded-sm shadow-xs flex flex-col justify-between"
           >
-            <div className="flex items-center justify-between pb-4 mb-6 border-b border-[#E6DFD5]">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-[#C5A059] font-semibold">
-                Active Research Roadmap
-              </span>
-              <span className="inline-block px-2.5 py-0.5 bg-[#FAF8F5] text-[#C5A059] text-[10px] font-mono border border-[#C5A059]/40">
-                In Development
-              </span>
-            </div>
-
-            <h3 className="font-editorial text-2xl text-[#1E3A2F] mb-6">
-              Scientific Exploration &amp; Calibration
-            </h3>
-
-            <div className="space-y-6">
-              {activeResearchDirections.map((direction) => (
-                <div key={direction.title} className="p-4 bg-white border border-[#E6DFD5]">
-                  <h4 className="font-editorial text-lg text-[#1A1F1C] mb-2 font-semibold">
-                    {direction.title}
-                  </h4>
-                  <p className="text-xs text-[#5C6660] leading-relaxed">
-                    {direction.summary}
-                  </p>
+            <div>
+              <div className="flex items-center justify-between mb-8 pb-4 border-b border-[#E6DFD5]">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#C5A059]" />
+                  <span className="text-xs font-mono uppercase tracking-widest text-[#1E3A2F] font-semibold">
+                    Active Research Roadmap
+                  </span>
                 </div>
-              ))}
+                <span className="text-[10px] font-mono uppercase tracking-wider text-amber-900 bg-amber-50 px-2.5 py-1 rounded-sm border border-amber-200">
+                  In Development
+                </span>
+              </div>
+
+              <h3 className="font-display font-serif text-2xl sm:text-3xl text-[#1A1F1C] font-medium mb-6">
+                Future Investigation
+              </h3>
+
+              <div className="space-y-5">
+                {researchRoadmap.map((item) => (
+                  <div key={item.title} className="flex items-start gap-3">
+                    <Search size={16} className="text-[#C5A059] shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-display font-serif text-lg text-[#1A1F1C] font-medium">
+                        {item.title}
+                      </h4>
+                      <p className="text-xs text-[#5C6660] font-body leading-relaxed mt-0.5">
+                        {item.desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-[#E6DFD5] text-[11px] font-mono text-[#8A948E] italic">
-              Research directions represent active engineering and clinical inquiry protocols. AayurFace does not assert completed clinical certifications.
+            <div className="mt-8 pt-6 border-t border-[#E6DFD5] text-[11px] font-mono text-[#5C6660]">
+              Research direction · Not presented as completed clinical trials
             </div>
           </motion.div>
 
