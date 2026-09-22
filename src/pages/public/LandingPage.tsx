@@ -2,72 +2,89 @@ import PageTransition from '@/components/layout/PageTransition';
 import LandingNav from '@/components/landing/LandingNav';
 import HeroSection from '@/components/landing/HeroSection';
 import PositioningStrip from '@/components/landing/PositioningStrip';
-import WhySection from '@/components/landing/WhySection';
-import JourneySection from '@/components/landing/JourneySection';
+import BeyondTheSelfieSection from '@/components/landing/BeyondTheSelfieSection';
+import ConstitutionalSystemSection from '@/components/landing/ConstitutionalSystemSection';
+import MultimodalSignalSection from '@/components/landing/MultimodalSignalSection';
 import ScanExperienceSection from '@/components/landing/ScanExperienceSection';
-import AyurvedaTechSection from '@/components/landing/AyurvedaTechSection';
-import ContextMattersSection from '@/components/landing/ContextMattersSection';
+import ComputerVisionSection from '@/components/landing/ComputerVisionSection';
+import KnowledgeEngineSection from '@/components/landing/KnowledgeEngineSection';
+import MultimodalFusionSection from '@/components/landing/MultimodalFusionSection';
+import ConfidenceAwareSection from '@/components/landing/ConfidenceAwareSection';
 import ExplainabilitySection from '@/components/landing/ExplainabilitySection';
 import PersonalizationSection from '@/components/landing/PersonalizationSection';
 import ProgressSection from '@/components/landing/ProgressSection';
-import HowItWorksSection from '@/components/landing/HowItWorksSection';
+import ResearchValidationSection from '@/components/landing/ResearchValidationSection';
 import ResponsibleAISafetySection from '@/components/landing/ResponsibleAISafetySection';
-import PhilosophySection from '@/components/landing/PhilosophySection';
 import FinalCTASection from '@/components/landing/FinalCTASection';
 import LandingFooter from '@/components/landing/LandingFooter';
+
+// Graceful safeguard for test and headless environments (e.g., jsdom)
+if (typeof window !== 'undefined' && !window.IntersectionObserver) {
+  (window as unknown as { IntersectionObserver: unknown }).IntersectionObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
 
 export default function LandingPage() {
   return (
     <PageTransition>
       <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-[#1A1F1C] font-body selection:bg-[#C5A059]/25 selection:text-[#1E3A2F] relative overflow-x-hidden">
-        {/* 01. Refined Sticky / Floating Navigation */}
+        {/* Navigation Bar */}
         <LandingNav />
 
         <main className="flex-1 flex flex-col relative z-10">
-          {/* 02. Editorial Asymmetric Hero Section */}
+          {/* 01. Hero: Editorial statement & 4 converging signals */}
           <HeroSection />
 
-          {/* 03. Truthful Conceptual Positioning Strip */}
+          {/* 02. Philosophy: "Skin is visible. Context is not." */}
           <PositioningStrip />
 
-          {/* 04. Why AayurFace: Beyond Surface Symptoms */}
-          <WhySection />
+          {/* 03. Beyond the Selfie: Conventional snapshot vs AayurFace multimodal paradigm */}
+          <BeyondTheSelfieSection />
 
-          {/* 05. The Observation Journey: 4-Stage Timeline */}
-          <JourneySection />
+          {/* 04. Prakriti & Tridosha: Whole-person Ayurvedic context (respectful & non-deterministic) */}
+          <ConstitutionalSystemSection />
 
-          {/* 06. Face Scan Experience Preview */}
+          {/* 05. The Face Is One Signal: Central portrait with radiating contextual pillars */}
+          <MultimodalSignalSection />
+
+          {/* 06. Standardized Capture: "Better input. More meaningful observation." */}
           <ScanExperienceSection />
 
-          {/* 07. Classical Principles & Modern Technology Bridge */}
-          <AyurvedaTechSection />
+          {/* 07. Seeing the Details: Structured visual observation & colorimetric decoupling */}
+          <ComputerVisionSection />
 
-          {/* 08. Context Matters: Radiating Lifestyle Pillars */}
-          <ContextMattersSection />
+          {/* 08. Knowledge Should Have Roots: Classical Ayurvedic Samhitas grounding */}
+          <KnowledgeEngineSection />
 
-          {/* 09. Explainable Wellness Intelligence (5-Stage Transparency) */}
+          {/* 09. Multimodal Intelligence: Evidence convergence and reasoning synthesis */}
+          <MultimodalFusionSection />
+
+          {/* 10. Confidence: High agreement vs signal divergence and honest uncertainty */}
+          <ConfidenceAwareSection />
+
+          {/* 11. Explainable AI: 5-stage transparent reasoning chain */}
           <ExplainabilitySection />
 
-          {/* 10. Personalized Care: Your Wellness Rhythm */}
+          {/* 12. Personalized Care: Contextual Dinacharya daily rhythms & botanicals */}
           <PersonalizationSection />
 
-          {/* 11. Longitudinal Progress (90-Day Observation Milestones) */}
+          {/* 13. Longitudinal Journey: Baseline ──► Observe ──► Compare ──► Reflect */}
           <ProgressSection />
 
-          {/* 12. How It Works: Concise 4-Step Walkthrough */}
-          <HowItWorksSection />
+          {/* 14. Research Direction: Current Capabilities vs Active Research Roadmap */}
+          <ResearchValidationSection />
 
-          {/* 13. Responsible AI & Ethical Safety Boundaries */}
+          {/* 15. Responsible AI: "Technology should know its limits." */}
           <ResponsibleAISafetySection />
 
-          {/* 14. Contemporary Ayurvedic Philosophy & Tenets */}
-          <PhilosophySection />
-
-          {/* 15. Final Closing CTA: Begin Your Skin Journey */}
+          {/* 16. Final Closing CTA: Begin Your AayurFace Journey */}
           <FinalCTASection />
         </main>
 
-        {/* 16. Multi-Column Minimal Editorial Footer */}
+        {/* Multi-Column Editorial Footer */}
         <LandingFooter />
       </div>
     </PageTransition>

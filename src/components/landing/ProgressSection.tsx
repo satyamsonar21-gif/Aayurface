@@ -1,35 +1,35 @@
 import { motion } from 'framer-motion';
-import { Sparkles, RefreshCw, Calendar, TrendingUp } from 'lucide-react';
+import { Sparkles, Eye, GitCompare, Compass } from 'lucide-react';
 
 export default function ProgressSection() {
   const milestones = [
     {
       day: 'DAY 01',
-      title: 'Baseline Observation',
+      title: 'Baseline Checkpoint',
       icon: Sparkles,
-      phase: 'Constitutional Mapping',
-      desc: 'First standardized facial capture records initial surface shine, moisture proxy, and baseline dosha tendencies.'
+      phase: 'BASELINE',
+      desc: 'First standardized facial observation captures initial surface characteristics, paired with your constitutional intake.'
     },
     {
       day: 'DAY 30',
-      title: 'Routine Integration',
-      icon: RefreshCw,
-      phase: 'Epidermal Adaptation',
-      desc: 'Skin adjusts to morning-evening Dinacharya. Initial reduction in superficial tightness and restored lipid calm.'
+      title: 'Initial Observation',
+      icon: Eye,
+      phase: 'OBSERVE',
+      desc: 'Reviewing daily routine consistency and noting subtle shifts in morning hydration feel and environmental comfort.'
     },
     {
       day: 'DAY 60',
-      title: 'Doshic Calibration',
-      icon: Calendar,
-      phase: 'Seasonal Transition',
-      desc: 'Adjusting herbal Lepas as external temperatures and humidity shift, preventing seasonal Vikriti flare-ups.'
+      title: 'Comparative Review',
+      icon: GitCompare,
+      phase: 'COMPARE',
+      desc: 'Comparing current observations against your Day 01 baseline as weather, sleep, and seasonal habits evolve.'
     },
     {
       day: 'DAY 90',
-      title: 'Sustained Equilibrium',
-      icon: TrendingUp,
-      phase: 'Constitutional Harmony',
-      desc: 'Consistent barrier strength and steady natural luminosity achieved through intuitive, daily self-awareness.'
+      title: 'Sustained Reflection',
+      icon: Compass,
+      phase: 'REFLECT',
+      desc: 'Deepening personal intuition and long-term self-awareness through continuous, calm longitudinal observation.'
     }
   ];
 
@@ -42,62 +42,88 @@ export default function ProgressSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           className="text-center max-w-3xl mx-auto mb-20"
         >
           <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#C5A059] block mb-4">
-            Longitudinal Observation
+            Longitudinal Wellness
           </span>
-          <h2 className="font-editorial text-4xl sm:text-5xl lg:text-6xl text-[#1A1F1C] leading-[1.1] mb-6">
-            Observation over time. <br/>
-            <span className="italic text-[#6B8E7D]">Not quick fixes.</span>
+          <h2 className="font-editorial text-4xl sm:text-5xl lg:text-6xl text-[#1A1F1C] leading-[1.12] mb-6">
+            A continuous journey. <br/>
+            <span className="italic text-[#6B8E7D] font-normal">Not a single snapshot.</span>
           </h2>
           <p className="text-base sm:text-lg text-[#5C6660] font-body leading-relaxed">
-            True skin vitality develops over natural cellular renewal cycles (28 to 40 days). We support continuous, thoughtful observation as your environment and seasons change.
+            True wellness unfolds over time. AayurFace moves away from transactional single scans, supporting thoughtful observation, routine consistency, and reflection across weeks and seasons.
           </p>
         </motion.div>
 
-        {/* Elegant Continuous Timeline */}
-        <div className="relative max-w-6xl mx-auto pt-10">
+        {/* Milestone Timeline */}
+        <div className="relative max-w-6xl mx-auto pt-6">
           
-          {/* Continuous Line (Desktop) */}
-          <div className="hidden lg:block absolute top-[110px] left-[10%] right-[10%] h-[1px] bg-gradient-to-r from-transparent via-[#C5A059] to-transparent opacity-40" />
+          {/* Connecting Hairline (Desktop) */}
+          <div className="hidden lg:block absolute top-[105px] left-[12%] right-[12%] h-[1px] bg-[#E6DFD5]" />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-4 relative z-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 relative z-10">
             {milestones.map((item, idx) => {
               const Icon = item.icon;
               return (
                 <motion.div 
                   key={item.day}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.8, delay: idx * 0.15, ease: [0.16, 1, 0.3, 1] }}
-                  className="flex flex-col items-center text-center group"
+                  transition={{ duration: 0.7, delay: idx * 0.12, ease: [0.16, 1, 0.3, 1] }}
+                  className="flex flex-col items-center text-center p-6 bg-[#FAF8F5] border border-[#E6DFD5] hover:border-[#C5A059] transition-colors"
                 >
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-[#C5A059] mb-4">
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-[#C5A059] font-semibold mb-4">
                     {item.day}
                   </span>
                   
                   {/* Circle Node */}
-                  <div className="w-16 h-16 rounded-full border border-[#E6DFD5] bg-[#FAF8F5] flex items-center justify-center mb-8 relative group-hover:border-[#C5A059] transition-colors">
-                    <Icon size={20} className="text-[#1E3A2F]" strokeWidth={1} />
-                    <div className="absolute inset-0 rounded-full border border-[#C5A059] scale-110 opacity-0 group-hover:opacity-30 group-hover:animate-ping" />
+                  <div className="w-14 h-14 rounded-full border border-[#E6DFD5] bg-white flex items-center justify-center mb-6 text-[#1E3A2F] shadow-xs">
+                    <Icon size={18} strokeWidth={1.5} />
                   </div>
 
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-[#6B8E7D] mb-2 block">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-[#6B8E7D] mb-1 block font-semibold">
                     {item.phase}
                   </span>
-                  <h3 className="font-editorial text-2xl text-[#1A1F1C] mb-4 px-2">
+                  
+                  <h3 className="font-editorial text-2xl text-[#1A1F1C] mb-3">
                     {item.title}
                   </h3>
-                  <p className="text-sm text-[#5C6660] leading-relaxed px-4 max-w-xs">
+                  
+                  <p className="text-xs text-[#5C6660] leading-relaxed">
                     {item.desc}
                   </p>
                 </motion.div>
               );
             })}
           </div>
+
+          {/* What We Track vs What We Do Not Claim Banner */}
+          <div className="mt-16 p-6 bg-[#FAF8F5] border border-[#E6DFD5] max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs text-[#5C6660]">
+            <div>
+              <span className="font-mono text-[10px] uppercase tracking-wider text-[#1E3A2F] font-semibold block mb-2">
+                What We Observe Over Time:
+              </span>
+              <ul className="space-y-1.5 list-disc list-inside">
+                <li>Consistency in completing daily morning and evening rituals.</li>
+                <li>Self-reported comfort, rest, and environmental changes.</li>
+                <li>Relative shifts in standardized visual surface characteristics.</li>
+              </ul>
+            </div>
+            <div>
+              <span className="font-mono text-[10px] uppercase tracking-wider text-[#8A948E] font-semibold block mb-2">
+                What We Never Claim:
+              </span>
+              <ul className="space-y-1.5 list-disc list-inside text-[#8A948E]">
+                <li>Never claims clinical cure of dermatological disease.</li>
+                <li>No fabricated percentage "improvement" scores.</li>
+                <li>Never replaces medical evaluation by a licensed physician.</li>
+              </ul>
+            </div>
+          </div>
+
         </div>
 
       </div>

@@ -1,118 +1,181 @@
-import { motion } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Sun, Scan, Focus, ShieldCheck, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ScanExperienceSection() {
   const { isAuthenticated, user } = useAuth();
+  const [showMethodology, setShowMethodology] = useState(false);
+
+  const captureInvariants = [
+    {
+      title: 'Balanced Lighting',
+      icon: Sun,
+      description: 'Diffused, natural daylight without harsh directional shadows or overexposed glare.'
+    },
+    {
+      title: 'Centered Framing',
+      icon: Scan,
+      description: 'Guided oval positioning ensures your facial contours sit squarely within the focal plane.'
+    },
+    {
+      title: 'Stillness & Sharpness',
+      icon: Focus,
+      description: 'Client-side clarity evaluation confirms the absence of camera shake or motion blur.'
+    },
+    {
+      title: 'Clear Visibility',
+      icon: ShieldCheck,
+      description: 'Unobstructed view of forehead, cheeks, and jawline free from hair or accessory occlusion.'
+    }
+  ];
 
   return (
-    <section id="scan-experience" className="w-full bg-[#FAF8F5] py-24 sm:py-32 px-6 sm:px-10 relative overflow-hidden border-t border-[#E6DFD5]">
-      
-      {/* Decorative center line */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1px] h-32 bg-[#E6DFD5]" />
-
+    <section id="scan-experience" className="w-full bg-[#FFFFFF] border-y border-[#E6DFD5] py-24 sm:py-32 px-6 sm:px-10 relative overflow-hidden">
       <div className="max-w-7xl mx-auto flex flex-col items-center">
         
+        {/* Section Header */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center max-w-2xl mb-20 relative z-10 pt-16"
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center max-w-3xl mb-16"
         >
-          <h2 className="font-editorial text-4xl sm:text-5xl lg:text-6xl text-[#1A1F1C] leading-[1.1] mb-6">
-            A moment of <br/>
-            <span className="italic text-[#6B8E7D]">calm observation.</span>
+          <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#C5A059] block mb-4">
+            Client-Side Quality Gateway
+          </span>
+          <h2 className="font-editorial text-4xl sm:text-5xl lg:text-6xl text-[#1A1F1C] leading-[1.12] mb-6">
+            Better input. <br/>
+            <span className="italic text-[#6B8E7D] font-normal">More meaningful observation.</span>
           </h2>
           <p className="text-base sm:text-lg text-[#5C6660] font-body leading-relaxed">
-            We use computer vision not to diagnose, but to understand. Before observation begins, the platform ensures perfect lighting and stillness—creating a consistent foundation for personalized Ayurvedic guidance.
+            Uncontrolled selfies produce unpredictable results. AayurFace introduces a standardized capture gateway that guides you into optimal conditions before observation begins—ensuring privacy and consistency directly in your browser.
           </p>
         </motion.div>
 
-        {/* Conceptual UI Experience */}
-        <div className="w-full max-w-5xl relative">
-          
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-2xl mx-auto h-[500px] sm:h-[700px]"
-          >
-            <div className="w-full h-full p-2 border border-[#E6DFD5] bg-white">
-              <div className="relative w-full h-full overflow-hidden grayscale-[10%]">
+        {/* Visual Simulated Interface */}
+        <div className="w-full max-w-4xl mb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            
+            {/* Left: Interactive Simulated Capture Viewfinder */}
+            <div className="lg:col-span-7 relative">
+              <div className="relative aspect-[4/5] sm:h-[520px] w-full bg-white p-2.5 border border-[#E6DFD5] shadow-md overflow-hidden">
                 <img 
                   src="/images/landing/scan-portrait.jpg" 
-                  alt="Standardized observation" 
-                  className="w-full h-full object-cover object-center image-scale-on-hover"
+                  alt="Standardized observation preview" 
+                  className="w-full h-full object-cover grayscale-[10%]"
                   loading="lazy"
                 />
-                
-                {/* Thin Framing Brackets */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[70%] border border-[#FFFFFF]/30" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[55%] h-[65%] border border-[#FFFFFF]/10" />
 
-                {/* Conceptual Scanning Line */}
-                <motion.div 
-                  initial={{ top: '15%' }}
-                  animate={{ top: '85%' }}
-                  transition={{ duration: 4, repeat: Infinity, repeatType: 'reverse', ease: "linear" }}
-                  className="absolute left-[20%] right-[20%] h-[1px] bg-gradient-to-r from-transparent via-[#C5A059] to-transparent shadow-[0_0_8px_rgba(197,160,89,0.5)]"
-                />
+                {/* Subtle Reticle & Guide Oval */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="w-[68%] h-[78%] border border-white/60 rounded-[45%] flex items-center justify-center">
+                    <div className="w-[96%] h-[96%] border border-white/20 rounded-[45%]" />
+                  </div>
+                </div>
 
-                {/* Technical Anchors inside frame */}
-                <div className="absolute top-[20%] left-[20%] w-1.5 h-1.5 rounded-full bg-white/80" />
-                <div className="absolute top-[20%] right-[20%] w-1.5 h-1.5 rounded-full bg-white/80" />
-                <div className="absolute bottom-[20%] left-[20%] w-1.5 h-1.5 rounded-full bg-white/80" />
-                <div className="absolute bottom-[20%] right-[20%] w-1.5 h-1.5 rounded-full bg-white/80" />
+                {/* Simulated Real-Time Status Indicators */}
+                <div className="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none">
+                  <div className="bg-[#1E3A2F]/90 backdrop-blur-xs text-white px-3 py-1 text-[10px] font-mono uppercase tracking-wider flex items-center gap-1.5 border border-white/20">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    Gateway Ready
+                  </div>
+                  <div className="bg-black/60 backdrop-blur-xs text-white/90 px-3 py-1 text-[10px] font-mono">
+                    Natural Light · 5200K
+                  </div>
+                </div>
+
+                {/* Corner Hairlines */}
+                <div className="absolute top-3 left-3 w-3 h-[1px] bg-white/70" />
+                <div className="absolute top-3 left-3 w-[1px] h-3 bg-white/70" />
+                <div className="absolute top-3 right-3 w-3 h-[1px] bg-white/70" />
+                <div className="absolute top-3 right-3 w-[1px] h-3 bg-white/70" />
+                <div className="absolute bottom-3 left-3 w-3 h-[1px] bg-white/70" />
+                <div className="absolute bottom-3 left-3 w-[1px] h-3 bg-white/70" />
+                <div className="absolute bottom-3 right-3 w-3 h-[1px] bg-white/70" />
+                <div className="absolute bottom-3 right-3 w-[1px] h-3 bg-white/70" />
               </div>
             </div>
 
-            {/* Connecting Hairlines and Labels (Desktop) */}
-            <div className="hidden lg:block absolute top-[25%] -left-32 flex flex-col items-end">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-[#1E3A2F] mb-1">Lighting</span>
-              <span className="text-xs font-editorial italic text-[#5C6660]">Diffused · Balanced</span>
-              <div className="absolute top-2 -right-8 w-8 h-[1px] bg-[#E6DFD5]" />
+            {/* Right: The 4 Intuitive Quality Factors */}
+            <div className="lg:col-span-5 space-y-4">
+              <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#8A948E] block">
+                Standardized Factors
+              </span>
+
+              {captureInvariants.map((factor) => {
+                const Icon = factor.icon;
+                return (
+                  <div 
+                    key={factor.title}
+                    className="p-4 bg-[#FAF8F5] border border-[#E6DFD5] flex items-start gap-3.5 hover:border-[#C5A059] transition-colors"
+                  >
+                    <div className="p-2 rounded-full bg-white border border-[#E6DFD5] text-[#1E3A2F] flex-shrink-0 mt-0.5">
+                      <Icon size={16} strokeWidth={1.5} />
+                    </div>
+                    <div>
+                      <h4 className="font-editorial text-lg text-[#1A1F1C] mb-1">
+                        {factor.title}
+                      </h4>
+                      <p className="text-xs text-[#5C6660] leading-relaxed">
+                        {factor.description}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+
+              <div className="pt-2">
+                <Link
+                  to={isAuthenticated ? (user?.onboarding_completed ? '/scan' : '/onboarding') : '/register'}
+                  className="w-full inline-block text-center py-3 px-6 bg-[#1E3A2F] text-white text-xs font-mono uppercase tracking-[0.15em] hover:bg-[#152B23] transition-colors"
+                >
+                  {isAuthenticated ? 'Open Observation Gateway' : 'Experience Observation'}
+                </Link>
+              </div>
             </div>
 
-            <div className="hidden lg:block absolute top-[50%] -right-32 flex flex-col items-start">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-[#1E3A2F] mb-1">Centering</span>
-              <span className="text-xs font-editorial italic text-[#5C6660]">Symmetrical Alignment</span>
-              <div className="absolute top-2 -left-8 w-8 h-[1px] bg-[#E6DFD5]" />
-            </div>
-
-            <div className="hidden lg:block absolute bottom-[25%] -left-40 flex flex-col items-end">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-[#1E3A2F] mb-1">Readiness</span>
-              <span className="text-xs font-editorial italic text-[#5C6660]">Motion Stable</span>
-              <div className="absolute top-2 -right-16 w-16 h-[1px] bg-[#E6DFD5]" />
-            </div>
-
-            {/* Mobile Labels */}
-            <div className="flex justify-center gap-6 mt-6 lg:hidden">
-              <span className="text-[10px] font-mono uppercase tracking-widest text-[#1E3A2F]">Lighting</span>
-              <span className="text-[10px] font-mono uppercase tracking-widest text-[#1E3A2F]">Centering</span>
-              <span className="text-[10px] font-mono uppercase tracking-widest text-[#1E3A2F]">Readiness</span>
-            </div>
-
-          </motion.div>
-
-          {/* Action CTA */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="flex justify-center mt-16"
-          >
-            <Link
-              to={isAuthenticated ? (user?.onboarding_completed ? '/scan' : '/onboarding') : '/register'}
-              className="text-[12px] font-mono uppercase tracking-[0.2em] text-[#1E3A2F] hover:text-[#C5A059] transition-colors pb-1 border-b border-[#1E3A2F]/30 hover:border-[#C5A059]"
-            >
-              {isAuthenticated ? 'Open Observation Tool' : 'Experience Observation'}
-            </Link>
-          </motion.div>
-
+          </div>
         </div>
+
+        {/* LEVEL 3: Optional Research & Methodology Expandable */}
+        <div className="w-full max-w-4xl border border-[#E6DFD5] bg-[#FAF8F5] p-5">
+          <button
+            onClick={() => setShowMethodology(!showMethodology)}
+            className="w-full flex items-center justify-between text-left text-xs font-mono text-[#1E3A2F] uppercase tracking-wider font-semibold cursor-pointer"
+          >
+            <div className="flex items-center gap-2">
+              <Sparkles size={14} className="text-[#C5A059]" />
+              <span>Level 3 Research: Client-Side Capture Pipeline Details</span>
+            </div>
+            {showMethodology ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+
+          <AnimatePresence>
+            {showMethodology && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="pt-4 mt-4 border-t border-[#E6DFD5] text-xs text-[#5C6660] space-y-3 font-mono leading-relaxed"
+              >
+                <p>
+                  <strong>Architecture Specification:</strong> The client gateway runs MediaPipe Face Mesh inside browser WebAssembly via WebGL. 468 landmark points are tracked locally in volatile memory.
+                </p>
+                <p>
+                  <strong>Deterministic Quality Checks:</strong> Single-face invariant, inter-pupillary distance scale (90px–180px), ROI mean luminance checking (target 80–220), and motion stability assessment. Zero raw frames are transmitted or stored prior to explicit user approval.
+                </p>
+                <p className="text-[#8A948E] italic">
+                  Non-clinical wellness observation standard. Designed to maximize signal reproducibility across varying household devices.
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
       </div>
     </section>
   );

@@ -27,7 +27,7 @@ export default function LandingNav() {
     <header
       className={`sticky top-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-[#FAF8F5]/95 backdrop-blur-md border-b border-[#E6DFD5] shadow-xs py-2'
+          ? 'bg-[#FAF8F5]/95 backdrop-blur-md border-b border-[#E6DFD5] shadow-xs py-2.5'
           : 'bg-[#FAF8F5]/90 backdrop-blur-sm border-b border-[#E6DFD5]/70 py-3.5'
       }`}
     >
@@ -45,26 +45,26 @@ export default function LandingNav() {
 
         {/* Center: Editorial Navigation Links */}
         <nav
-          className="hidden md:flex items-center gap-8 text-sm font-medium text-[#5C6660]"
+          className="hidden lg:flex items-center gap-7 text-[13px] font-medium text-[#5C6660]"
           aria-label="Main Navigation"
         >
-          <a href="#about" className="hover:text-[#1E3A2F] transition-colors py-1">
-            About
+          <a href="#philosophy" className="hover:text-[#1E3A2F] transition-colors py-1">
+            Philosophy
           </a>
-          <a href="#scan-experience" className="hover:text-[#1E3A2F] transition-colors py-1">
-            Observe
+          <a href="#beyond-selfie" className="hover:text-[#1E3A2F] transition-colors py-1">
+            Beyond the Selfie
           </a>
-          <a href="#how-it-works" className="hover:text-[#1E3A2F] transition-colors py-1">
-            How It Works
+          <a href="#prakriti" className="hover:text-[#1E3A2F] transition-colors py-1">
+            Prakriti &amp; Context
           </a>
-          <a href="#ayurveda" className="hover:text-[#1E3A2F] transition-colors py-1">
-            Ayurveda
+          <a href="#multimodal" className="hover:text-[#1E3A2F] transition-colors py-1">
+            Multimodal Reasoning
           </a>
-          <a href="#progress" className="hover:text-[#1E3A2F] transition-colors py-1">
-            Progress
+          <a href="#confidence" className="hover:text-[#1E3A2F] transition-colors py-1">
+            Confidence &amp; XAI
           </a>
-          <a href="#safety" className="hover:text-[#1E3A2F] transition-colors py-1">
-            Trust &amp; Safety
+          <a href="#research" className="hover:text-[#1E3A2F] transition-colors py-1">
+            Research &amp; Limits
           </a>
         </nav>
 
@@ -112,7 +112,7 @@ export default function LandingNav() {
         <button
           type="button"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 rounded-md text-[#1E3A2F] hover:bg-[#F3EFEA] transition-colors"
+          className="lg:hidden p-2 rounded-md text-[#1E3A2F] hover:bg-[#F3EFEA] transition-colors"
           aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
           aria-expanded={mobileMenuOpen}
         >
@@ -128,49 +128,49 @@ export default function LandingNav() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="md:hidden bg-[#FAF8F5] border-b border-[#E6DFD5] px-6 py-6 flex flex-col gap-4 shadow-sm"
+            className="lg:hidden bg-[#FAF8F5] border-b border-[#E6DFD5] px-6 py-6 flex flex-col gap-4 shadow-sm"
           >
             <a
-              href="#about"
+              href="#philosophy"
               onClick={() => setMobileMenuOpen(false)}
               className="text-base font-medium text-[#1A1F1C] hover:text-[#1E3A2F] py-1"
             >
-              About
+              Philosophy
             </a>
             <a
-              href="#scan-experience"
+              href="#beyond-selfie"
               onClick={() => setMobileMenuOpen(false)}
               className="text-base font-medium text-[#1A1F1C] hover:text-[#1E3A2F] py-1"
             >
-              Observe
+              Beyond the Selfie
             </a>
             <a
-              href="#how-it-works"
+              href="#prakriti"
               onClick={() => setMobileMenuOpen(false)}
               className="text-base font-medium text-[#1A1F1C] hover:text-[#1E3A2F] py-1"
             >
-              How It Works
+              Prakriti &amp; Context
             </a>
             <a
-              href="#ayurveda"
+              href="#multimodal"
               onClick={() => setMobileMenuOpen(false)}
               className="text-base font-medium text-[#1A1F1C] hover:text-[#1E3A2F] py-1"
             >
-              Ayurveda
+              Multimodal Reasoning
             </a>
             <a
-              href="#progress"
+              href="#confidence"
               onClick={() => setMobileMenuOpen(false)}
               className="text-base font-medium text-[#1A1F1C] hover:text-[#1E3A2F] py-1"
             >
-              Progress
+              Confidence &amp; XAI
             </a>
             <a
-              href="#safety"
+              href="#research"
               onClick={() => setMobileMenuOpen(false)}
               className="text-base font-medium text-[#1A1F1C] hover:text-[#1E3A2F] py-1"
             >
-              Trust &amp; Safety
+              Research &amp; Limits
             </a>
 
             <div className="pt-4 border-t border-[#E6DFD5] flex flex-col gap-3">

@@ -3,123 +3,105 @@ import Logo from '@/components/common/Logo';
 
 export default function LandingFooter() {
   return (
-    <footer id="contact" className="bg-[#FAF8F5] pt-24 sm:pt-32 pb-12 px-6 sm:px-10 border-t border-[#E6DFD5]">
-      <div className="max-w-7xl mx-auto flex flex-col justify-between min-h-[400px]">
+    <footer id="contact" className="bg-[#FAF8F5] pt-20 sm:pt-28 pb-12 px-6 sm:px-10 border-t border-[#E6DFD5]">
+      <div className="max-w-7xl mx-auto flex flex-col justify-between min-h-[380px]">
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-8 mb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 mb-16">
           {/* Brand Column */}
-          <div className="lg:col-span-5 flex flex-col space-y-8">
+          <div className="lg:col-span-5 flex flex-col space-y-6">
             <div>
               <Logo size="lg" />
             </div>
-            <p className="text-sm sm:text-base text-[#5C6660] max-w-sm leading-relaxed font-body">
-              Evidence-aware multimodal skin and wellness intelligence bridging classical Ayurvedic philosophy with disciplined computer vision.
+            <p className="text-sm text-[#5C6660] max-w-sm leading-relaxed font-body">
+              A contemporary Ayurveda-first intelligent skin-wellness platform uniting standardized visual observation with personal constitutional context, lifestyle rhythms, and classical Ayurvedic knowledge.
             </p>
-            <div className="mt-auto pt-8">
-              <span className="inline-block px-3 py-1.5 border border-[#C5A059]/30 text-[10px] uppercase tracking-widest text-[#C5A059] font-medium font-mono">
-                Classical Sanskrit Botanical Citation
+            <div className="pt-2">
+              <span className="inline-block px-3 py-1.5 border border-[#C5A059]/40 text-[10px] uppercase tracking-widest text-[#1E3A2F] font-semibold font-mono bg-white">
+                Classical Literature Grounding
               </span>
             </div>
           </div>
 
           {/* Links Grid */}
-          <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-12 lg:pl-12">
+          <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8 lg:pl-10">
             
-            {/* Column 1: Explore */}
-            <div className="space-y-6">
-              <h4 className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#C5A059]">Explore</h4>
-              <ul className="space-y-4 text-sm text-[#1A1F1C] font-medium">
+            {/* Column 1: Philosophy & System */}
+            <div className="space-y-4">
+              <h4 className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#C5A059] font-semibold">Narrative</h4>
+              <ul className="space-y-3 text-xs text-[#1A1F1C] font-medium">
                 <li>
-                  <a href="#about" className="hover:text-[#6B8E7D] transition-colors inline-block relative group">
-                    Philosophy
-                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#6B8E7D] transition-all group-hover:w-full" />
+                  <a href="#philosophy" className="hover:text-[#1E3A2F] transition-colors">
+                    Core Philosophy
                   </a>
                 </li>
                 <li>
-                  <a href="#scan-experience" className="hover:text-[#6B8E7D] transition-colors inline-block relative group">
-                    Standardized Scan
-                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#6B8E7D] transition-all group-hover:w-full" />
+                  <a href="#beyond-selfie" className="hover:text-[#1E3A2F] transition-colors">
+                    Beyond the Selfie
                   </a>
                 </li>
                 <li>
-                  <a href="#how-it-works" className="hover:text-[#6B8E7D] transition-colors inline-block relative group">
-                    Methodology
-                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#6B8E7D] transition-all group-hover:w-full" />
+                  <a href="#prakriti" className="hover:text-[#1E3A2F] transition-colors">
+                    Prakriti &amp; Tridosha
                   </a>
                 </li>
                 <li>
-                  <a href="#ayurveda" className="hover:text-[#6B8E7D] transition-colors inline-block relative group">
-                    The 3 Doshas
-                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#6B8E7D] transition-all group-hover:w-full" />
+                  <a href="#multimodal" className="hover:text-[#1E3A2F] transition-colors">
+                    Multimodal Convergence
                   </a>
                 </li>
                 <li>
-                  <a href="#progress" className="hover:text-[#6B8E7D] transition-colors inline-block relative group">
-                    Progress Over Time
-                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#6B8E7D] transition-all group-hover:w-full" />
+                  <a href="#confidence" className="hover:text-[#1E3A2F] transition-colors">
+                    Confidence &amp; Uncertainty
                   </a>
                 </li>
               </ul>
             </div>
 
-            {/* Column 2: Product */}
-            <div className="space-y-6">
-              <h4 className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#C5A059]">Product</h4>
-              <ul className="space-y-4 text-sm text-[#1A1F1C] font-medium">
+            {/* Column 2: Experience & Progress */}
+            <div className="space-y-4">
+              <h4 className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#C5A059] font-semibold">Journey</h4>
+              <ul className="space-y-3 text-xs text-[#1A1F1C] font-medium">
                 <li>
-                  <Link to="/dashboard" className="hover:text-[#6B8E7D] transition-colors inline-block relative group">
-                    Wellness Dashboard
-                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#6B8E7D] transition-all group-hover:w-full" />
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/scan" className="hover:text-[#6B8E7D] transition-colors inline-block relative group">
-                    Facial Observation
-                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#6B8E7D] transition-all group-hover:w-full" />
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/chat" className="hover:text-[#6B8E7D] transition-colors inline-block relative group">
-                    Ayurvedic Companion
-                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#6B8E7D] transition-all group-hover:w-full" />
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/remedies" className="hover:text-[#6B8E7D] transition-colors inline-block relative group">
-                    Botanical Library
-                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#6B8E7D] transition-all group-hover:w-full" />
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Column 3: Trust & Safety */}
-            <div className="space-y-6">
-              <h4 className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#C5A059]">Trust &amp; Safety</h4>
-              <ul className="space-y-4 text-sm text-[#1A1F1C] font-medium">
-                <li>
-                  <a href="#safety" className="hover:text-[#6B8E7D] transition-colors inline-block relative group">
-                    Non-Diagnostic
-                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#6B8E7D] transition-all group-hover:w-full" />
+                  <a href="#scan-experience" className="hover:text-[#1E3A2F] transition-colors">
+                    Standardized Capture
                   </a>
                 </li>
                 <li>
-                  <a href="#safety" className="hover:text-[#6B8E7D] transition-colors inline-block relative group">
-                    Privacy Principles
-                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#6B8E7D] transition-all group-hover:w-full" />
+                  <a href="#progress" className="hover:text-[#1E3A2F] transition-colors">
+                    Longitudinal Progress
                   </a>
                 </li>
                 <li>
-                  <Link to="/signin" className="hover:text-[#6B8E7D] transition-colors inline-block relative group">
+                  <Link to="/register" className="hover:text-[#1E3A2F] transition-colors">
+                    Begin Journey
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/signin" className="hover:text-[#1E3A2F] transition-colors">
                     Member Portal
-                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#6B8E7D] transition-all group-hover:w-full" />
                   </Link>
                 </li>
+              </ul>
+            </div>
+
+            {/* Column 3: Research & Ethics */}
+            <div className="space-y-4">
+              <h4 className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#C5A059] font-semibold">Research &amp; Safety</h4>
+              <ul className="space-y-3 text-xs text-[#1A1F1C] font-medium">
                 <li>
-                  <Link to="/register" className="hover:text-[#6B8E7D] transition-colors inline-block relative group">
-                    Register Account
-                    <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#6B8E7D] transition-all group-hover:w-full" />
-                  </Link>
+                  <a href="#research" className="hover:text-[#1E3A2F] transition-colors">
+                    Indian-Skin Validation
+                  </a>
+                </li>
+                <li>
+                  <a href="#safety" className="hover:text-[#1E3A2F] transition-colors">
+                    Non-Diagnostic Standard
+                  </a>
+                </li>
+                <li>
+                  <a href="#safety" className="hover:text-[#1E3A2F] transition-colors">
+                    In-Browser Privacy
+                  </a>
                 </li>
               </ul>
             </div>
@@ -127,17 +109,18 @@ export default function LandingFooter() {
           </div>
         </div>
 
-        {/* Big Bottom Typography */}
-        <div className="border-t border-[#E6DFD5] pt-12 mt-auto">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-            <h1 className="font-editorial text-7xl sm:text-8xl md:text-[10rem] leading-none tracking-tighter text-[#1A1F1C] opacity-10">
-              aayur<span className="italic">face</span>
-            </h1>
-            
-            <div className="flex flex-col items-start md:items-end gap-2 text-xs text-[#8A948E] font-mono uppercase tracking-widest pb-4">
-              <p>© {new Date().getFullYear()} AayurFace Platform</p>
-              <p>All rights reserved</p>
-            </div>
+        {/* Classical Literature Citation Strip & Ethical Advisory */}
+        <div className="border-t border-[#E6DFD5] pt-8 pb-6">
+          <div className="p-4 bg-white border border-[#E6DFD5] mb-8 text-xs text-[#5C6660] leading-relaxed">
+            <strong className="text-[#1E3A2F] font-semibold block mb-1">
+              Ethical &amp; Non-Clinical Advisory:
+            </strong>
+            AayurFace provides AI-assisted wellness guidance based on classical Ayurvedic literature (Charaka Samhita, Sushruta Samhita, Ashtanga Hridaya, and Bhavaprakasha). It does not provide medical diagnoses or dermatological prescriptions. For clinical skin concerns or dermatological conditions, consult a licensed healthcare professional.
+          </div>
+
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-[#8A948E] font-mono">
+            <span>© {new Date().getFullYear()} AayurFace Platform. All rights reserved.</span>
+            <span>Contemporary Ayurveda × Computational Observation</span>
           </div>
         </div>
 

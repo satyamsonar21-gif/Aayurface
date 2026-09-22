@@ -1,28 +1,51 @@
 import { motion } from 'framer-motion';
-import { Sunrise, Sun, Sunset } from 'lucide-react';
+import { Sunrise, Sun, Sunset, AlertCircle, Sparkles } from 'lucide-react';
 
 export default function PersonalizationSection() {
-  const schedule = [
+  const dailyRhythms = [
     {
       period: 'MORNING (PRATAHKAL)',
       icon: Sunrise,
-      title: 'Awakening & Nourishment',
-      ritual: 'Warm Kumkumadi Taila pressed gently along the jawline.',
-      tag: 'Vata-Pitta Pacification'
+      title: 'Awakening & Hydration',
+      focus: 'Gentle Cleansing & Barrier Shielding',
+      narrative: 'Aligning with sunrise to awaken cutaneous microcirculation, balance overnight moisture, and prepare skin for daily solar exposure.'
     },
     {
       period: 'MIDDAY (MADHYANHA)',
       icon: Sun,
-      title: 'Thermal Calming',
-      ritual: 'Cooling Vetiver aromatic floral mist across the face.',
-      tag: 'Pitta Heat Balance'
+      title: 'Thermal Equilibrium',
+      focus: 'Solar Calming & Pitta Pacification',
+      narrative: 'When solar warmth peaks, routines emphasize cooling hydration and gentle shade, avoiding aggravating internal and external heat.'
     },
     {
       period: 'EVENING (SANDHYAKAL)',
       icon: Sunset,
-      title: 'Circadian Wind-down',
-      ritual: 'Sandalwood & Licorice purifying herbal mask with pure aloe.',
-      tag: 'Cellular Rejuvenation'
+      title: 'Restoration & Repair',
+      focus: 'Cellular Wind-Down & Lipid Replenishment',
+      narrative: 'As dusk approaches, restorative botanicals and gentle facial pressure assist nocturnal recovery, grounding the nervous system before rest.'
+    }
+  ];
+
+  const botanicalKnowledge = [
+    {
+      name: 'Kumkumadi Taila',
+      role: 'Classical Saffron & Herb Infusion',
+      context: 'Traditionally prepared to nourish skin vitality, impart natural radiance, and support tone uniformity.'
+    },
+    {
+      name: 'Chandana (Sandalwood)',
+      role: 'Thermal Pacifier',
+      context: 'Recognized in Charaka Samhita for natural cooling qualities, calming reactive skin warmth.'
+    },
+    {
+      name: 'Ushira (Vetiver)',
+      role: 'Aromatic Balancer',
+      context: 'Prized for deep, grounding hydration and soothing midday environmental stress.'
+    },
+    {
+      name: 'Triphala',
+      role: 'Three-Fruit Clarifier',
+      context: 'Classic synergy of Amalaki, Bibhitaki, and Haritaki providing gentle clarification and antioxidant support.'
     }
   ];
 
@@ -35,92 +58,101 @@ export default function PersonalizationSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20 border-b border-[#E6DFD5] pb-12"
         >
           <div className="max-w-2xl">
             <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#C5A059] block mb-4">
-              Bespoke Ayurvedic Care
+              Contextual Care
             </span>
-            <h2 className="font-editorial text-4xl sm:text-5xl text-[#1A1F1C] leading-[1.1]">
-              A daily rhythm shaped <br/>
-              <span className="italic text-[#6B8E7D]">for your constitution.</span>
+            <h2 className="font-editorial text-4xl sm:text-5xl lg:text-6xl text-[#1A1F1C] leading-[1.12]">
+              Guidance is contextual. <br/>
+              <span className="italic text-[#6B8E7D] font-normal">Never a one-size-fits-all formula.</span>
             </h2>
           </div>
-          <p className="text-base text-[#5C6660] font-body max-w-sm">
-            Instead of rigid synthetic chemicals, we craft a disciplined natural rhythm that honors the time of day and your skin's natural state.
+          <p className="text-base text-[#5C6660] font-body max-w-sm leading-relaxed">
+            Ayurveda does not believe in static labels. AayurFace suggests care rituals calibrated to your constitution, the current season, and the time of day—without commercial sales pitches.
           </p>
         </motion.div>
 
-        {/* Editorial Split Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-center">
-          
-          {/* Left: Lifestyle Imagery */}
-          <motion.div 
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-7 relative h-[600px] w-full"
-          >
-            <div className="w-full h-full p-3 border border-[#E6DFD5] bg-white">
-              <img
-                src="/images/landing/wellness-lifestyle.jpg"
-                alt="Mindful botanical application"
-                className="w-full h-full object-cover grayscale-[10%] sepia-[5%] image-scale-on-hover"
-                loading="lazy"
-              />
-            </div>
-            
-            {/* Minimalist Floating Badge */}
-            <div className="absolute top-12 -right-6 lg:-right-12 bg-[#1E3A2F] text-[#FAF8F5] p-6 shadow-xl w-48 hidden sm:block">
-              <div className="w-4 h-[1px] bg-[#C5A059] mb-4" />
-              <p className="font-editorial italic text-lg leading-tight mb-2">Dinacharya</p>
-              <p className="text-[10px] font-mono tracking-widest uppercase text-[#8A948E]">
-                Daily Sacred Rhythm
-              </p>
-            </div>
-          </motion.div>
+        {/* Dinacharya Daily Rhythm Cards */}
+        <div className="mb-20">
+          <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-[#8A948E] block mb-6">
+            Dinacharya — The Daily Circadian Rhythm
+          </span>
 
-          {/* Right: The 3 Rhythms */}
-          <div className="lg:col-span-5 relative">
-            <div className="absolute left-[15px] top-8 bottom-8 w-[1px] bg-gradient-to-b from-[#E6DFD5] via-[#C5A059] to-[#E6DFD5]" />
-            
-            <div className="space-y-16">
-              {schedule.map((item, idx) => {
-                const Icon = item.icon;
-                return (
-                  <motion.div
-                    key={item.period}
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, margin: "-50px" }}
-                    transition={{ duration: 0.8, delay: idx * 0.15, ease: [0.16, 1, 0.3, 1] }}
-                    className="relative pl-12"
-                  >
-                    <div className="absolute left-0 top-1 w-8 h-8 rounded-full bg-[#FAF8F5] border border-[#C5A059] flex items-center justify-center -translate-x-1/2">
-                      <Icon size={14} className="text-[#1E3A2F]" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {dailyRhythms.map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <motion.div
+                  key={item.period}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.7, delay: idx * 0.12, ease: [0.16, 1, 0.3, 1] }}
+                  className="p-8 bg-white border border-[#E6DFD5] flex flex-col justify-between hover:border-[#C5A059] transition-colors"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-6 pb-3 border-b border-[#E6DFD5]">
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-[#C5A059] font-semibold">
+                        {item.period}
+                      </span>
+                      <div className="w-8 h-8 rounded-full bg-[#FAF8F5] border border-[#E6DFD5] flex items-center justify-center text-[#1E3A2F]">
+                        <Icon size={15} />
+                      </div>
                     </div>
 
-                    <span className="text-[10px] font-mono font-semibold uppercase tracking-widest text-[#C5A059] block mb-2">
-                      {item.period}
-                    </span>
-                    <h3 className="font-editorial text-2xl text-[#1A1F1C] mb-3">
+                    <h3 className="font-editorial text-2xl text-[#1A1F1C] mb-2">
                       {item.title}
                     </h3>
-                    <p className="text-sm text-[#5C6660] leading-relaxed mb-4">
-                      {item.ritual}
-                    </p>
-                    <span className="inline-block text-[10px] font-mono text-[#1E3A2F] bg-white px-3 py-1 border border-[#E6DFD5]">
-                      {item.tag}
+                    
+                    <span className="text-xs font-mono text-[#6B8E7D] block mb-4">
+                      {item.focus}
                     </span>
-                  </motion.div>
-                );
-              })}
-            </div>
+
+                    <p className="text-xs text-[#5C6660] leading-relaxed">
+                      {item.narrative}
+                    </p>
+                  </div>
+
+                  <div className="pt-6 mt-6 border-t border-[#E6DFD5] text-[10px] font-mono text-[#8A948E]">
+                    Dynamic Circadian Alignment
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Botanical Knowledge System (Dravyaguna) */}
+        <div className="p-8 sm:p-10 bg-white border border-[#E6DFD5] mb-12">
+          <div className="flex items-center gap-2 mb-6">
+            <Sparkles size={16} className="text-[#C5A059]" />
+            <span className="text-xs font-mono uppercase tracking-widest text-[#1E3A2F] font-semibold">
+              Botanical Intelligence (Dravyaguna) — Contextual Examples
+            </span>
           </div>
 
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {botanicalKnowledge.map(botanical => (
+              <div key={botanical.name} className="p-4 bg-[#FAF8F5] border border-[#E6DFD5]">
+                <h4 className="font-editorial text-xl text-[#1E3A2F] mb-1">{botanical.name}</h4>
+                <span className="text-[10px] font-mono text-[#C5A059] uppercase block mb-2">{botanical.role}</span>
+                <p className="text-xs text-[#5C6660] leading-relaxed">{botanical.context}</p>
+              </div>
+            ))}
+          </div>
         </div>
+
+        {/* Mandatory Safety Directive */}
+        <div className="max-w-3xl mx-auto p-4 bg-[#FAF8F5] border border-[#C5A059]/40 flex items-center gap-3 text-xs text-[#5C6660]">
+          <AlertCircle size={18} className="text-[#C5A059] flex-shrink-0" />
+          <span>
+            <strong>Mandatory Safety Directive:</strong> All topical herbal preparations should undergo a 24-hour patch test behind the ear prior to routine application.
+          </span>
+        </div>
+
       </div>
     </section>
   );
