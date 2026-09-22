@@ -327,3 +327,4 @@ CREATE POLICY "Public can read remedies" ON public.remedies
 DROP POLICY IF EXISTS "Public can read daily tips" ON public.daily_tips;
 CREATE POLICY "Public can read daily tips" ON public.daily_tips
   FOR SELECT USING (is_active = TRUE);
+

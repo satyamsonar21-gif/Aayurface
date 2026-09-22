@@ -249,3 +249,68 @@
     border-radius: 4px;
   }
 }
+
+/* ============================================================
+   AayurFace Premium Editorial Utilities
+   ============================================================ */
+
+.font-editorial {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, var(--color-brand-accent) 0%, #E8D099 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-gradient-forest {
+  background: linear-gradient(135deg, var(--color-brand-primary) 0%, var(--color-brand-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
+.hairline-border {
+  border: 1px solid rgba(230, 223, 213, 0.4);
+}
+
+.glass-surface {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.image-scale-on-hover {
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.image-scale-on-hover:hover {
+  transform: scale(1.03);
+}
+
+/* Slow, elegant animations */
+.animate-fade-up-slow {
+  animation: fade-up-slow 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@keyframes fade-up-slow {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }

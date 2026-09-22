@@ -1,94 +1,78 @@
-import { ArrowRight, Compass } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function WhySection() {
+  const elements = [
+    { title: "Observe", text: "We capture high-fidelity physical data through controlled lens standards." },
+    { title: "Context", text: "We layer in the invisible: your daily habits, sleep, and environment." },
+    { title: "Guidance", text: "We interpret balance through the lens of classical Ayurvedic principles." },
+    { title: "Progress", text: "We measure true wellness over longitudinal time, not just single instances." }
+  ];
+
   return (
-    <section id="about" className="w-full bg-[#FAF8F5] py-20 sm:py-28 lg:py-32 px-6 sm:px-10 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto space-y-16">
-        {/* Section Header */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-end">
-          <div className="lg:col-span-7 space-y-4">
-            <span className="text-xs font-semibold font-body uppercase tracking-[0.2em] text-[#6B8E7D]">
-              CONSTITUTIONAL PERSPECTIVE
-            </span>
-            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#1A1F1C] leading-[1.12]">
-              Your skin tells only<br />
-              <span className="italic font-normal text-[#1E3A2F]">part of the story.</span>
+    <section id="about" className="w-full bg-[#FAF8F5] py-24 sm:py-32 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+        
+        {/* Left: Large Visual */}
+        <motion.div 
+          initial={{ opacity: 0, x: -30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          className="relative h-[600px] w-full"
+        >
+          <div className="w-full h-full relative overflow-hidden">
+            <img 
+              src="/images/landing/ayurvedic-textures.jpg" 
+              alt="Ayurvedic pure botanical herbs" 
+              className="w-full h-full object-cover grayscale-[20%] sepia-[10%] image-scale-on-hover"
+              loading="lazy"
+            />
+          </div>
+          
+          {/* Subtle Offset Frame */}
+          <div className="absolute -top-4 -left-4 w-full h-full border border-[#C5A059]/30 -z-10" />
+          
+          <div className="absolute bottom-8 right-8 bg-[#FAF8F5]/90 backdrop-blur px-6 py-4 border border-[#E6DFD5]">
+            <p className="font-editorial text-2xl italic text-[#1E3A2F]">Beyond the surface</p>
+          </div>
+        </motion.div>
+
+        {/* Right: Editorial Typography */}
+        <div className="flex flex-col justify-center space-y-12">
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <h2 className="font-editorial text-4xl sm:text-5xl text-[#1A1F1C] leading-[1.15] mb-6">
+              A holistic perspective <br />
+              <span className="text-[#6B8E7D] italic">on skin intelligence.</span>
             </h2>
-          </div>
-          <div className="lg:col-span-5 space-y-4">
-            <p className="text-base text-[#5C6660] leading-relaxed">
-              Conventional skincare often isolates surface symptoms with quick synthetic fixes. Ayurveda recognizes the face as a living canvas reflecting deeper systemic balance — where visible texture, natural sebum flow, and skin temperature are dynamic conversations between your constitution (<em className="text-[#1E3A2F] font-medium">Prakriti</em>), current imbalances (<em className="text-[#1E3A2F] font-medium">Vikriti</em>), and daily habits.
+            <p className="text-base sm:text-lg text-[#5C6660] font-body leading-relaxed max-w-lg">
+              Conventional skincare often isolates surface symptoms with quick synthetic fixes. We recognize the face as a living canvas reflecting deeper systemic balance—where visible texture is a dynamic conversation between your constitution, current imbalances, and daily habits.
             </p>
-            <a
-              href="#how-it-works"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-[#1E3A2F] hover:text-[#C5A059] transition-colors group"
-            >
-              <span>Explore the multi-layer methodology</span>
-              <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform" />
-            </a>
-          </div>
-        </div>
+          </motion.div>
 
-        {/* Asymmetric Layered Showcase */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center pt-6">
-          {/* Left: Deep Insight Editorial Points */}
-          <div className="lg:col-span-6 space-y-8 order-2 lg:order-1">
-            <div className="border-l-2 border-[#1E3A2F] pl-6 space-y-2">
-              <h3 className="font-display text-2xl font-semibold text-[#1A1F1C]">
-                Beyond Surface Symptoms
-              </h3>
-              <p className="text-sm text-[#5C6660] leading-relaxed">
-                A dry cheek patch is rarely just dryness. In Ayurveda, it represents elevated Vata aggravated by cold winds or irregular rest. A flare of warmth on the nose or forehead often points to inflamed Pitta. We look at the interplay, not just the isolated pixel.
-              </p>
-            </div>
-
-            <div className="border-l-2 border-[#C5A059] pl-6 space-y-2">
-              <h3 className="font-display text-2xl font-semibold text-[#1A1F1C]">
-                Prakriti vs. Vikriti
-              </h3>
-              <p className="text-sm text-[#5C6660] leading-relaxed">
-                Your birth constitution is permanent (<span className="text-[#1E3A2F] font-medium">Prakriti</span>), but your current skin state (<span className="text-[#1E3A2F] font-medium">Vikriti</span>) shifts with the weather, travel, stress, and sleep. Effective care pacifies the present imbalance without disrupting your core nature.
-              </p>
-            </div>
-
-            <div className="border-l-2 border-[#6B8E7D] pl-6 space-y-2">
-              <h3 className="font-display text-2xl font-semibold text-[#1A1F1C]">
-                Gentle Botanical Synchrony
-              </h3>
-              <p className="text-sm text-[#5C6660] leading-relaxed">
-                Rather than harsh stripping cleansers, classical herbs like Sandalwood, Manjistha, Neem, and Kumkumadi nurture the micro-biome and lipid barrier naturally through time-tested lipophilic infusion.
-              </p>
-            </div>
-          </div>
-
-          {/* Right: Layered Visual Composition */}
-          <div className="lg:col-span-6 order-1 lg:order-2 relative">
-            <div className="relative rounded-2xl overflow-hidden border border-[#E6DFD5] bg-[#FFFFFF] shadow-md">
-              <img
-                src="/images/auth-bg.jpg"
-                alt="Ayurvedic pure botanical herbs, golden oil, and turmeric bowl in natural light"
-                className="w-full h-[440px] sm:h-[480px] object-cover object-center"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#12392F]/60 via-transparent to-transparent pointer-events-none" />
-
-              {/* Floating Information Overlay */}
-              <div className="absolute bottom-6 left-6 right-6 bg-[#FAF8F5]/95 backdrop-blur-md p-5 rounded-xl border border-[#E6DFD5] shadow-md space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-mono uppercase tracking-widest text-[#6B8E7D] font-semibold">
-                    Classical Observation Matrix
-                  </span>
-                  <Compass size={16} className="text-[#C5A059]" />
+          <motion.div 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col gap-6 pt-4 border-t border-[#E6DFD5]"
+          >
+            {elements.map((el, i) => (
+              <div key={el.title} className="flex flex-col gap-1">
+                <div className="flex items-center gap-3">
+                  <span className="text-[10px] font-mono text-[#C5A059]">0{i + 1}</span>
+                  <h3 className="font-editorial text-2xl text-[#1E3A2F]">{el.title}</h3>
                 </div>
-                <p className="font-display text-lg text-[#1A1F1C] italic">
-                  &ldquo;Yatha pinde tatha brahmande&rdquo;
-                </p>
-                <p className="text-xs text-[#5C6660]">
-                  As is the individual, so is the universal nature. Skin is a direct reflection of inner elemental harmony.
-                </p>
+                <p className="text-sm text-[#5C6660] pl-7 max-w-sm">{el.text}</p>
               </div>
-            </div>
-          </div>
+            ))}
+          </motion.div>
+
         </div>
       </div>
     </section>

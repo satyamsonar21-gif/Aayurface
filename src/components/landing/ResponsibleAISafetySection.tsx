@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { ShieldCheck, EyeOff, FileText, Stethoscope } from 'lucide-react';
 
 export default function ResponsibleAISafetySection() {
@@ -25,49 +26,67 @@ export default function ResponsibleAISafetySection() {
   ];
 
   return (
-    <section id="safety" className="w-full bg-[#FFFFFF] border-y border-[#E6DFD5] py-20 sm:py-28 lg:py-32 px-6 sm:px-10">
-      <div className="max-w-5xl mx-auto space-y-12">
-        {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF8F5] border border-[#E6DFD5]">
-            <ShieldCheck size={14} className="text-[#6B8E7D]" />
-            <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#1E3A2F] font-body">
-              ETHICAL FOUNDATION
-            </span>
-          </div>
-
-          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#1A1F1C]">
-            Wellness guidance, with clear boundaries.
-          </h2>
-
-          <p className="text-base text-[#5C6660] leading-relaxed">
-            We believe technology should earn your trust through transparency, rigorous privacy boundaries, and deep respect for the limits of computer vision.
-          </p>
+    <section id="safety" className="w-full bg-[#1A1F1C] py-24 sm:py-32 px-6 sm:px-10 overflow-hidden text-[#FAF8F5]">
+      <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-16 lg:gap-24">
+        
+        {/* Left: Section Header */}
+        <div className="lg:w-1/3">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="sticky top-32"
+          >
+            <div className="inline-flex items-center gap-3 mb-6">
+              <span className="w-8 h-[1px] bg-[#C5A059]" />
+              <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#C5A059]">
+                Ethical Foundation
+              </span>
+            </div>
+            
+            <h2 className="font-editorial text-4xl sm:text-5xl text-[#FAF8F5] leading-[1.1] mb-6">
+              Wellness guidance. <br/>
+              <span className="italic text-[#8A948E]">With clear boundaries.</span>
+            </h2>
+            
+            <p className="text-base text-[#8A948E] font-body leading-relaxed max-w-sm">
+              We believe technology should earn your trust through transparency, rigorous privacy boundaries, and deep respect for the limits of computer vision.
+            </p>
+          </motion.div>
         </div>
 
-        {/* 4 Trust Pillars */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-4">
-          {pillars.map((item) => {
-            const Icon = item.icon;
-            return (
-              <div
-                key={item.title}
-                className="p-6 rounded-2xl bg-[#FAF8F5] border border-[#E6DFD5] space-y-3"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-[#FFFFFF] border border-[#E6DFD5] flex items-center justify-center text-[#1E3A2F]">
-                    <Icon size={18} />
+        {/* Right: Pillars */}
+        <div className="lg:w-2/3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-16">
+            {pillars.map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.8, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                  className="group"
+                >
+                  <div className="mb-6 inline-block">
+                    <Icon size={24} className="text-[#C5A059]" strokeWidth={1} />
                   </div>
-                  <h3 className="font-display text-xl font-semibold text-[#1A1F1C]">
+                  
+                  <h3 className="font-editorial text-2xl text-[#FAF8F5] mb-4">
                     {item.title}
                   </h3>
-                </div>
-                <p className="text-xs sm:text-sm text-[#5C6660] leading-relaxed">
-                  {item.desc}
-                </p>
-              </div>
-            );
-          })}
+                  
+                  <p className="text-sm text-[#8A948E] leading-relaxed">
+                    {item.desc}
+                  </p>
+
+                  <div className="w-0 h-[1px] bg-[#C5A059] mt-6 group-hover:w-full transition-all duration-700 ease-in-out" />
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>

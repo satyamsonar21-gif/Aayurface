@@ -1,80 +1,85 @@
+import { motion } from 'framer-motion';
+
 export default function JourneySection() {
   const steps = [
     {
       num: '01',
-      title: 'OBSERVE',
-      subtitle: 'Standardized Capture',
-      desc: 'Guided in-browser face capture verifies lighting, face centering, and motion clarity under balanced natural daylight.'
+      title: 'Capture',
+      subtitle: 'Physical Observation',
+      desc: 'Guided in-browser face capture verifies lighting, centering, and motion clarity under balanced natural daylight.'
     },
     {
       num: '02',
-      title: 'UNDERSTAND',
+      title: 'Understand',
       subtitle: 'Constitutional Mapping',
       desc: 'Correlates observed skin surface characteristics with inherent constitution (Prakriti) and transient imbalances (Vikriti).'
     },
     {
       num: '03',
-      title: 'PERSONALIZE',
+      title: 'Personalize',
       subtitle: 'Bespoke Dinacharya',
-      desc: 'Generates tailored herbal recipes (Lepas), pacifying oils (Tailas), and daily morning-to-evening care rituals.'
+      desc: 'Generates tailored herbal recipes, pacifying oils, and daily morning-to-evening care rituals.'
     },
     {
       num: '04',
-      title: 'TRACK',
+      title: 'Track',
       subtitle: 'Longitudinal Balance',
-      desc: 'Follow natural 30-to-90 day epidermal renewal cycles and seasonal transitions (Ritucharya) with quiet confidence.'
+      desc: 'Follow natural 30-to-90 day epidermal renewal cycles and seasonal transitions with quiet confidence.'
     }
   ];
 
   return (
-    <section id="journey" className="w-full bg-[#FFFFFF] border-y border-[#E6DFD5] py-20 sm:py-28 lg:py-32 px-6 sm:px-10">
-      <div className="max-w-7xl mx-auto space-y-16">
+    <section id="journey" className="w-full bg-[#FFFFFF] border-y border-[#E6DFD5] py-24 sm:py-32 px-6 sm:px-10">
+      <div className="max-w-7xl mx-auto">
+        
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <span className="text-xs font-semibold font-body uppercase tracking-[0.2em] text-[#6B8E7D]">
-            THE OBSERVATION JOURNEY
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-3xl mb-20"
+        >
+          <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#C5A059] block mb-4">
+            The Observation Journey
           </span>
-          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#1A1F1C]">
-            A Thoughtful Path to Constitutional Balance
+          <h2 className="font-editorial text-4xl sm:text-5xl text-[#1A1F1C] leading-[1.1]">
+            A thoughtful path to <br/>
+            <span className="italic text-[#6B8E7D]">constitutional balance.</span>
           </h2>
-          <p className="text-base text-[#5C6660] max-w-xl mx-auto leading-relaxed">
-            Ayurveda honors skin care as an ongoing meditative rhythm rather than an overnight aggressive transformation.
-          </p>
-        </div>
+        </motion.div>
 
-        {/* Horizontal Editorial Timeline (Desktop) & Vertical (Mobile) */}
-        <div className="relative pt-8">
-          {/* Subtle Horizontal Rule across steps (Desktop only) */}
-          <div className="hidden lg:block absolute top-[68px] left-[5%] right-[5%] h-[1px] bg-[#E6DFD5] -z-0" />
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 relative z-10">
-            {steps.map((step) => (
-              <div key={step.num} className="flex flex-col space-y-4 group">
-                {/* Number & Dot Anchor */}
-                <div className="flex items-center justify-between lg:justify-start lg:gap-4">
-                  <span className="font-display text-4xl sm:text-5xl font-semibold text-[#C5A059] transition-transform duration-300 group-hover:-translate-y-1">
-                    {step.num}
-                  </span>
-                  <div className="w-3 h-3 rounded-full bg-[#FAF8F5] border-2 border-[#1E3A2F] group-hover:bg-[#1E3A2F] transition-colors" />
-                </div>
-
-                {/* Title and Subtitle */}
-                <div className="space-y-1">
-                  <h3 className="font-display text-2xl font-semibold text-[#1A1F1C] tracking-tight">
-                    {step.title}
-                  </h3>
-                  <p className="text-xs font-semibold text-[#6B8E7D] uppercase tracking-wider font-body">
-                    {step.subtitle}
-                  </p>
-                </div>
-
-                {/* Description */}
-                <p className="text-sm text-[#5C6660] leading-relaxed font-normal">
-                  {step.desc}
-                </p>
+        {/* Journey Timeline */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-16">
+          {steps.map((step, idx) => (
+            <motion.div 
+              key={step.num}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.8, delay: idx * 0.15, ease: [0.16, 1, 0.3, 1] }}
+              className="flex flex-col relative group"
+            >
+              {/* Top Hairline and Dot */}
+              <div className="w-full h-[1px] bg-[#E6DFD5] mb-8 relative">
+                <div className="absolute top-1/2 left-0 -translate-y-1/2 w-2 h-2 rounded-full bg-[#1E3A2F] scale-0 group-hover:scale-100 transition-transform duration-500" />
               </div>
-            ))}
-          </div>
+              
+              <div className="mb-6 overflow-hidden">
+                <span className="font-editorial text-6xl text-[#FAF8F5] block font-semibold" style={{ WebkitTextStroke: '1px #C5A059' }}>
+                  {step.num}
+                </span>
+              </div>
+
+              <h3 className="font-editorial text-2xl text-[#1A1F1C] mb-2">{step.title}</h3>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-[#6B8E7D] mb-4 block">
+                {step.subtitle}
+              </span>
+              <p className="text-sm text-[#5C6660] leading-relaxed pr-4">
+                {step.desc}
+              </p>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>

@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { Eye, Layers, Gauge, BookOpen, ShieldAlert } from 'lucide-react';
 
 export default function ExplainabilitySection() {
@@ -6,119 +7,128 @@ export default function ExplainabilitySection() {
       stage: '01',
       label: 'OBSERVED',
       icon: Eye,
-      color: 'text-[#6B8E7D]',
-      borderColor: 'border-[#6B8E7D]',
       title: 'Visual Surface Signal',
       details: 'Detected surface dryness lines across cheeks with localized specular sheen in T-zone.',
-      tag: 'Client-Side Computer Vision'
     },
     {
       stage: '02',
       label: 'INFLUENCE',
       icon: Layers,
-      color: 'text-[#C5A059]',
-      borderColor: 'border-[#C5A059]',
       title: 'Contextual Covariates',
       details: 'Self-reported late sleep schedules (6.5 hrs) combined with seasonal dry autumn weather (Sharad Ritu).',
-      tag: 'Lifestyle & Environment'
     },
     {
       stage: '03',
       label: 'CONFIDENCE',
       icon: Gauge,
-      color: 'text-[#1E3A2F]',
-      borderColor: 'border-[#1E3A2F]',
       title: 'Signal Reliability',
       details: 'High capture quality (Laplacian variance > 60, diffuse daylight 5200K, zero motion blur).',
-      tag: 'Preserved Uncertainty'
     },
     {
       stage: '04',
       label: 'MEANING',
       icon: BookOpen,
-      color: 'text-[#12392F]',
-      borderColor: 'border-[#12392F]',
       title: 'Constitutional Interpretation',
       details: 'Suggests a temporary Pitta-Vata elevation (Vikriti): aggravated Pitta in sebaceous glands coupled with Vata dehydration.',
-      tag: 'Ayurvedic Dravyaguna Logic'
     },
     {
       stage: '05',
       label: 'LIMITS',
       icon: ShieldAlert,
-      color: 'text-[#7A6F61]',
-      borderColor: 'border-[#7A6F61]',
       title: 'Safety Boundary',
       details: 'Constitutional skincare wellness observation only. Not a medical evaluation for dermatological disease.',
-      tag: 'Non-Clinical Standard'
     }
   ];
 
   return (
-    <section className="w-full bg-[#FFFFFF] border-y border-[#E6DFD5] py-20 sm:py-28 lg:py-32 px-6 sm:px-10">
-      <div className="max-w-6xl mx-auto space-y-16">
+    <section className="w-full bg-[#1A1F1C] border-y border-[#2A312D] py-24 sm:py-32 px-6 sm:px-10 overflow-hidden text-[#FAF8F5]">
+      <div className="max-w-6xl mx-auto">
+        
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <span className="text-xs font-semibold font-body uppercase tracking-[0.2em] text-[#6B8E7D]">
-            TRANSPARENT REASONING
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center max-w-3xl mx-auto mb-20"
+        >
+          <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#C5A059] block mb-4">
+            Transparent Reasoning
           </span>
-          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#1A1F1C]">
-            Not just an answer.<br />
-            <span className="italic font-normal text-[#1E3A2F]">An explanation.</span>
+          <h2 className="font-editorial text-4xl sm:text-5xl lg:text-6xl text-[#FAF8F5] leading-[1.1] mb-6">
+            Not just an answer. <br/>
+            <span className="italic text-[#8A948E]">An explanation.</span>
           </h2>
-          <p className="text-base text-[#5C6660] leading-relaxed">
-            We reject black-box scores. Every recommendation unfolds in a clear, five-stage evidentiary hierarchy so you always understand why a botanical or ritual is suggested.
+          <p className="text-base sm:text-lg text-[#8A948E] font-body leading-relaxed max-w-xl mx-auto">
+            We reject black-box scores. Every recommendation unfolds in a clear, evidentiary hierarchy so you always understand why a botanical or ritual is suggested.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Explainability Stepper / Hierarchy Display */}
-        <div className="bg-[#FAF8F5] rounded-3xl p-6 sm:p-10 border border-[#E6DFD5] shadow-xs space-y-8">
-          <div className="flex items-center justify-between border-b border-[#E6DFD5] pb-4">
-            <span className="text-xs font-mono uppercase tracking-widest text-[#1E3A2F] font-semibold">
-              Live Observation Explanation Schema
-            </span>
-            <span className="text-[11px] font-mono text-[#8A948E]">
-              Schema: v1-explainable-ayur
-            </span>
-          </div>
+        {/* Interface Abstraction */}
+        <div className="relative w-full max-w-5xl mx-auto">
+          
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="rounded-xl border border-[#FAF8F5]/10 bg-[#121513] shadow-2xl overflow-hidden"
+          >
+            {/* Window Header */}
+            <div className="flex items-center justify-between border-b border-[#FAF8F5]/10 bg-[#1A1F1C] px-6 py-4">
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-[#353C38]" />
+                <div className="w-2.5 h-2.5 rounded-full bg-[#353C38]" />
+                <div className="w-2.5 h-2.5 rounded-full bg-[#353C38]" />
+              </div>
+              <span className="text-[10px] font-mono tracking-widest uppercase text-[#8A948E]">
+                Log: V1-EXPLAINABLE-AYUR
+              </span>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 relative">
-            {chain.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div key={item.stage} className="flex flex-col space-y-3 relative group">
-                  {/* Top Bar Indicator */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-bold tracking-widest uppercase text-[#8A948E]">
-                      {item.stage} / {item.label}
-                    </span>
-                    <Icon size={16} className={item.color} />
-                  </div>
+            {/* Content Area */}
+            <div className="p-6 sm:p-10">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-6 sm:gap-10">
+                {chain.map((item, idx) => {
+                  const Icon = item.icon;
+                  return (
+                    <motion.div 
+                      key={item.stage} 
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-50px" }}
+                      transition={{ duration: 0.6, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                      className="flex flex-col relative"
+                    >
+                      {/* Connecting Line (Desktop) */}
+                      {idx !== chain.length - 1 && (
+                        <div className="hidden md:block absolute top-6 left-full w-10 h-[1px] bg-[#FAF8F5]/10 -translate-x-4" />
+                      )}
 
-                  <div className={`w-full h-1 rounded-full bg-[#E6DFD5] overflow-hidden`}>
-                    <div className={`h-full w-full ${item.borderColor.replace('border-', 'bg-')}`} />
-                  </div>
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="text-[10px] font-mono uppercase tracking-widest text-[#C5A059]">
+                          {item.stage} / {item.label}
+                        </span>
+                      </div>
+                      
+                      <div className="w-10 h-10 rounded border border-[#FAF8F5]/10 bg-[#1A1F1C] flex items-center justify-center mb-6 text-[#8A948E]">
+                        <Icon size={16} strokeWidth={1.5} />
+                      </div>
 
-                  {/* Content */}
-                  <div className="space-y-1.5 pt-1">
-                    <h3 className="font-display text-lg font-semibold text-[#1A1F1C] leading-snug">
-                      {item.title}
-                    </h3>
-                    <p className="text-xs text-[#5C6660] leading-relaxed">
-                      {item.details}
-                    </p>
-                  </div>
+                      <h3 className="font-editorial text-lg text-[#FAF8F5] mb-3">
+                        {item.title}
+                      </h3>
+                      
+                      <p className="text-xs text-[#8A948E] leading-relaxed font-mono">
+                        {item.details}
+                      </p>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+          </motion.div>
 
-                  {/* Tag */}
-                  <div className="pt-2 mt-auto">
-                    <span className="inline-block text-[10px] font-mono text-[#1E3A2F] bg-[#FFFFFF] px-2 py-0.5 rounded border border-[#E6DFD5]">
-                      {item.tag}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         </div>
       </div>
     </section>

@@ -1,4 +1,5 @@
-import { Calendar, RefreshCw, Sparkles, TrendingUp } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Sparkles, RefreshCw, Calendar, TrendingUp } from 'lucide-react';
 
 export default function ProgressSection() {
   const milestones = [
@@ -33,63 +34,72 @@ export default function ProgressSection() {
   ];
 
   return (
-    <section id="progress" className="w-full bg-[#FFFFFF] border-y border-[#E6DFD5] py-20 sm:py-28 lg:py-32 px-6 sm:px-10">
-      <div className="max-w-7xl mx-auto space-y-16">
+    <section id="progress" className="w-full bg-[#FFFFFF] border-y border-[#E6DFD5] py-24 sm:py-32 px-6 sm:px-10 overflow-hidden">
+      <div className="max-w-7xl mx-auto">
+        
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <span className="text-xs font-semibold font-body uppercase tracking-[0.2em] text-[#6B8E7D]">
-            LONGITUDINAL OBSERVATION
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          className="text-center max-w-3xl mx-auto mb-20"
+        >
+          <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#C5A059] block mb-4">
+            Longitudinal Observation
           </span>
-          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#1A1F1C]">
-            Observation over time, not quick fixes.
+          <h2 className="font-editorial text-4xl sm:text-5xl lg:text-6xl text-[#1A1F1C] leading-[1.1] mb-6">
+            Observation over time. <br/>
+            <span className="italic text-[#6B8E7D]">Not quick fixes.</span>
           </h2>
-          <p className="text-base text-[#5C6660] leading-relaxed">
-            True skin vitality develops over natural cellular renewal cycles (28 to 40 days). AayurFace supports continuous, thoughtful observation as your environment and seasons change.
+          <p className="text-base sm:text-lg text-[#5C6660] font-body leading-relaxed">
+            True skin vitality develops over natural cellular renewal cycles (28 to 40 days). We support continuous, thoughtful observation as your environment and seasons change.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Milestone Progression Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative">
-          {milestones.map((item, idx) => {
-            const Icon = item.icon;
-            return (
-              <div
-                key={item.day}
-                className="p-8 rounded-2xl bg-[#FAF8F5] border border-[#E6DFD5] shadow-xs space-y-4 relative group hover:border-[#1E3A2F]/40 transition-colors flex flex-col justify-between"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#C5A059]">
-                      {item.day}
-                    </span>
-                    <div className="w-8 h-8 rounded-lg bg-[#FFFFFF] border border-[#E6DFD5] flex items-center justify-center text-[#1E3A2F]">
-                      <Icon size={16} />
-                    </div>
+        {/* Elegant Continuous Timeline */}
+        <div className="relative max-w-6xl mx-auto pt-10">
+          
+          {/* Continuous Line (Desktop) */}
+          <div className="hidden lg:block absolute top-[110px] left-[10%] right-[10%] h-[1px] bg-gradient-to-r from-transparent via-[#C5A059] to-transparent opacity-40" />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-4 relative z-10">
+            {milestones.map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <motion.div 
+                  key={item.day}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.8, delay: idx * 0.15, ease: [0.16, 1, 0.3, 1] }}
+                  className="flex flex-col items-center text-center group"
+                >
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-[#C5A059] mb-4">
+                    {item.day}
+                  </span>
+                  
+                  {/* Circle Node */}
+                  <div className="w-16 h-16 rounded-full border border-[#E6DFD5] bg-[#FAF8F5] flex items-center justify-center mb-8 relative group-hover:border-[#C5A059] transition-colors">
+                    <Icon size={20} className="text-[#1E3A2F]" strokeWidth={1} />
+                    <div className="absolute inset-0 rounded-full border border-[#C5A059] scale-110 opacity-0 group-hover:opacity-30 group-hover:animate-ping" />
                   </div>
 
-                  <div className="w-full h-[1px] bg-[#E6DFD5]" />
-
-                  <div>
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-[#6B8E7D] block">
-                      {item.phase}
-                    </span>
-                    <h3 className="font-display text-2xl font-semibold text-[#1A1F1C]">
-                      {item.title}
-                    </h3>
-                  </div>
-
-                  <p className="text-xs sm:text-sm text-[#5C6660] leading-relaxed">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-[#6B8E7D] mb-2 block">
+                    {item.phase}
+                  </span>
+                  <h3 className="font-editorial text-2xl text-[#1A1F1C] mb-4 px-2">
+                    {item.title}
+                  </h3>
+                  <p className="text-sm text-[#5C6660] leading-relaxed px-4 max-w-xs">
                     {item.desc}
                   </p>
-                </div>
-
-                <div className="pt-2 text-[11px] font-mono text-[#8A948E]">
-                  Milestone Stage 0{idx + 1}
-                </div>
-              </div>
-            );
-          })}
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
+
       </div>
     </section>
   );

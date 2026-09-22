@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { Camera, Cpu, Leaf, BarChart3 } from 'lucide-react';
 
 export default function HowItWorksSection() {
@@ -29,51 +30,64 @@ export default function HowItWorksSection() {
   ];
 
   return (
-    <section id="how-it-works" className="w-full bg-[#FAF8F5] py-20 sm:py-28 lg:py-32 px-6 sm:px-10">
-      <div className="max-w-7xl mx-auto space-y-16">
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <span className="text-xs font-semibold font-body uppercase tracking-[0.2em] text-[#6B8E7D]">
-            THE PROCESS
-          </span>
-          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#1A1F1C]">
-            Simple steps to balanced skincare.
-          </h2>
-          <p className="text-base text-[#5C6660] leading-relaxed">
-            A clear, four-step journey designed for quiet clarity and self-awareness, directly inside your browser.
-          </p>
+    <section id="how-it-works" className="w-full bg-[#FAF8F5] py-24 sm:py-32 px-6 sm:px-10 overflow-hidden border-t border-[#E6DFD5]">
+      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-16 lg:gap-24">
+        
+        {/* Left: Sticky Header Area */}
+        <div className="lg:w-1/3">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="sticky top-32"
+          >
+            <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-[#C5A059] block mb-4">
+              The Process
+            </span>
+            <h2 className="font-editorial text-4xl sm:text-5xl text-[#1A1F1C] leading-[1.1] mb-6">
+              Simple steps to <br/>
+              <span className="italic text-[#6B8E7D]">balanced skincare.</span>
+            </h2>
+            <p className="text-base text-[#5C6660] font-body leading-relaxed max-w-sm">
+              A clear, four-step journey designed for quiet clarity and self-awareness, directly inside your browser.
+            </p>
+          </motion.div>
         </div>
 
-        {/* 4 Process Columns */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {steps.map((item) => {
+        {/* Right: Staggered Steps */}
+        <div className="lg:w-2/3 flex flex-col gap-12">
+          {steps.map((item, idx) => {
             const Icon = item.icon;
             return (
-              <div
+              <motion.div
                 key={item.step}
-                className="p-8 rounded-2xl bg-[#FFFFFF] border border-[#E6DFD5] shadow-xs space-y-4 group hover:border-[#1E3A2F]/40 transition-all flex flex-col justify-between"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.8, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                className="flex flex-col sm:flex-row gap-8 items-start group"
               >
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="font-display text-3xl font-semibold text-[#C5A059]">
-                      {item.step}
-                    </span>
-                    <div className="w-10 h-10 rounded-xl bg-[#FAF8F5] border border-[#E6DFD5] flex items-center justify-center text-[#1E3A2F] group-hover:bg-[#1E3A2F] group-hover:text-white transition-colors">
-                      <Icon size={18} />
-                    </div>
+                <div className="flex-shrink-0">
+                  <span className="font-editorial text-6xl text-[#E6DFD5] group-hover:text-[#C5A059] transition-colors duration-500 block leading-none">
+                    {item.step}
+                  </span>
+                </div>
+                
+                <div className="pt-2">
+                  <div className="w-10 h-10 rounded-full border border-[#E6DFD5] bg-white flex items-center justify-center text-[#1E3A2F] mb-6 group-hover:border-[#C5A059] transition-colors duration-500">
+                    <Icon size={16} strokeWidth={1.5} />
                   </div>
-
-                  <h3 className="font-display text-2xl font-semibold text-[#1A1F1C]">
+                  
+                  <h3 className="font-editorial text-3xl text-[#1A1F1C] mb-3">
                     {item.title}
                   </h3>
-
-                  <p className="text-xs sm:text-sm text-[#5C6660] leading-relaxed">
+                  
+                  <p className="text-sm sm:text-base text-[#5C6660] leading-relaxed max-w-md">
                     {item.desc}
                   </p>
                 </div>
-
-                <div className="w-8 h-[2px] bg-[#E6DFD5] group-hover:w-16 group-hover:bg-[#C5A059] transition-all" />
-              </div>
+              </motion.div>
             );
           })}
         </div>
