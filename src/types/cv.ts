@@ -75,7 +75,8 @@ export interface FaceQualityMetrics {
   medianLuminance: number; // 0 - 255
   shadowClippingRatio: number; // 0.0 - 1.0 (ratio of pixels <= 15)
   highlightClippingRatio: number; // 0.0 - 1.0 (ratio of pixels >= 240)
-  sharpnessVariance: number; // 2D Discrete Laplacian variance
+  sharpnessVariance: number; // 2D Discrete Laplacian variance (raw metric)
+  sharpnessScore: number; // Calibrated 0 - 100 face sharpness score
   localContrast: number; // Standard deviation of luminance in ROI
   status: 'PASS' | 'WARN' | 'FAIL';
   confidence: number | null;
@@ -107,7 +108,7 @@ export interface CVReadinessDecision {
   reasons: CVReadinessReason[];
   warnings: string[];
   actionableGuidance: string[];
-  ruleVersion: 'face-readiness-v1-heuristic';
+  ruleVersion: 'face-readiness-v1-heuristic' | 'face-readiness-v1.1-heuristic';
 }
 
 export interface CVResult {

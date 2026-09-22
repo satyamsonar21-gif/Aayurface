@@ -1,0 +1,405 @@
+{
+  "timestamp": "2026-09-22T11:41:20.178Z",
+  "viewports": {
+    "desktop-1440x900": {
+      "fullpageScreenshot": "D:\\Project Aayurface\\docs\\engineering\\frontend\\visual-audit\\landing-redesign\\landing-desktop-1440x900-fullpage.png",
+      "foldScreenshot": "D:\\Project Aayurface\\docs\\engineering\\frontend\\visual-audit\\landing-redesign\\landing-desktop-1440x900-hero-fold.png",
+      "overflow": {
+        "docWidth": 1440,
+        "maxScrollWidth": 1440,
+        "hasOverflow": false,
+        "diff": 0
+      }
+    },
+    "desktop-1280x720": {
+      "fullpageScreenshot": "D:\\Project Aayurface\\docs\\engineering\\frontend\\visual-audit\\landing-redesign\\landing-desktop-1280x720-fullpage.png",
+      "foldScreenshot": "D:\\Project Aayurface\\docs\\engineering\\frontend\\visual-audit\\landing-redesign\\landing-desktop-1280x720-hero-fold.png",
+      "overflow": {
+        "docWidth": 1280,
+        "maxScrollWidth": 1280,
+        "hasOverflow": false,
+        "diff": 0
+      }
+    },
+    "mobile-390x844": {
+      "fullpageScreenshot": "D:\\Project Aayurface\\docs\\engineering\\frontend\\visual-audit\\landing-redesign\\landing-mobile-390x844-fullpage.png",
+      "foldScreenshot": "D:\\Project Aayurface\\docs\\engineering\\frontend\\visual-audit\\landing-redesign\\landing-mobile-390x844-hero-fold.png",
+      "overflow": {
+        "docWidth": 390,
+        "maxScrollWidth": 390,
+        "hasOverflow": false,
+        "diff": 0
+      }
+    },
+    "mobile-375x812": {
+      "fullpageScreenshot": "D:\\Project Aayurface\\docs\\engineering\\frontend\\visual-audit\\landing-redesign\\landing-mobile-375x812-fullpage.png",
+      "foldScreenshot": "D:\\Project Aayurface\\docs\\engineering\\frontend\\visual-audit\\landing-redesign\\landing-mobile-375x812-hero-fold.png",
+      "overflow": {
+        "docWidth": 375,
+        "maxScrollWidth": 375,
+        "hasOverflow": false,
+        "diff": 0
+      }
+    }
+  },
+  "images": [
+    {
+      "src": "http://localhost:5173/favicon.png",
+      "alt": "Aayurface Logo",
+      "naturalWidth": 1024,
+      "naturalHeight": 1024,
+      "complete": true,
+      "displayedWidth": 48,
+      "displayedHeight": 48
+    },
+    {
+      "src": "http://localhost:5173/images/landing/hero-portrait.jpg",
+      "alt": "Authentic South Asian woman with radiant, natural skin under soft warm daylight",
+      "naturalWidth": 896,
+      "naturalHeight": 1200,
+      "complete": true,
+      "displayedWidth": 461,
+      "displayedHeight": 520
+    },
+    {
+      "src": "http://localhost:5173/images/auth-bg.jpg",
+      "alt": "Ayurvedic pure botanical herbs, golden oil, and turmeric bowl in natural light",
+      "naturalWidth": 1024,
+      "naturalHeight": 1024,
+      "complete": true,
+      "displayedWidth": 614,
+      "displayedHeight": 480
+    },
+    {
+      "src": "http://localhost:5173/images/landing/scan-portrait.jpg",
+      "alt": "Standardized face capture viewfinder preview with calm neutral framing",
+      "naturalWidth": 896,
+      "naturalHeight": 1200,
+      "complete": true,
+      "displayedWidth": 343,
+      "displayedHeight": 458
+    },
+    {
+      "src": "http://localhost:5173/images/landing/botanical-still-life.jpg",
+      "alt": "Ayurvedic stone mortar, kumkumadi oil, saffron, neem sprig, and raw turmeric on linen",
+      "naturalWidth": 1200,
+      "naturalHeight": 896,
+      "complete": true,
+      "displayedWidth": 494,
+      "displayedHeight": 520
+    },
+    {
+      "src": "http://localhost:5173/images/landing/hero-portrait.jpg",
+      "alt": "Central wellness portrait representing human vitality",
+      "naturalWidth": 896,
+      "naturalHeight": 1200,
+      "complete": true,
+      "displayedWidth": 338,
+      "displayedHeight": 450
+    },
+    {
+      "src": "http://localhost:5173/images/landing/wellness-lifestyle.jpg",
+      "alt": "South Asian woman mindfully applying botanical facial oil in sunlit morning room",
+      "naturalWidth": 1200,
+      "naturalHeight": 896,
+      "complete": true,
+      "displayedWidth": 614,
+      "displayedHeight": 540
+    },
+    {
+      "src": "http://localhost:5173/images/landing/ayurvedic-textures.jpg",
+      "alt": "Handcrafted ceramic bowl with botanical herbs, dried roses, and smooth river stones in soft morning light",
+      "naturalWidth": 1200,
+      "naturalHeight": 896,
+      "complete": true,
+      "displayedWidth": 503,
+      "displayedHeight": 480
+    },
+    {
+      "src": "http://localhost:5173/favicon.png",
+      "alt": "Aayurface Logo",
+      "naturalWidth": 1024,
+      "naturalHeight": 1024,
+      "complete": true,
+      "displayedWidth": 48,
+      "displayedHeight": 48
+    }
+  ],
+  "consoleErrors": [],
+  "overflowAudit": {
+    "desktop-1440x900": {
+      "docWidth": 1440,
+      "maxScrollWidth": 1440,
+      "hasOverflow": false,
+      "diff": 0
+    },
+    "desktop-1280x720": {
+      "docWidth": 1280,
+      "maxScrollWidth": 1280,
+      "hasOverflow": false,
+      "diff": 0
+    },
+    "mobile-390x844": {
+      "docWidth": 390,
+      "maxScrollWidth": 390,
+      "hasOverflow": false,
+      "diff": 0
+    },
+    "mobile-375x812": {
+      "docWidth": 375,
+      "maxScrollWidth": 375,
+      "hasOverflow": false,
+      "diff": 0
+    }
+  },
+  "headingAudit": [
+    {
+      "tag": "h1",
+      "text": "Ancient Wisdom.Modern Intelligence."
+    },
+    {
+      "tag": "h2",
+      "text": "STANDARDIZED OBSERVATION"
+    },
+    {
+      "tag": "h2",
+      "text": "AYURVEDIC KNOWLEDGE"
+    },
+    {
+      "tag": "h2",
+      "text": "PERSONAL CONTEXT"
+    },
+    {
+      "tag": "h2",
+      "text": "EXPLAINABLE GUIDANCE"
+    },
+    {
+      "tag": "h2",
+      "text": "Your skin tells onlypart of the story."
+    },
+    {
+      "tag": "h3",
+      "text": "Beyond Surface Symptoms"
+    },
+    {
+      "tag": "h3",
+      "text": "Prakriti vs. Vikriti"
+    },
+    {
+      "tag": "h3",
+      "text": "Gentle Botanical Synchrony"
+    },
+    {
+      "tag": "h2",
+      "text": "A Thoughtful Path to Constitutional Balance"
+    },
+    {
+      "tag": "h3",
+      "text": "OBSERVE"
+    },
+    {
+      "tag": "h3",
+      "text": "UNDERSTAND"
+    },
+    {
+      "tag": "h3",
+      "text": "PERSONALIZE"
+    },
+    {
+      "tag": "h3",
+      "text": "TRACK"
+    },
+    {
+      "tag": "h2",
+      "text": "Start with a clearer observation."
+    },
+    {
+      "tag": "h3",
+      "text": "Deterministic Quality Gates"
+    },
+    {
+      "tag": "h2",
+      "text": "Ancient principles.Modern observation."
+    },
+    {
+      "tag": "h3",
+      "text": "Classical Ayurvedic Foundations"
+    },
+    {
+      "tag": "h3",
+      "text": "Structured Knowledge System"
+    },
+    {
+      "tag": "h3",
+      "text": "Objective Computer Vision"
+    },
+    {
+      "tag": "h3",
+      "text": "Multimodal Personal Context"
+    },
+    {
+      "tag": "h3",
+      "text": "Explainable Wellness Guidance"
+    },
+    {
+      "tag": "h2",
+      "text": "Context matters: skin is never in isolation."
+    },
+    {
+      "tag": "h3",
+      "text": "SLEEP RHYTHM"
+    },
+    {
+      "tag": "h3",
+      "text": "DAILY DINACHARYA"
+    },
+    {
+      "tag": "h3",
+      "text": "HYDRATION & AGNI"
+    },
+    {
+      "tag": "h3",
+      "text": "CLIMATE & RITU"
+    },
+    {
+      "tag": "h3",
+      "text": "FOOD HABITS"
+    },
+    {
+      "tag": "h2",
+      "text": "Not just an answer.An explanation."
+    },
+    {
+      "tag": "h3",
+      "text": "Visual Surface Signal"
+    },
+    {
+      "tag": "h3",
+      "text": "Contextual Covariates"
+    },
+    {
+      "tag": "h3",
+      "text": "Signal Reliability"
+    },
+    {
+      "tag": "h3",
+      "text": "Constitutional Interpretation"
+    },
+    {
+      "tag": "h3",
+      "text": "Safety Boundary"
+    },
+    {
+      "tag": "h2",
+      "text": "A daily rhythm shaped for your constitution."
+    },
+    {
+      "tag": "h3",
+      "text": "Gentle Awakening & Barrier Nourishment"
+    },
+    {
+      "tag": "h3",
+      "text": "Thermal Calming & Hydration"
+    },
+    {
+      "tag": "h3",
+      "text": "Restorative Lepa & Circadian Wind-down"
+    },
+    {
+      "tag": "h2",
+      "text": "Observation over time, not quick fixes."
+    },
+    {
+      "tag": "h3",
+      "text": "Baseline Observation"
+    },
+    {
+      "tag": "h3",
+      "text": "Routine Integration"
+    },
+    {
+      "tag": "h3",
+      "text": "Doshic Calibration"
+    },
+    {
+      "tag": "h3",
+      "text": "Sustained Equilibrium"
+    },
+    {
+      "tag": "h2",
+      "text": "Simple steps to balanced skincare."
+    },
+    {
+      "tag": "h3",
+      "text": "Guided Capture"
+    },
+    {
+      "tag": "h3",
+      "text": "Multimodal Analysis"
+    },
+    {
+      "tag": "h3",
+      "text": "Bespoke Guidance"
+    },
+    {
+      "tag": "h3",
+      "text": "Longitudinal Care"
+    },
+    {
+      "tag": "h2",
+      "text": "Wellness guidance, with clear boundaries."
+    },
+    {
+      "tag": "h3",
+      "text": "Non-Clinical Standard"
+    },
+    {
+      "tag": "h3",
+      "text": "Private & Client-Side"
+    },
+    {
+      "tag": "h3",
+      "text": "Uncertainty Preserved"
+    },
+    {
+      "tag": "h3",
+      "text": "Classical Lineage"
+    },
+    {
+      "tag": "h2",
+      "text": "Living in rhythmwith natural balance."
+    },
+    {
+      "tag": "h3",
+      "text": "Prakriti (Inherent Constitution)"
+    },
+    {
+      "tag": "h3",
+      "text": "Vikriti (Current Imbalance)"
+    },
+    {
+      "tag": "h3",
+      "text": "Dinacharya (Daily Rhythm)"
+    },
+    {
+      "tag": "h3",
+      "text": "Dravyaguna (Plant Intelligence)"
+    },
+    {
+      "tag": "h2",
+      "text": "Begin Your Skin Journey."
+    },
+    {
+      "tag": "h4",
+      "text": "Explore"
+    },
+    {
+      "tag": "h4",
+      "text": "Product"
+    },
+    {
+      "tag": "h4",
+      "text": "Trust & Safety"
+    }
+  ]
+}

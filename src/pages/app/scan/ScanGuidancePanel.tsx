@@ -343,25 +343,38 @@ export const ScanGuidancePanel: React.FC<ScanGuidancePanelProps> = ({
                       </div>
 
                       {/* Face Sharpness */}
-                      <div className={`flex items-start gap-2 text-xs p-2.5 rounded-lg border ${
-                        cvResult.faceQuality.sharpnessVariance >= 12
-                          ? 'bg-background-surface border-border-default text-text-primary'
-                          : 'bg-rose-500/10 border-rose-500/30 text-rose-950 dark:text-rose-200'
-                      }`}>
-                        {cvResult.faceQuality.sharpnessVariance >= 12 ? (
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                        ) : (
-                          <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-                        )}
-                        <div>
-                          <span className="font-semibold">Face Sharpness: </span>
-                          <span className="text-text-secondary">
-                            {cvResult.faceQuality.sharpnessVariance < 12 
-                              ? 'Facial features are blurred. Hold steady and refocus.' 
-                              : 'Facial details are clear and focused.'}
-                          </span>
-                        </div>
-                      </div>
+                      {(() => {
+                        const score = cvResult.faceQuality.sharpnessScore ?? Math.round(cvResult.faceQuality.sharpnessVariance * 5);
+                        const isSharpPass = score >= 50 && cvResult.faceQuality.sharpnessVariance >= 1.2;
+                        const isSharpWarn = score >= 30 && score < 50;
+                        return (
+                          <div className={`flex items-start gap-2 text-xs p-2.5 rounded-lg border ${
+                            isSharpPass
+                              ? 'bg-background-surface border-border-default text-text-primary'
+                              : isSharpWarn
+                                ? 'bg-amber-500/10 border-amber-500/30 text-amber-950 dark:text-amber-200'
+                                : 'bg-rose-500/10 border-rose-500/30 text-rose-950 dark:text-rose-200'
+                          }`}>
+                            {isSharpPass ? (
+                              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                            ) : isSharpWarn ? (
+                              <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                            ) : (
+                              <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                            )}
+                            <div>
+                              <span className="font-semibold">Face Sharpness: </span>
+                              <span className="text-text-secondary">
+                                {isSharpPass
+                                  ? `Facial details are clear and focused (sharpness: ${score}/100).`
+                                  : isSharpWarn
+                                    ? `Face has subtle softness (sharpness: ${score}/100). Retake recommended for higher precision.`
+                                    : `Face details are not clear enough (sharpness: ${score}/100). Hold steady and refocus.`}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </>
                   )}
 

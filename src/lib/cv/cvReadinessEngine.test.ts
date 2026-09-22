@@ -363,7 +363,8 @@ describe('Phase 10: CV Readiness Engine & Double Gate Verification', () => {
 
     expect(result.readiness.status).toBe('REJECTED');
     expect(result.readiness.reasons.some((r) => r.code === 'FACE_TOO_BLURRY')).toBe(true);
-    expect(result.faceQuality?.sharpnessVariance).toBeLessThan(12);
+    expect(result.faceQuality?.sharpnessVariance).toBeLessThan(1.2);
+    expect(result.faceQuality?.sharpnessScore).toBeLessThan(30);
   });
 
   // -------------------------------------------------------------
@@ -438,7 +439,7 @@ describe('Phase 10: CV Readiness Engine & Double Gate Verification', () => {
       pose: null,
       occlusion: null,
       framing: null,
-      readiness: { status: 'READY', reasons: [], warnings: [], actionableGuidance: [], ruleVersion: 'face-readiness-v1-heuristic' }
+      readiness: { status: 'READY', reasons: [], warnings: [], actionableGuidance: [], ruleVersion: 'face-readiness-v1.1-heuristic' }
     };
 
     const mismatchedCVResult: CVResult = {
@@ -490,5 +491,80 @@ describe('Phase 10: CV Readiness Engine & Double Gate Verification', () => {
     expect(typeof liveResult.faceCount).toBe('number');
     expect(typeof liveResult.isReady).toBe('boolean');
     expect(typeof liveResult.guidanceText).toBe('string');
+  });
+
+  // -------------------------------------------------------------
+  // Test 12: In-Focus Face with Natural Gradients (User Scenario Verification)
+  // Evaluates that a normal in-focus face with feature contours receives calibrated score >= 50
+  // -------------------------------------------------------------
+  it('evaluates in-focus face with natural facial contours and passes readiness with calibrated score >= 50', async () => {
+    const artifact = createMockArtifact();
+    const face: DetectedFace = {
+      id: 'face-natural',
+      confidence: 0.98,
+      boundingBox: { x: 440, y: 160, width: 400, height: 400 },
+      normalizedBoundingBox: { x: 440 / 1280, y: 160 / 720, width: 400 / 1280, height: 400 / 720 },
+      areaRatio: (400 * 400) / (1280 * 720),
+      center: { x: 0.5, y: 0.5 }
+    };
+
+    // Realistic face with smooth cheeks but distinct eye/mouth feature edges
+    const canvas = createSyntheticCanvas(1280, 720, (x, y) => {
+      const insideFace = x >= 440 && x <= 840 && y >= 160 && y <= 560;
+      if (!insideFace) return [200, 200, 200, 255];
+
+      const relX = x - 440;
+      const relY = y - 160;
+
+      // Eyes region at Y=120, lips at Y=280
+      const isEye = (relY >= 110 && relY <= 130) && ((relX >= 80 && relX <= 140) || (relX >= 260 && relX <= 320));
+      const isMouth = (relY >= 270 && relY <= 290) && (relX >= 150 && relX <= 250);
+
+      if (isEye) return [20, 20, 20, 255]; // High edge gradient
+      if (isMouth) return [160, 60, 60, 255]; // Moderate edge gradient
+      return [205, 160, 130, 255]; // Smooth skin
+    });
+
+    const provider = new MockCVProvider({ faces: [face] });
+    const result = await evaluateArtifactFaceReadiness(artifact, {
+      customProvider: provider,
+      canvas
+    });
+
+    expect(result.readiness.status).toBe('READY');
+    expect(result.readiness.ruleVersion).toBe('face-readiness-v1.1-heuristic');
+    expect(result.faceQuality).not.toBeNull();
+    expect(result.faceQuality!.sharpnessScore).toBeGreaterThanOrEqual(50);
+    expect(result.faceQuality!.sharpnessVariance).toBeGreaterThanOrEqual(1.2);
+  });
+
+  // -------------------------------------------------------------
+  // Test 13: Deterministic Sharpness Stability Check
+  // -------------------------------------------------------------
+  it('produces 100% deterministic identical sharpness score across consecutive runs', async () => {
+    const artifact = createMockArtifact();
+    const face: DetectedFace = {
+      id: 'face-stability',
+      confidence: 0.95,
+      boundingBox: { x: 440, y: 160, width: 400, height: 400 },
+      normalizedBoundingBox: { x: 440 / 1280, y: 160 / 720, width: 400 / 1280, height: 400 / 720 },
+      areaRatio: (400 * 400) / (1280 * 720),
+      center: { x: 0.5, y: 0.5 }
+    };
+
+    const canvas = createSyntheticCanvas(1280, 720, (x, y) => {
+      const insideFace = x >= 440 && x <= 840 && y >= 160 && y <= 560;
+      if (!insideFace) return [180, 180, 180, 255];
+      return [(x * 7) % 255, (y * 11) % 255, 120, 255];
+    });
+
+    const provider = new MockCVProvider({ faces: [face] });
+    const run1 = await evaluateArtifactFaceReadiness(artifact, { customProvider: provider, canvas });
+    const run2 = await evaluateArtifactFaceReadiness(artifact, { customProvider: provider, canvas });
+    const run3 = await evaluateArtifactFaceReadiness(artifact, { customProvider: provider, canvas });
+
+    expect(run1.faceQuality!.sharpnessScore).toBe(run2.faceQuality!.sharpnessScore);
+    expect(run2.faceQuality!.sharpnessScore).toBe(run3.faceQuality!.sharpnessScore);
+    expect(run1.faceQuality!.sharpnessVariance).toBe(run2.faceQuality!.sharpnessVariance);
   });
 });

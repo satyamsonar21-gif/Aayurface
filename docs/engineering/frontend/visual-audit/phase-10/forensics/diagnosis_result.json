@@ -1,0 +1,47 @@
+{
+  "rasterDetected": 0,
+  "rasterFaceMetrics": null,
+  "mpDetected": 1,
+  "mpFaceBbox": {
+    "x": 500,
+    "y": 241,
+    "width": 276,
+    "height": 276
+  },
+  "mpFaceMetrics": {
+    "meanLuminance": 151.8,
+    "medianLuminance": 155,
+    "shadowClippingRatio": 0,
+    "highlightClippingRatio": 0.04,
+    "sharpnessVariance": 415.7,
+    "localContrast": 29.3,
+    "status": "PASS",
+    "confidence": 0.85
+  },
+  "thresholds": {
+    "RULE_VERSION": "face-readiness-v1-heuristic",
+    "FACE_AREA_RATIO_MIN_FAIL": 0.06,
+    "FACE_AREA_RATIO_MIN_PASS": 0.12,
+    "FACE_AREA_RATIO_MAX_FAIL": 0.8,
+    "FACE_MIN_PIXEL_DIM": 120,
+    "FACE_LUMINANCE_FAIL_DARK": 55,
+    "FACE_LUMINANCE_WARN_DARK": 75,
+    "FACE_LUMINANCE_PASS_MAX": 200,
+    "FACE_LUMINANCE_FAIL_BRIGHT": 230,
+    "FACE_LUMINANCE_WARN_BRIGHT": 215,
+    "FACE_SHADOW_CLIPPING_FAIL": 0.35,
+    "FACE_SHADOW_CLIPPING_WARN": 0.2,
+    "FACE_HIGHLIGHT_CLIPPING_FAIL": 0.3,
+    "FACE_HIGHLIGHT_CLIPPING_WARN": 0.18,
+    "FACE_SHARPNESS_FAIL_BLUR": 30,
+    "FACE_SHARPNESS_WARN_SOFT": 55,
+    "FACE_BORDER_MARGIN_MIN": 0.02,
+    "FACE_CENTER_OFFSET_MAX_WARN": 0.25,
+    "POSE_YAW_MAX_FAIL": 22,
+    "POSE_YAW_MAX_WARN": 14,
+    "POSE_PITCH_MAX_FAIL": 20,
+    "POSE_PITCH_MAX_WARN": 12,
+    "POSE_ROLL_MAX_FAIL": 18,
+    "POSE_ROLL_MAX_WARN": 10
+  }
+}

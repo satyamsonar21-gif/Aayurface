@@ -438,7 +438,7 @@ async function runE2ESuite() {
           pose: null,
           occlusion: null,
           framing: null,
-          readiness: { status: 'READY', reasons: [], warnings: [], actionableGuidance: [], ruleVersion: 'face-readiness-v1-heuristic' }
+          readiness: { status: 'READY', reasons: [], warnings: [], actionableGuidance: [], ruleVersion: 'face-readiness-v1.1-heuristic' }
         };
 
         return cvResult.artifactId === artifact.id && cvResult.schemaVersion === 'cv-schema-v1';

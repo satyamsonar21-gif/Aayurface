@@ -13,7 +13,7 @@ import type {
 } from '@/types/cv';
 
 export const FACE_QUALITY_THRESHOLDS_V1 = {
-  RULE_VERSION: 'face-readiness-v1-heuristic' as const,
+  RULE_VERSION: 'face-readiness-v1.1-heuristic' as const,
 
   // Face size thresholds (relative to full image area)
   FACE_AREA_RATIO_MIN_FAIL: 0.06, // Less than 6% of frame is too small
@@ -34,9 +34,11 @@ export const FACE_QUALITY_THRESHOLDS_V1 = {
   FACE_HIGHLIGHT_CLIPPING_FAIL: 0.30, // >30% face blown out (>=240)
   FACE_HIGHLIGHT_CLIPPING_WARN: 0.18,
 
-  // Face ROI Sharpness thresholds (2D Discrete Laplacian variance on face pixels)
-  FACE_SHARPNESS_FAIL_BLUR: 30, // Blurry face (even if background is sharp)
-  FACE_SHARPNESS_WARN_SOFT: 55,
+  // Face ROI Sharpness thresholds (Preliminary engineering calibration: 0-100 fused score with physical floors)
+  FACE_SHARPNESS_SCORE_FAIL: 30, // Fused score < 30 indicates genuine blur / severe defocus
+  FACE_SHARPNESS_SCORE_WARN: 50, // Fused score 30 - 49 indicates subtle softness
+  FACE_SHARPNESS_VARIANCE_FLOOR: 1.2, // Physical safety floor for raw Laplacian variance
+  FACE_SHARPNESS_SALIENCY_FLOOR: 2.5, // Physical safety floor for top 10% edge magnitude
 
   // Framing thresholds
   FACE_BORDER_MARGIN_MIN: 0.02, // Must be at least 2% away from border
@@ -50,6 +52,53 @@ export const FACE_QUALITY_THRESHOLDS_V1 = {
   POSE_ROLL_MAX_FAIL: 18,
   POSE_ROLL_MAX_WARN: 10
 } as const;
+
+/**
+ * Bilinear downscaling for grayscale pixel buffer to canonical dimensions.
+ * Canonical ROI normalization for improved scale comparability without DOM canvas allocations.
+ */
+function downscaleGrayscaleBilinear(
+  srcGray: Uint8Array,
+  srcW: number,
+  srcH: number,
+  dstW: number,
+  dstH: number
+): Uint8Array {
+  const dst = new Uint8Array(dstW * dstH);
+  const scaleX = srcW / dstW;
+  const scaleY = srcH / dstH;
+
+  for (let y = 0; y < dstH; y++) {
+    const srcY = (y + 0.5) * scaleY - 0.5;
+    const y0 = Math.max(0, Math.floor(srcY));
+    const y1 = Math.min(srcH - 1, y0 + 1);
+    const wy = Math.max(0, Math.min(1, srcY - y0));
+    const row0 = y0 * srcW;
+    const row1 = y1 * srcW;
+    const dstRow = y * dstW;
+
+    for (let x = 0; x < dstW; x++) {
+      const srcX = (x + 0.5) * scaleX - 0.5;
+      const x0 = Math.max(0, Math.floor(srcX));
+      const x1 = Math.min(srcW - 1, x0 + 1);
+      const wx = Math.max(0, Math.min(1, srcX - x0));
+
+      const v00 = srcGray[row0 + x0];
+      const v10 = srcGray[row0 + x1];
+      const v01 = srcGray[row1 + x0];
+      const v11 = srcGray[row1 + x1];
+
+      const val =
+        (1 - wx) * (1 - wy) * v00 +
+        wx * (1 - wy) * v10 +
+        (1 - wx) * wy * v01 +
+        wx * wy * v11;
+      dst[dstRow + x] = Math.round(val);
+    }
+  }
+
+  return dst;
+}
 
 /**
  * Extracts and analyzes the interior facial ROI from a canvas.
@@ -79,6 +128,7 @@ export function analyzeFaceROIQuality(
       shadowClippingRatio: 0,
       highlightClippingRatio: 0,
       sharpnessVariance: 65,
+      sharpnessScore: 85,
       localContrast: 35,
       status: 'PASS',
       confidence: null
@@ -134,34 +184,87 @@ export function analyzeFaceROIQuality(
   }
   const localContrast = totalPixels > 0 ? Math.sqrt(varianceSum / totalPixels) : 0;
 
-  // 2. Calculate Sharpness via 2D Discrete Laplacian on Face ROI
+  // 2. Canonical Downscaling for Sharpness (Max 256px for canonical ROI normalization and improved scale comparability; never upscale)
+  const CANONICAL_MAX_DIM = 256;
+  let analysisGray: Uint8Array = grayscale;
+  let analysisW = roiW;
+  let analysisH = roiH;
+
+  if (roiW > CANONICAL_MAX_DIM || roiH > CANONICAL_MAX_DIM) {
+    const scale = CANONICAL_MAX_DIM / Math.max(roiW, roiH);
+    analysisW = Math.max(16, Math.round(roiW * scale));
+    analysisH = Math.max(16, Math.round(roiH * scale));
+    analysisGray = downscaleGrayscaleBilinear(grayscale, roiW, roiH, analysisW, analysisH);
+  }
+
+  // 3. Calculate Sharpness via 2D Discrete Laplacian on Canonical Face ROI
   let lapSum = 0;
   let lapSumSq = 0;
   let lapCount = 0;
+  const lapMagnitudes: number[] = [];
 
-  for (let y = 1; y < roiH - 1; y++) {
-    const rowOffset = y * roiW;
-    const rowAbove = (y - 1) * roiW;
-    const rowBelow = (y + 1) * roiW;
+  for (let y = 1; y < analysisH - 1; y++) {
+    const rowOffset = y * analysisW;
+    const rowAbove = (y - 1) * analysisW;
+    const rowBelow = (y + 1) * analysisW;
 
-    for (let x = 1; x < roiW - 1; x++) {
-      const center = grayscale[rowOffset + x];
-      const top = grayscale[rowAbove + x];
-      const bottom = grayscale[rowBelow + x];
-      const left = grayscale[rowOffset + x - 1];
-      const right = grayscale[rowOffset + x + 1];
+    for (let x = 1; x < analysisW - 1; x++) {
+      const center = analysisGray[rowOffset + x];
+      const top = analysisGray[rowAbove + x];
+      const bottom = analysisGray[rowBelow + x];
+      const left = analysisGray[rowOffset + x - 1];
+      const right = analysisGray[rowOffset + x + 1];
 
       const lap = top + bottom + left + right - 4 * center;
       lapSum += lap;
       lapSumSq += lap * lap;
       lapCount++;
+      lapMagnitudes.push(Math.abs(lap));
     }
   }
 
   const lapMean = lapCount > 0 ? lapSum / lapCount : 0;
   const sharpnessVariance = lapCount > 0 ? Math.max(0, lapSumSq / lapCount - lapMean * lapMean) : 0;
 
-  // 3. Evaluate Status
+  // Top 10% edge magnitude (measures salient facial feature edges: eyes, pupils, lips)
+  lapMagnitudes.sort((a, b) => b - a);
+  const topCount = Math.max(10, Math.floor(lapMagnitudes.length * 0.10));
+  let topSum = 0;
+  for (let i = 0; i < topCount; i++) {
+    topSum += lapMagnitudes[i];
+  }
+  const top10Magnitude = topCount > 0 ? topSum / topCount : 0;
+
+  // Principled Metric Normalization & Fusion:
+  // Note: V_raw (Laplacian variance) has quadratic intensity units (ΔI^2).
+  // M_top10 (mean absolute Laplacian magnitude) has linear intensity units (ΔI).
+  // They are NEVER mixed directly via max() or addition.
+  // Instead, each metric is independently transformed into a dimensionless [0, 100]
+  // score using its respective preliminary engineering response curve, then combined
+  // as a principled convex combination.
+  //
+  // Response Curve 1: Global Laplacian Variance (V_raw)
+  // Inflection constant K1 = 4.20, steepness p = 0.85
+  const k1 = Math.pow(4.2, 0.85);
+  const vp1 = Math.pow(Math.max(0, sharpnessVariance), 0.85);
+  const sGlobal = (100 * vp1) / (vp1 + k1);
+
+  // Response Curve 2: Top 10% Salient Feature Edge Magnitude (M_top10)
+  // Inflection constant K2 = 6.00, steepness p = 0.85
+  const k2 = Math.pow(6.0, 0.85);
+  const vp2 = Math.pow(Math.max(0, top10Magnitude), 0.85);
+  const sSaliency = (100 * vp2) / (vp2 + k2);
+
+  // Fused Sharpness Score: 50% global ROI variance + 50% salient feature sharpness
+  const fusedScore = 0.5 * sGlobal + 0.5 * sSaliency;
+  const sharpnessScore = Math.min(100, Math.max(0, Math.round(fusedScore)));
+
+  // 4. Evaluate Status
+  // Note on Sensor Noise / Low-Light Interaction:
+  // High analog sensor gain (ISO) creates high-frequency shot noise that artificially
+  // inflates discrete Laplacian variance. Therefore, sharpness CANNOT override illumination
+  // or shadow clipping checks. If a frame is underexposed or in deep shadow, isDarkFail
+  // unconditionally forces status to FAIL regardless of sharpnessScore.
   const isDarkFail =
     meanLuminance < FACE_QUALITY_THRESHOLDS_V1.FACE_LUMINANCE_FAIL_DARK ||
     shadowClippingRatio > FACE_QUALITY_THRESHOLDS_V1.FACE_SHADOW_CLIPPING_FAIL;
@@ -170,7 +273,10 @@ export function analyzeFaceROIQuality(
     meanLuminance > FACE_QUALITY_THRESHOLDS_V1.FACE_LUMINANCE_FAIL_BRIGHT ||
     highlightClippingRatio > FACE_QUALITY_THRESHOLDS_V1.FACE_HIGHLIGHT_CLIPPING_FAIL;
 
-  const isBlurFail = sharpnessVariance < FACE_QUALITY_THRESHOLDS_V1.FACE_SHARPNESS_FAIL_BLUR;
+  const isBlurFail =
+    sharpnessScore < FACE_QUALITY_THRESHOLDS_V1.FACE_SHARPNESS_SCORE_FAIL ||
+    sharpnessVariance < FACE_QUALITY_THRESHOLDS_V1.FACE_SHARPNESS_VARIANCE_FLOOR ||
+    top10Magnitude < FACE_QUALITY_THRESHOLDS_V1.FACE_SHARPNESS_SALIENCY_FLOOR;
 
   let status: 'PASS' | 'WARN' | 'FAIL' = 'PASS';
   if (isDarkFail || isBrightFail || isBlurFail) {
@@ -178,7 +284,7 @@ export function analyzeFaceROIQuality(
   } else if (
     meanLuminance < FACE_QUALITY_THRESHOLDS_V1.FACE_LUMINANCE_WARN_DARK ||
     meanLuminance > FACE_QUALITY_THRESHOLDS_V1.FACE_LUMINANCE_WARN_BRIGHT ||
-    sharpnessVariance < FACE_QUALITY_THRESHOLDS_V1.FACE_SHARPNESS_WARN_SOFT ||
+    sharpnessScore < FACE_QUALITY_THRESHOLDS_V1.FACE_SHARPNESS_SCORE_WARN ||
     shadowClippingRatio > FACE_QUALITY_THRESHOLDS_V1.FACE_SHADOW_CLIPPING_WARN ||
     highlightClippingRatio > FACE_QUALITY_THRESHOLDS_V1.FACE_HIGHLIGHT_CLIPPING_WARN
   ) {
@@ -191,6 +297,7 @@ export function analyzeFaceROIQuality(
     shadowClippingRatio: Math.round(shadowClippingRatio * 100) / 100,
     highlightClippingRatio: Math.round(highlightClippingRatio * 100) / 100,
     sharpnessVariance: Math.round(sharpnessVariance * 10) / 10,
+    sharpnessScore,
     localContrast: Math.round(localContrast * 10) / 10,
     status,
     confidence: face.confidence

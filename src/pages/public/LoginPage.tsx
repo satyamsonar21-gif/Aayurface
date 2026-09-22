@@ -43,8 +43,8 @@ const LoginPage = () => {
       } else {
         navigate(from, { replace: true });
       }
-    } catch {
-      setErrorMsg('Invalid email or password. Please check your credentials.');
+    } catch (err: any) {
+      setErrorMsg(err?.message || 'Invalid email or password. Please try again.');
     } finally {
       setIsLoading(false);
     }

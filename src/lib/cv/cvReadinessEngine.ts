@@ -243,16 +243,19 @@ export async function evaluateArtifactFaceReadiness(
     warnings.push('Face lighting is slightly sub-optimal.');
   }
 
-  // Check 7C: Face ROI Sharpness & Blur
-  if (faceQuality.sharpnessVariance < FACE_QUALITY_THRESHOLDS_V1.FACE_SHARPNESS_FAIL_BLUR) {
+  // Check 7C: Face ROI Sharpness & Clarity (Calibrated 0-100 score + physical floor)
+  if (
+    faceQuality.sharpnessScore < FACE_QUALITY_THRESHOLDS_V1.FACE_SHARPNESS_SCORE_FAIL ||
+    faceQuality.sharpnessVariance < FACE_QUALITY_THRESHOLDS_V1.FACE_SHARPNESS_VARIANCE_FLOOR
+  ) {
     reasons.push({
       code: 'FACE_TOO_BLURRY',
       severity: 'REJECT',
-      message: `Face details are blurry or affected by motion (sharpness: ${faceQuality.sharpnessVariance}).`,
+      message: `Face details are not clear enough for reliable analysis (sharpness: ${faceQuality.sharpnessScore}/100).`,
       actionableGuidance: 'Hold your device steady and wait for focus before capturing.'
     });
-  } else if (faceQuality.sharpnessVariance < FACE_QUALITY_THRESHOLDS_V1.FACE_SHARPNESS_WARN_SOFT) {
-    warnings.push('Face has subtle softness.');
+  } else if (faceQuality.sharpnessScore < FACE_QUALITY_THRESHOLDS_V1.FACE_SHARPNESS_SCORE_WARN) {
+    warnings.push(`Face has subtle softness (sharpness: ${faceQuality.sharpnessScore}/100).`);
   }
 
   // Check 7D: Pose

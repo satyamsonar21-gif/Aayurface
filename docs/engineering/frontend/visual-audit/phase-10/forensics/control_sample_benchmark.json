@@ -1,0 +1,66 @@
+[
+  {
+    "id": "A",
+    "name": "Genuinely Blurry Face",
+    "rawLaplacianVariance": 0.8,
+    "top10EdgeMagnitude": 2.2,
+    "normalizedScore": 16,
+    "currentDecision_thresh30": "FAIL"
+  },
+  {
+    "id": "B",
+    "name": "Clearly Sharp Face (Natural Webcam)",
+    "rawLaplacianVariance": 512.1,
+    "top10EdgeMagnitude": 41.3,
+    "normalizedScore": 100,
+    "currentDecision_thresh30": "PASS"
+  },
+  {
+    "id": "C",
+    "name": "Moderately Sharp Face (Slight Soft Focus)",
+    "rawLaplacianVariance": 11.8,
+    "top10EdgeMagnitude": 9.6,
+    "normalizedScore": 94,
+    "currentDecision_thresh30": "FAIL"
+  },
+  {
+    "id": "D",
+    "name": "Low-Light but Sharp Face",
+    "rawLaplacianVariance": 103.1,
+    "top10EdgeMagnitude": 18.5,
+    "normalizedScore": 100,
+    "currentDecision_thresh30": "PASS"
+  },
+  {
+    "id": "E",
+    "name": "Bright/Backlit Face",
+    "rawLaplacianVariance": 718,
+    "top10EdgeMagnitude": 46.8,
+    "normalizedScore": 100,
+    "currentDecision_thresh30": "PASS"
+  },
+  {
+    "id": "F",
+    "name": "Compressed Image (JPEG 0.40)",
+    "rawLaplacianVariance": 512.1,
+    "top10EdgeMagnitude": 41.3,
+    "normalizedScore": 100,
+    "currentDecision_thresh30": "PASS"
+  },
+  {
+    "id": "G",
+    "name": "Small Face in Frame (Area ~8%)",
+    "rawLaplacianVariance": 746.8,
+    "top10EdgeMagnitude": 68.9,
+    "normalizedScore": 100,
+    "currentDecision_thresh30": "PASS"
+  },
+  {
+    "id": "H",
+    "name": "Large Face in Frame (Area ~40%)",
+    "rawLaplacianVariance": 211.2,
+    "top10EdgeMagnitude": 22.4,
+    "normalizedScore": 100,
+    "currentDecision_thresh30": "PASS"
+  }
+]

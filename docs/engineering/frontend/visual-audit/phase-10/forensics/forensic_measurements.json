@@ -1,0 +1,23 @@
+{
+  "bbox": {
+    "x": 450,
+    "y": 120,
+    "width": 380,
+    "height": 480
+  },
+  "roi15Inset": {
+    "x": 507,
+    "y": 192,
+    "width": 266,
+    "height": 336
+  },
+  "varCurrent15Inset": 679.79,
+  "varFullBbox": 365.17,
+  "varEyesBrowBand": 1843.52,
+  "varCheekSmooth": 100.75,
+  "varBlur15Inset": 1.24,
+  "varBlurFullBbox": 1.23,
+  "varSoft15Inset": 6.19,
+  "varSoftFullBbox": 3.86,
+  "varHalfBbox": 585.28
+}

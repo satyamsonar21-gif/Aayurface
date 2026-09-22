@@ -811,6 +811,7 @@ describe('Phase 06.7: Scan Skin Engine & Camera Lifecycle Tests', () => {
         shadowClippingRatio: 0.01,
         highlightClippingRatio: 0.01,
         sharpnessVariance: 38,
+        sharpnessScore: 78,
         localContrast: 25,
         status: 'PASS',
         confidence: 0.95

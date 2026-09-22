@@ -38,8 +38,8 @@ const RegisterPage = () => {
       await signUp(data.email, data.password);
       // Canonical New User Flow: Route strictly to 6-step onboarding
       navigate('/onboarding', { replace: true });
-    } catch {
-      setErrorMsg('Failed to create account. Please try again.');
+    } catch (err: any) {
+      setErrorMsg(err?.message || 'Failed to create account. Please try again.');
     } finally {
       setIsLoading(false);
     }
