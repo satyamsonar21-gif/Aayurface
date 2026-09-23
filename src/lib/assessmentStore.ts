@@ -62,6 +62,9 @@ const BASELINE_PREVENTION_TIPS: PreventionTip[] = [
   { icon: '🛡️', text: 'Conduct a patch test behind the ear before applying any new topical formulation.' },
 ];
 
+import { evaluateAyurvedicContext } from './ayurveda';
+import type { VisualObservationSet, AyurvedicContext, PrakritiContext } from './ayurveda';
+
 /**
  * Creates, persists, and returns a new authentic assessment for the authenticated user.
  */
@@ -87,6 +90,39 @@ export function createAssessment(
     ? userProfile.skin_type.charAt(0).toUpperCase() + userProfile.skin_type.slice(1)
     : 'Combination';
 
+  // PHASE 11: Bridge to Ayurvedic Intelligence Foundation
+  const prakritiVal: PrakritiContext['value'] = userProfile?.dosha
+    ? (userProfile.dosha.toUpperCase() as PrakritiContext['value'])
+    : 'UNKNOWN';
+
+  const ayurContext: AyurvedicContext = {
+    userId,
+    prakriti: {
+      value: prakritiVal,
+      source: 'USER_REPORTED',
+      status: userProfile?.dosha ? 'REPORTED' : 'UNAVAILABLE'
+    },
+    lifestyle: []
+  };
+
+  // Phase 10 does not yet produce explicit redness/dryness observations.
+  // We explicitly mark them as NOT_ASSESSED to preserve the strict Phase 11 safety boundary.
+  const visualObs: VisualObservationSet = {
+    captureId: captureArtifact?.id,
+    observations: [
+      {
+        id: `obs-redness-${Date.now()}`,
+        type: 'REDNESS_LIKE_APPEARANCE',
+        state: 'NOT_ASSESSED',
+        confidence: 'NOT_APPLICABLE',
+        timestamp: new Date().toISOString(),
+        source: 'SYSTEM_DERIVED'
+      }
+    ]
+  };
+
+  const interpretation = evaluateAyurvedicContext(visualObs, ayurContext);
+
   const newAssessment: Assessment = {
     id: generateAssessmentId(),
     userId,
@@ -103,7 +139,8 @@ export function createAssessment(
     remedies: BASELINE_REMEDIES,
     preventionTips: BASELINE_PREVENTION_TIPS,
     ...(captureArtifact ? { captureArtifact } : {}),
-    ...(cvResult ? { cvResult } : {})
+    ...(cvResult ? { cvResult } : {}),
+    ayurvedicInterpretation: interpretation
   };
 
   saveAssessment(userId, newAssessment);

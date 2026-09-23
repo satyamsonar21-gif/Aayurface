@@ -272,6 +272,48 @@ export default function ResultsPage() {
               </p>
             </div>
 
+            {assessment.ayurvedicInterpretation && (
+              <div className="p-6 rounded-lg bg-amber-50/50 border border-amber-200 shadow-sm space-y-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-800 font-body">
+                    Ayurvedic Contextual Engine (Phase 11)
+                  </span>
+                </div>
+                {assessment.ayurvedicInterpretation.interpretations.length > 0 ? (
+                  assessment.ayurvedicInterpretation.interpretations.map((interp, idx) => (
+                    <div key={idx} className="space-y-2 pb-3 border-b border-amber-100 last:border-0 last:pb-0">
+                      <p className="text-sm font-medium text-amber-950">
+                        {interp.rationale.description}
+                      </p>
+                      <div className="flex flex-wrap gap-2 text-xs">
+                        <span className="bg-amber-100/80 text-amber-900 px-2 py-1 rounded">
+                          Evidence: {interp.evidence.replace(/_/g, ' ')}
+                        </span>
+                        {interp.limitations && (
+                          <span className="bg-white/60 border border-amber-200 text-amber-800 px-2 py-1 rounded">
+                            Note: {interp.limitations}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-amber-900">
+                    Observation yielded {assessment.ayurvedicInterpretation.overallEvidenceState.replace(/_/g, ' ')}. 
+                    No definitive contextual interpretation applied.
+                  </p>
+                )}
+                <div className="pt-2 flex justify-between items-center border-t border-amber-200/50">
+                  <span className="text-[10px] text-amber-700/80 font-mono">
+                    Rule Engine v: {assessment.ayurvedicInterpretation.versionInfo.ruleVersion}
+                  </span>
+                  <span className="text-[10px] text-amber-700/80 font-mono">
+                    Knowledge v: {assessment.ayurvedicInterpretation.versionInfo.knowledgeVersion}
+                  </span>
+                </div>
+              </div>
+            )}
+
             {/* Observable Factors */}
             <div className="p-6 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-4">
               <h3 className="font-display text-lg font-semibold text-text-primary flex items-center gap-2">

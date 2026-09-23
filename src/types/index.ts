@@ -49,10 +49,12 @@ export interface Assessment {
   preventionTips: PreventionTip[];
   captureArtifact?: import('./capture').CaptureArtifact;
   cvResult?: import('./cv').CVResult;
+  ayurvedicInterpretation?: import('../lib/ayurveda').AyurvedicInterpretationSet;
 }
 
 export * from './capture';
 export * from './cv';
+export * from '../lib/ayurveda';
 
 export interface ScanCause {
   icon: string;
