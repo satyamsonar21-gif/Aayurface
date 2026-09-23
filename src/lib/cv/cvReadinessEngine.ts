@@ -258,32 +258,32 @@ export async function evaluateArtifactFaceReadiness(
     warnings.push('Face has subtle softness, but is usable.');
   }
 
-  // Check 7D: Pose
+  // Check 7D: Pose (Tolerant consumer wellness policy — soft signal, non-blocking for normal posture)
   if (pose.status === 'REJECTED') {
     if (Math.abs(pose.yaw || 0) > FACE_QUALITY_THRESHOLDS_V1.POSE_YAW_MAX_FAIL) {
       reasons.push({
         code: 'EXCESSIVE_POSE_YAW',
         severity: 'REJECT',
-        message: `Head is turned too far to the side (${pose.yaw}°).`,
-        actionableGuidance: 'Face the camera more directly.'
+        message: 'Face the camera directly.',
+        actionableGuidance: 'Face the camera directly.'
       });
     } else if (Math.abs(pose.pitch || 0) > FACE_QUALITY_THRESHOLDS_V1.POSE_PITCH_MAX_FAIL) {
       reasons.push({
         code: 'EXCESSIVE_POSE_PITCH',
         severity: 'REJECT',
-        message: `Head is tilted too far up or down (${pose.pitch}°).`,
-        actionableGuidance: 'Hold your head level with the camera lens.'
+        message: 'Hold your head level with the camera.',
+        actionableGuidance: 'Hold your head level with the camera.'
       });
     } else if (Math.abs(pose.roll || 0) > FACE_QUALITY_THRESHOLDS_V1.POSE_ROLL_MAX_FAIL) {
       reasons.push({
         code: 'EXCESSIVE_POSE_ROLL',
         severity: 'REJECT',
-        message: `Head is tilted laterally (${pose.roll}°).`,
-        actionableGuidance: 'Keep your head straight without tilting to either shoulder.'
+        message: 'Face the camera directly.',
+        actionableGuidance: 'Face the camera directly.'
       });
     }
   } else if (pose.status === 'WARNING') {
-    warnings.push('Minor head angle detected.');
+    warnings.push('Hold still for a moment.');
   }
 
   // Check 7E: Occlusion
@@ -397,7 +397,7 @@ export async function evaluateLiveVideoFaceReadiness(
     return {
       faceCount: 0,
       primaryFace: null,
-      guidanceText: 'Position your face inside the guide',
+      guidanceText: 'Place your face inside the frame',
       isReady: false,
       status: 'REJECTED'
     };
@@ -407,7 +407,7 @@ export async function evaluateLiveVideoFaceReadiness(
     return {
       faceCount: faces.length,
       primaryFace: null,
-      guidanceText: 'Make sure only one person is visible',
+      guidanceText: 'Make sure only one face is visible',
       isReady: false,
       status: 'REJECTED'
     };
@@ -420,7 +420,7 @@ export async function evaluateLiveVideoFaceReadiness(
     return {
       faceCount: 1,
       primaryFace,
-      guidanceText: 'Move slightly closer',
+      guidanceText: 'Move your face into the frame',
       isReady: false,
       status: 'REJECTED'
     };
@@ -444,7 +444,7 @@ export async function evaluateLiveVideoFaceReadiness(
     return {
       faceCount: 1,
       primaryFace,
-      guidanceText: 'Center your face in the oval',
+      guidanceText: 'Move your face into the frame',
       isReady: false,
       status: 'WARNING'
     };
@@ -453,7 +453,7 @@ export async function evaluateLiveVideoFaceReadiness(
   return {
     faceCount: 1,
     primaryFace,
-    guidanceText: 'Face aligned. Hold steady.',
+    guidanceText: 'Face ready',
     isReady: true,
     status: 'READY'
   };

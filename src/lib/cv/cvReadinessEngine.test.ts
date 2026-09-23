@@ -607,4 +607,141 @@ describe('Phase 10: CV Readiness Engine & Double Gate Verification', () => {
     expect(run2.faceQuality!.sharpnessScore).toBe(run3.faceQuality!.sharpnessScore);
     expect(run1.faceQuality!.sharpnessVariance).toBe(run2.faceQuality!.sharpnessVariance);
   });
+
+  // -------------------------------------------------------------
+  // Phase 10 Targeted Hotfix: Tolerant Face Pose & Head Tilt Policy
+  // -------------------------------------------------------------
+  describe('Phase 10 Targeted Hotfix: Tolerant Face Pose & Head Tilt Policy', () => {
+    const makeSharpCanvas = () =>
+      createSyntheticCanvas(1280, 720, (x, y) => {
+        const insideFace = x >= 440 && x <= 840 && y >= 160 && y <= 560;
+        if (insideFace) {
+          const grain = (x % 4 === 0 ? 30 : -30) + (y % 4 === 0 ? 30 : -30);
+          const val = Math.max(40, Math.min(200, 128 + grain));
+          return [val, val, val, 255];
+        }
+        return [30, 30, 30, 255];
+      });
+
+    const baseLandmarks = {
+      leftEye: { x: 540, y: 280 },
+      rightEye: { x: 740, y: 280 },
+      noseTip: { x: 640, y: 360 },
+      mouthCenter: { x: 640, y: 440 },
+      leftEarTragion: { x: 460, y: 300 },
+      rightEarTragion: { x: 820, y: 300 }
+    };
+
+    const makePoseFace = (overrides: Partial<typeof baseLandmarks>): DetectedFace => ({
+      id: 'face-pose-test',
+      confidence: 0.96,
+      boundingBox: { x: 440, y: 160, width: 400, height: 400 },
+      normalizedBoundingBox: { x: 440 / 1280, y: 160 / 720, width: 400 / 1280, height: 400 / 720 },
+      areaRatio: (400 * 400) / (1280 * 720),
+      center: { x: 0.5, y: 0.5 },
+      landmarks: { ...baseLandmarks, ...overrides }
+    });
+
+    it('1. Near-frontal face evaluates to READY', async () => {
+      const artifact = createMockArtifact();
+      const face = makePoseFace({});
+      const canvas = makeSharpCanvas();
+      const provider = new MockCVProvider({ faces: [face] });
+
+      const result = await evaluateArtifactFaceReadiness(artifact, { customProvider: provider, canvas });
+      expect(result.readiness.status).toBe('READY');
+      expect(result.pose?.status).toBe('ACCEPTABLE');
+      expect(result.readiness.reasons.length).toBe(0);
+    });
+
+    it('2. Small roll/tilt (~11° natural tilt) evaluates to READY without blocking', async () => {
+      const artifact = createMockArtifact();
+      // dx = 200, dy = 40 => atan2(40, 200) * 180 / PI = ~11.3°
+      const face = makePoseFace({
+        leftEye: { x: 540, y: 260 },
+        rightEye: { x: 740, y: 300 }
+      });
+      const canvas = makeSharpCanvas();
+      const provider = new MockCVProvider({ faces: [face] });
+
+      const result = await evaluateArtifactFaceReadiness(artifact, { customProvider: provider, canvas });
+      expect(result.pose?.roll).toBeCloseTo(11.3, 0);
+      expect(result.pose?.status).toBe('ACCEPTABLE');
+      expect(result.readiness.status).toBe('READY');
+      expect(result.readiness.reasons.some((r) => r.severity === 'REJECT')).toBe(false);
+    });
+
+    it('3. Moderate natural roll/tilt (~25°) evaluates to READY_WITH_WARNING without blocking', async () => {
+      const artifact = createMockArtifact();
+      // dx = 200, dy = 95 => atan2(95, 200) * 180 / PI = ~25.4°
+      const face = makePoseFace({
+        leftEye: { x: 540, y: 235 },
+        rightEye: { x: 740, y: 330 }
+      });
+      const canvas = makeSharpCanvas();
+      const provider = new MockCVProvider({ faces: [face] });
+
+      const result = await evaluateArtifactFaceReadiness(artifact, { customProvider: provider, canvas });
+      expect(result.pose?.roll).toBeCloseTo(25.4, 0);
+      expect(result.pose?.status).toBe('WARNING');
+      // Must not be REJECTED — allows user to proceed
+      expect(result.readiness.status).toBe('WARNING');
+      expect(result.readiness.reasons.some((r) => r.severity === 'REJECT')).toBe(false);
+      expect(result.readiness.warnings).toContain('Hold still for a moment.');
+    });
+
+    it('4. Small yaw (~13° natural webcam turn) evaluates to READY without blocking', async () => {
+      const artifact = createMockArtifact();
+      // distLeft = 130, distRight = 70 => yawRatio = -0.3 => yawDeg = ~-13.5°
+      const face = makePoseFace({
+        noseTip: { x: 670, y: 360 }
+      });
+      const canvas = makeSharpCanvas();
+      const provider = new MockCVProvider({ faces: [face] });
+
+      const result = await evaluateArtifactFaceReadiness(artifact, { customProvider: provider, canvas });
+      expect(Math.abs(result.pose?.yaw || 0)).toBeLessThanOrEqual(22);
+      expect(result.pose?.status).toBe('ACCEPTABLE');
+      expect(result.readiness.status).toBe('READY');
+      expect(result.readiness.reasons.some((r) => r.severity === 'REJECT')).toBe(false);
+    });
+
+    it('5. Small pitch (~9° laptop screen angle) evaluates to READY without blocking', async () => {
+      const artifact = createMockArtifact();
+      // eyeToNose = 100, noseToMouth = 80 => pitchRatio = 1.25 => pitchDeg = ~8.8°
+      const face = makePoseFace({
+        noseTip: { x: 640, y: 380 },
+        mouthCenter: { x: 640, y: 460 }
+      });
+      const canvas = makeSharpCanvas();
+      const provider = new MockCVProvider({ faces: [face] });
+
+      const result = await evaluateArtifactFaceReadiness(artifact, { customProvider: provider, canvas });
+      expect(Math.abs(result.pose?.pitch || 0)).toBeLessThanOrEqual(22);
+      expect(result.pose?.status).toBe('ACCEPTABLE');
+      expect(result.readiness.status).toBe('READY');
+      expect(result.readiness.reasons.some((r) => r.severity === 'REJECT')).toBe(false);
+    });
+
+    it('6. Severe pose / unusable face geometry (>38° profile turn) blocks with non-technical guidance', async () => {
+      const artifact = createMockArtifact();
+      // Extreme profile turn: noseTip at edge of eye line
+      // distLeft = 195, distRight = 5 => yawRatio = -0.95 => yawDeg = ~-42.8°
+      const face = makePoseFace({
+        noseTip: { x: 735, y: 360 }
+      });
+      const canvas = makeSharpCanvas();
+      const provider = new MockCVProvider({ faces: [face] });
+
+      const result = await evaluateArtifactFaceReadiness(artifact, { customProvider: provider, canvas });
+      expect(result.pose?.status).toBe('REJECTED');
+      expect(result.readiness.status).toBe('REJECTED');
+      expect(result.readiness.reasons.some((r) => r.code === 'EXCESSIVE_POSE_YAW')).toBe(true);
+
+      // Verify NO raw degree numbers or technical jargon are exposed in the user-facing message
+      const yawReason = result.readiness.reasons.find((r) => r.code === 'EXCESSIVE_POSE_YAW');
+      expect(yawReason?.message).toBe('Face the camera directly.');
+      expect(yawReason?.message).not.toMatch(/[0-9]+°/);
+    });
+  });
 });

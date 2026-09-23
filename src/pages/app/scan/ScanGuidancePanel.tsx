@@ -129,7 +129,7 @@ export const ScanGuidancePanel: React.FC<ScanGuidancePanelProps> = ({
                 liveFaceCount > 1
                   ? 'Multiple Faces Detected'
                   : isLiveFaceReady
-                    ? 'Face Centered & Ready'
+                    ? 'Face Ready'
                     : 'Camera Ready'
               )}
               {state === 'requesting' && 'Requesting Camera Access…'}

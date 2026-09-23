@@ -44,13 +44,14 @@ export const FACE_QUALITY_THRESHOLDS_V1 = {
   FACE_BORDER_MARGIN_MIN: 0.02, // Must be at least 2% away from border
   FACE_CENTER_OFFSET_MAX_WARN: 0.25, // Max offset from frame center
 
-  // Pose thresholds (Degrees)
-  POSE_YAW_MAX_FAIL: 22,
-  POSE_YAW_MAX_WARN: 14,
-  POSE_PITCH_MAX_FAIL: 20,
-  POSE_PITCH_MAX_WARN: 12,
-  POSE_ROLL_MAX_FAIL: 18,
-  POSE_ROLL_MAX_WARN: 10
+  // Pose thresholds (Degrees) — Calibrated for tolerant consumer wellness camera observation
+  // Prevents normal head tilt or webcam angle from falsely rejecting usable captures
+  POSE_YAW_MAX_FAIL: 38,   // Severe profile view (>38°) obscures opposite facial zone
+  POSE_YAW_MAX_WARN: 22,   // Noticeable turn (>22°) but skin remains observable
+  POSE_PITCH_MAX_FAIL: 35, // Looking sharply up or down (>35°) obscures key zones
+  POSE_PITCH_MAX_WARN: 22, // Noticeable angle (>22°) but features visible
+  POSE_ROLL_MAX_FAIL: 35,  // Severe lateral tilt (>35°)
+  POSE_ROLL_MAX_WARN: 20   // Natural lateral tilt (up to 20° is ACCEPTABLE / PASS)
 } as const;
 
 
