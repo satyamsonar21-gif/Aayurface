@@ -368,6 +368,46 @@ describe('Phase 10: CV Readiness Engine & Double Gate Verification', () => {
   });
 
   // -------------------------------------------------------------
+  // Test 6.1: REGRESSION: Consumer Webcam Slight Softness (Previously "sharpness: 8")
+  // -------------------------------------------------------------
+  it('REGRESSION: accepts a slightly soft but usable consumer webcam image without unnecessary rejection', async () => {
+    const artifact = createMockArtifact();
+    const face: DetectedFace = {
+      id: 'face-regression-sharpness',
+      confidence: 0.9,
+      boundingBox: { x: 440, y: 160, width: 400, height: 400 },
+      normalizedBoundingBox: { x: 440 / 1280, y: 160 / 720, width: 400 / 1280, height: 400 / 720 },
+      areaRatio: (400 * 400) / (1280 * 720),
+      center: { x: 0.5, y: 0.5 }
+    };
+
+    // Simulate mild softening but clear facial presence.
+    // Previously, aggressive CANONICAL_MAX_DIM downscaling would artificially crush this variance to 0, yielding score 8.
+    // Now, native ROI evaluation should properly yield a passing/warning score >= 30.
+    const canvas = createSyntheticCanvas(1280, 720, (x, y) => {
+      const insideFace = x >= 440 && x <= 840 && y >= 160 && y <= 560;
+      if (insideFace) {
+        // Mild periodic gradient to represent low-amplitude edge details (slightly soft)
+        const mildGrain = (x % 16 === 0 ? 15 : 0) + (y % 16 === 0 ? 15 : 0);
+        const val = Math.max(40, Math.min(200, 128 + mildGrain));
+        return [val, val, val, 255];
+      }
+      return [30, 30, 30, 255];
+    });
+
+    const provider = new MockCVProvider({ faces: [face] });
+    const result = await evaluateArtifactFaceReadiness(artifact, {
+      customProvider: provider,
+      canvas
+    });
+
+    // Score should be acceptable (>= 30) rather than a hard FAIL.
+    expect(result.readiness.status).not.toBe('REJECTED');
+    expect(result.faceQuality?.sharpnessScore).toBeGreaterThanOrEqual(30);
+    expect(result.readiness.reasons.some((r) => r.code === 'FACE_TOO_BLURRY')).toBe(false);
+  });
+
+  // -------------------------------------------------------------
   // Test 7: Face Too Small -> REJECTED (FACE_TOO_SMALL)
   // -------------------------------------------------------------
   it('rejects capture when face area ratio is below 8%', async () => {
