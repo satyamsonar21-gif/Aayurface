@@ -743,5 +743,36 @@ describe('Phase 10: CV Readiness Engine & Double Gate Verification', () => {
       expect(yawReason?.message).toBe('Face the camera directly.');
       expect(yawReason?.message).not.toMatch(/[0-9]+°/);
     });
+
+    it('7. MediaPipe landmark coordinate alignment evaluates near-frontal face without 180° roll inversion', async () => {
+      // In MediaPipe Tasks Vision FaceDetector:
+      // kp[0] is subject anatomical right eye, which is on viewer-left (smaller x, e.g. 583.7)
+      // kp[1] is subject anatomical left eye, which is on viewer-right (larger x, e.g. 708.2)
+      const artifact = createMockArtifact();
+      const face: DetectedFace = {
+        id: 'face-mp-real',
+        confidence: 0.95,
+        boundingBox: { x: 497, y: 227, width: 278, height: 278 },
+        normalizedBoundingBox: { x: 497 / 1280, y: 227 / 720, width: 278 / 1280, height: 278 / 720 },
+        areaRatio: (278 * 278) / (1280 * 720),
+        center: { x: 0.5, y: 0.5 },
+        landmarks: {
+          leftEye: { x: 583.7, y: 287.6 }, // kp[0] mapped to leftEye (viewer left)
+          rightEye: { x: 708.2, y: 300.1 }, // kp[1] mapped to rightEye (viewer right)
+          noseTip: { x: 645.1, y: 344.6 },
+          mouthCenter: { x: 637.5, y: 412.7 }
+        }
+      };
+      const canvas = makeSharpCanvas();
+      const provider = new MockCVProvider({ faces: [face] });
+
+      const result = await evaluateArtifactFaceReadiness(artifact, { customProvider: provider, canvas });
+      expect(result.pose?.status).toBe('ACCEPTABLE');
+      expect(result.pose?.roll).toBeCloseTo(5.7, 1);
+      expect(result.pose?.roll).not.toBeCloseTo(180, 0);
+      expect(result.pose?.roll).not.toBeCloseTo(-180, 0);
+      expect(result.readiness.status).toBe('READY');
+      expect(result.readiness.reasons.some((r) => r.code === 'EXCESSIVE_POSE_ROLL')).toBe(false);
+    });
   });
 });

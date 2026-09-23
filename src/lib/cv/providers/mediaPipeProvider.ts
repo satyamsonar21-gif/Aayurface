@@ -173,10 +173,14 @@ export class BrowserMediaPipeFaceProvider implements CVProvider {
             ? Math.round(d.categories[0].score * 100) / 100
             : null;
 
-        // Keypoints: 0=right eye, 1=left eye, 2=nose tip, 3=mouth center, 4=right ear, 5=left ear
+        // MediaPipe BlazeFace keypoints:
+        // kp[0]=subject anatomical right eye (image-left / smaller x)
+        // kp[1]=subject anatomical left eye (image-right / larger x)
+        // kp[2]=nose tip, kp[3]=mouth center, kp[4]=right ear, kp[5]=left ear
+        // In image-space Cartesian coordinates, leftEye is on the viewer's left (kp[0]) and rightEye is on the viewer's right (kp[1])
         const kp = d.keypoints || [];
-        const leftEye = kp[1] ? { x: Math.round(kp[1].x * width * 10) / 10, y: Math.round(kp[1].y * height * 10) / 10 } : undefined;
-        const rightEye = kp[0] ? { x: Math.round(kp[0].x * width * 10) / 10, y: Math.round(kp[0].y * height * 10) / 10 } : undefined;
+        const leftEye = kp[0] ? { x: Math.round(kp[0].x * width * 10) / 10, y: Math.round(kp[0].y * height * 10) / 10 } : undefined;
+        const rightEye = kp[1] ? { x: Math.round(kp[1].x * width * 10) / 10, y: Math.round(kp[1].y * height * 10) / 10 } : undefined;
         const noseTip = kp[2] ? { x: Math.round(kp[2].x * width * 10) / 10, y: Math.round(kp[2].y * height * 10) / 10 } : undefined;
         const mouthCenter = kp[3] ? { x: Math.round(kp[3].x * width * 10) / 10, y: Math.round(kp[3].y * height * 10) / 10 } : undefined;
 

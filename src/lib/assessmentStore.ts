@@ -64,6 +64,7 @@ const BASELINE_PREVENTION_TIPS: PreventionTip[] = [
 
 import { evaluateAyurvedicContext } from './ayurveda';
 import type { VisualObservationSet, AyurvedicContext, PrakritiContext } from './ayurveda';
+import { evaluateMultimodalFusion } from './fusion';
 
 /**
  * Creates, persists, and returns a new authentic assessment for the authenticated user.
@@ -105,8 +106,8 @@ export function createAssessment(
     lifestyle: []
   };
 
-  // Phase 10 does not yet produce explicit redness/dryness observations.
-  // We explicitly mark them as NOT_ASSESSED to preserve the strict Phase 11 safety boundary.
+  // Phase 10 establishes Face Observation readiness; granular skin segmentation (redness, dryness, shine)
+  // is deliberately guarded as NOT_ASSESSED to preserve strict Phase 11 safety boundary.
   const visualObs: VisualObservationSet = {
     captureId: captureArtifact?.id,
     observations: [
@@ -122,9 +123,23 @@ export function createAssessment(
   };
 
   const interpretation = evaluateAyurvedicContext(visualObs, ayurContext);
+  const assessmentId = generateAssessmentId();
+
+  // PHASE 12: Multimodal Fusion Engine
+  const fusionResult = evaluateMultimodalFusion({
+    userId,
+    assessmentId,
+    cvResult: cvResult ?? null,
+    ayurvedicSet: interpretation ?? null,
+    userContext: {
+      userId,
+      dosha: userProfile?.dosha,
+      skinType: userProfile?.skin_type
+    }
+  });
 
   const newAssessment: Assessment = {
-    id: generateAssessmentId(),
+    id: assessmentId,
     userId,
     capturedImage,
     createdAt: new Date().toISOString(),
@@ -140,7 +155,8 @@ export function createAssessment(
     preventionTips: BASELINE_PREVENTION_TIPS,
     ...(captureArtifact ? { captureArtifact } : {}),
     ...(cvResult ? { cvResult } : {}),
-    ayurvedicInterpretation: interpretation
+    ayurvedicInterpretation: interpretation,
+    fusionResult
   };
 
   saveAssessment(userId, newAssessment);

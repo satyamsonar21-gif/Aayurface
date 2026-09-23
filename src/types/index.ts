@@ -50,11 +50,14 @@ export interface Assessment {
   captureArtifact?: import('./capture').CaptureArtifact;
   cvResult?: import('./cv').CVResult;
   ayurvedicInterpretation?: import('../lib/ayurveda').AyurvedicInterpretationSet;
+  fusionResult?: import('./fusion').FusionResult;
 }
 
 export * from './capture';
 export * from './cv';
+export * from './fusion';
 export * from '../lib/ayurveda';
+export * from '../lib/fusion';
 
 export interface ScanCause {
   icon: string;

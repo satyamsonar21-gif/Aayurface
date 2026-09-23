@@ -272,6 +272,46 @@ export default function ResultsPage() {
               </p>
             </div>
 
+            {/* Phase 12: Multimodal Fusion & Evidence Agreement */}
+            {assessment.fusionResult && (
+              <div className="p-6 rounded-lg bg-emerald-50/40 border border-emerald-200/80 shadow-sm space-y-4 font-body">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-600" />
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-900 font-body">
+                      Multimodal Evidence Fusion (Phase 12)
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-semibold font-mono text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded border border-emerald-200">
+                    {assessment.fusionResult.evidenceStrength} STRENGTH
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <h3 className="font-display text-base font-semibold text-text-primary">
+                    {assessment.fusionResult.summaryInsight.headline}
+                  </h3>
+                  <p className="text-sm text-text-secondary leading-relaxed">
+                    {assessment.fusionResult.summaryInsight.contextualMeaning}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-2 text-xs pt-1">
+                  <span className="bg-emerald-100/60 text-emerald-900 px-2.5 py-1 rounded-md font-medium">
+                    Evidence State: {assessment.fusionResult.interpretationState.replace(/_/g, ' ')}
+                  </span>
+                  <span className="bg-background-surface border border-border-default text-text-secondary px-2.5 py-1 rounded-md">
+                    Signals: {assessment.fusionResult.supportingEvidence.length} Supported • {assessment.fusionResult.conflictState.replace(/_/g, ' ')}
+                  </span>
+                </div>
+
+                <div className="pt-2 flex justify-between items-center border-t border-emerald-200/50 text-[10px] text-emerald-800/80 font-mono">
+                  <span>Engine: {assessment.fusionResult.versions.fusionVersion}</span>
+                  <span>Non-Diagnostic Cross-Modality Congruence</span>
+                </div>
+              </div>
+            )}
+
             {assessment.ayurvedicInterpretation && (
               <div className="p-6 rounded-lg bg-amber-50/50 border border-amber-200 shadow-sm space-y-4">
                 <div className="flex items-center gap-2 mb-2">
