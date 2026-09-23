@@ -136,5 +136,52 @@ describe('Phase 11: Ayurvedic Intelligence Foundation - Engine', () => {
       expect(shineInterp.evidence).not.toBe('SUPPORTED');
       expect(shineInterp.limitations).toContain('does not constitute a clinical Kapha diagnosis');
     });
+
+    it('REGRESSION: texture irregularity does NOT deterministically equal Dosha diagnosis', () => {
+      const observations: VisualObservationSet = {
+        observations: [{ id: 'obs-texture', type: 'TEXTURE_IRREGULARITY', state: 'OBSERVED', confidence: 'SUPPORTED', timestamp: '', source: 'SYSTEM_DERIVED' }]
+      };
+      const result = evaluateAyurvedicContext(observations, null);
+      expect(result.interpretations.length).toBe(0);
+      expect(result.overallEvidenceState).toBe('INSUFFICIENT_EVIDENCE');
+    });
+
+    it('REGRESSION: NOT_ASSESSED observations cannot silently become positive Ayurvedic conclusions', () => {
+      const observations: VisualObservationSet = {
+        observations: [
+          { id: 'obs-na-1', type: 'REDNESS_LIKE_APPEARANCE', state: 'NOT_ASSESSED', confidence: 'NOT_APPLICABLE', timestamp: '', source: 'SYSTEM_DERIVED' },
+          { id: 'obs-na-2', type: 'DRYNESS_LIKE_APPEARANCE', state: 'NOT_ASSESSED', confidence: 'NOT_APPLICABLE', timestamp: '', source: 'SYSTEM_DERIVED' }
+        ]
+      };
+      const result = evaluateAyurvedicContext(observations, null);
+      expect(result.interpretations.length).toBe(0);
+      expect(result.overallEvidenceState).toBe('INSUFFICIENT_EVIDENCE');
+    });
+
+    it('REGRESSION: UNAVAILABLE observations cannot silently become positive Ayurvedic conclusions', () => {
+      const observations: VisualObservationSet = {
+        observations: [
+          { id: 'obs-un-1', type: 'SHINE_LIKE_APPEARANCE', state: 'UNAVAILABLE', confidence: 'NOT_APPLICABLE', timestamp: '', source: 'SYSTEM_DERIVED' }
+        ]
+      };
+      const result = evaluateAyurvedicContext(observations, null);
+      expect(result.interpretations.length).toBe(0);
+      expect(result.overallEvidenceState).toBe('INSUFFICIENT_EVIDENCE');
+    });
+
+    it('safely handles UNKNOWN or UNAVAILABLE Prakriti without false interpretations', () => {
+      const context: AyurvedicContext = {
+        userId: 'test-user',
+        prakriti: {
+          value: 'UNKNOWN',
+          source: 'USER_REPORTED',
+          status: 'UNAVAILABLE'
+        },
+        lifestyle: []
+      };
+      const result = evaluateAyurvedicContext(null, context);
+      expect(result.interpretations.length).toBe(0);
+      expect(result.overallEvidenceState).toBe('INSUFFICIENT_EVIDENCE');
+    });
   });
 });
