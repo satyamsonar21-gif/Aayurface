@@ -53,52 +53,6 @@ export const FACE_QUALITY_THRESHOLDS_V1 = {
   POSE_ROLL_MAX_WARN: 10
 } as const;
 
-/**
- * Bilinear downscaling for grayscale pixel buffer to canonical dimensions.
- * Canonical ROI normalization for improved scale comparability without DOM canvas allocations.
- */
-function downscaleGrayscaleBilinear(
-  srcGray: Uint8Array,
-  srcW: number,
-  srcH: number,
-  dstW: number,
-  dstH: number
-): Uint8Array {
-  const dst = new Uint8Array(dstW * dstH);
-  const scaleX = srcW / dstW;
-  const scaleY = srcH / dstH;
-
-  for (let y = 0; y < dstH; y++) {
-    const srcY = (y + 0.5) * scaleY - 0.5;
-    const y0 = Math.max(0, Math.floor(srcY));
-    const y1 = Math.min(srcH - 1, y0 + 1);
-    const wy = Math.max(0, Math.min(1, srcY - y0));
-    const row0 = y0 * srcW;
-    const row1 = y1 * srcW;
-    const dstRow = y * dstW;
-
-    for (let x = 0; x < dstW; x++) {
-      const srcX = (x + 0.5) * scaleX - 0.5;
-      const x0 = Math.max(0, Math.floor(srcX));
-      const x1 = Math.min(srcW - 1, x0 + 1);
-      const wx = Math.max(0, Math.min(1, srcX - x0));
-
-      const v00 = srcGray[row0 + x0];
-      const v10 = srcGray[row0 + x1];
-      const v01 = srcGray[row1 + x0];
-      const v11 = srcGray[row1 + x1];
-
-      const val =
-        (1 - wx) * (1 - wy) * v00 +
-        wx * (1 - wy) * v10 +
-        (1 - wx) * wy * v01 +
-        wx * wy * v11;
-      dst[dstRow + x] = Math.round(val);
-    }
-  }
-
-  return dst;
-}
 
 /**
  * Extracts and analyzes the interior facial ROI from a canvas.
@@ -184,18 +138,10 @@ export function analyzeFaceROIQuality(
   }
   const localContrast = totalPixels > 0 ? Math.sqrt(varianceSum / totalPixels) : 0;
 
-  // 2. Canonical Downscaling for Sharpness (Max 256px for canonical ROI normalization and improved scale comparability; never upscale)
-  const CANONICAL_MAX_DIM = 256;
+  // 2. No aggressive downscaling. Use actual face dimensions to preserve raw camera sharpness signals.
   let analysisGray: Uint8Array = grayscale;
   let analysisW = roiW;
   let analysisH = roiH;
-
-  if (roiW > CANONICAL_MAX_DIM || roiH > CANONICAL_MAX_DIM) {
-    const scale = CANONICAL_MAX_DIM / Math.max(roiW, roiH);
-    analysisW = Math.max(16, Math.round(roiW * scale));
-    analysisH = Math.max(16, Math.round(roiH * scale));
-    analysisGray = downscaleGrayscaleBilinear(grayscale, roiW, roiH, analysisW, analysisH);
-  }
 
   // 3. Calculate Sharpness via 2D Discrete Laplacian on Canonical Face ROI
   let lapSum = 0;

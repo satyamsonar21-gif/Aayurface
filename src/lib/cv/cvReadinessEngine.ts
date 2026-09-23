@@ -222,14 +222,14 @@ export async function evaluateArtifactFaceReadiness(
     reasons.push({
       code: 'FACE_TOO_DARK',
       severity: 'REJECT',
-      message: `Face region is too dark for accurate facial observation (luminance: ${faceQuality.meanLuminance}).`,
+      message: 'Face region is too dark for accurate facial observation.',
       actionableGuidance: 'Face toward a soft, natural light source and avoid strong backlighting.'
     });
   } else if (faceQuality.meanLuminance > FACE_QUALITY_THRESHOLDS_V1.FACE_LUMINANCE_FAIL_BRIGHT) {
     reasons.push({
       code: 'FACE_TOO_BRIGHT',
       severity: 'REJECT',
-      message: `Face region is washed out by direct light (luminance: ${faceQuality.meanLuminance}).`,
+      message: 'Face region is washed out by direct light.',
       actionableGuidance: 'Move away from direct overhead light or intense glare.'
     });
   } else if (faceQuality.shadowClippingRatio > FACE_QUALITY_THRESHOLDS_V1.FACE_SHADOW_CLIPPING_FAIL) {
@@ -251,11 +251,11 @@ export async function evaluateArtifactFaceReadiness(
     reasons.push({
       code: 'FACE_TOO_BLURRY',
       severity: 'REJECT',
-      message: `Face details are not clear enough for reliable analysis (sharpness: ${faceQuality.sharpnessScore}/100).`,
+      message: 'Face details are blurry or affected by motion.',
       actionableGuidance: 'Hold your device steady and wait for focus before capturing.'
     });
   } else if (faceQuality.sharpnessScore < FACE_QUALITY_THRESHOLDS_V1.FACE_SHARPNESS_SCORE_WARN) {
-    warnings.push(`Face has subtle softness (sharpness: ${faceQuality.sharpnessScore}/100).`);
+    warnings.push('Face has subtle softness, but is usable.');
   }
 
   // Check 7D: Pose

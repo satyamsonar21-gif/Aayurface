@@ -366,10 +366,10 @@ export const ScanGuidancePanel: React.FC<ScanGuidancePanelProps> = ({
                               <span className="font-semibold">Face Sharpness: </span>
                               <span className="text-text-secondary">
                                 {isSharpPass
-                                  ? `Facial details are clear and focused (sharpness: ${score}/100).`
+                                  ? 'Facial details are clear and focused.'
                                   : isSharpWarn
-                                    ? `Face has subtle softness (sharpness: ${score}/100). Retake recommended for higher precision.`
-                                    : `Face details are not clear enough (sharpness: ${score}/100). Hold steady and refocus.`}
+                                    ? 'Face has subtle softness but is usable.'
+                                    : 'Face details are not clear enough. Hold steady and refocus.'}
                               </span>
                             </div>
                           </div>
