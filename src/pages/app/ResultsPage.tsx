@@ -393,12 +393,52 @@ export default function ResultsPage() {
           <div className="p-6 sm:p-8 rounded-lg bg-background-surface border border-border-default shadow-sm space-y-6">
             <div>
               <h2 className="font-display text-2xl font-semibold text-text-primary">
-                Targeted Botanical Regimens (Prototype Reference)
+                Targeted Botanical Regimens
               </h2>
               <p className="text-body-md text-text-secondary">
                 Grounded topical Lepas and daily dinacharya aligned with your constitutional focus
               </p>
             </div>
+
+            {/* Phase 14: Personalization & Recommendation Intelligence */}
+            {assessment.personalizationResult && (
+              <div className="p-6 rounded-lg bg-teal-50/40 border border-teal-200/80 shadow-sm space-y-4 font-body">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-teal-600" />
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-teal-900 font-body">
+                      Personalization &amp; Recommendation Intelligence (Phase 14)
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-semibold font-mono text-teal-800 bg-teal-100/70 px-2 py-0.5 rounded border border-teal-200">
+                    {assessment.personalizationResult.overallConfidence.replace(/_/g, ' ')}
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <h3 className="font-display text-base font-semibold text-text-primary">
+                    Governed Ayurvedic Personalization Active
+                  </h3>
+                  <p className="text-sm text-text-secondary leading-relaxed">
+                    {assessment.personalizationResult.auditTrace.finalStateRationale}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-2 text-xs pt-1">
+                  <span className="bg-teal-100/60 text-teal-900 px-2.5 py-1 rounded-md font-medium">
+                    Eligibility: {assessment.personalizationResult.eligibility.eligibilityStatus}
+                  </span>
+                  <span className="bg-background-surface border border-border-default text-text-secondary px-2.5 py-1 rounded-md">
+                    Rules: {assessment.personalizationResult.auditTrace.rulesFired} Fired • {assessment.personalizationResult.auditTrace.rulesSkipped} Skipped • {assessment.personalizationResult.auditTrace.rulesExcluded} Excluded
+                  </span>
+                </div>
+
+                <div className="pt-2 flex justify-between items-center border-t border-teal-200/50 text-[10px] text-teal-800/80 font-mono">
+                  <span>Engine: {assessment.personalizationResult.versions.personalizationVersion}</span>
+                  <span>Safety: Patch-Test Mandatory • Non-Diagnostic</span>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-4">
               {displayRemedies.map((remedy, idx) => (

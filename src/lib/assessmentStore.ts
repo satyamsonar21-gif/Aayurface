@@ -65,6 +65,7 @@ const BASELINE_PREVENTION_TIPS: PreventionTip[] = [
 import { evaluateAyurvedicContext } from './ayurveda';
 import type { VisualObservationSet, AyurvedicContext, PrakritiContext } from './ayurveda';
 import { evaluateMultimodalFusion } from './fusion';
+import { evaluatePersonalization } from './personalization';
 
 /**
  * Creates, persists, and returns a new authentic assessment for the authenticated user.
@@ -138,6 +139,49 @@ export function createAssessment(
     }
   });
 
+  // PHASE 14: Personalization & Recommendation Intelligence Engine
+  const personalizationResult = evaluatePersonalization({
+    userId,
+    assessmentId,
+    fusionResult,
+    ayurvedicSet: interpretation,
+    userDosha: userProfile?.dosha,
+    userSkinType: userProfile?.skin_type,
+  });
+
+  // Adapt Phase 14 recommendations into ScanRemedy items when available
+  const personalizedRemedies: ScanRemedy[] = personalizationResult.recommendations
+    .filter((r) => r.formulation != null)
+    .map((r) => ({
+      name: r.title,
+      ingredient: r.formulation!.ingredients.map((i) => i.name).join(' & '),
+      what_to_use: r.guidanceText,
+      how_to_apply: r.formulation!.applicationSteps,
+      how_often: r.formulation!.frequency,
+    }));
+
+  const finalRemedies = personalizedRemedies.length > 0 ? personalizedRemedies : BASELINE_REMEDIES;
+
+  // Adapt Phase 14 lifestyle recommendations into PreventionTips
+  const personalizedTips: PreventionTip[] = personalizationResult.recommendations
+    .filter((r) => r.category !== 'TOPICAL_BOTANICAL')
+    .map((r) => ({
+      icon:
+        r.category === 'HYDRATION_GUIDANCE'
+          ? '💧'
+          : r.category === 'SLEEP_HYGIENE'
+          ? '🌙'
+          : r.category === 'STRESS_MANAGEMENT'
+          ? '🧘'
+          : '🌿',
+      text: r.guidanceText,
+    }));
+
+  const finalTips =
+    personalizedTips.length > 0
+      ? [...personalizedTips, BASELINE_PREVENTION_TIPS[3]]
+      : BASELINE_PREVENTION_TIPS;
+
   const newAssessment: Assessment = {
     id: assessmentId,
     userId,
@@ -151,12 +195,13 @@ export function createAssessment(
       description: `${primaryDosha} baseline balance recorded during observation.`,
     },
     causes: BASELINE_CAUSES,
-    remedies: BASELINE_REMEDIES,
-    preventionTips: BASELINE_PREVENTION_TIPS,
+    remedies: finalRemedies,
+    preventionTips: finalTips,
     ...(captureArtifact ? { captureArtifact } : {}),
     ...(cvResult ? { cvResult } : {}),
     ayurvedicInterpretation: interpretation,
-    fusionResult
+    fusionResult,
+    personalizationResult,
   };
 
   saveAssessment(userId, newAssessment);

@@ -51,13 +51,16 @@ export interface Assessment {
   cvResult?: import('./cv').CVResult;
   ayurvedicInterpretation?: import('../lib/ayurveda').AyurvedicInterpretationSet;
   fusionResult?: import('./fusion').FusionResult;
+  personalizationResult?: import('./personalization').PersonalizationResult;
 }
 
 export * from './capture';
 export * from './cv';
 export * from './fusion';
+export * from './personalization';
 export * from '../lib/ayurveda';
 export * from '../lib/fusion';
+export * from '../lib/personalization';
 
 export interface ScanCause {
   icon: string;
