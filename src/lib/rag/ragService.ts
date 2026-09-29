@@ -13,7 +13,12 @@ import type {
 } from '@/types/rag';
 import type { FusionResult } from '@/types/fusion';
 import { sanitizeUserQuery } from './promptDefense';
-import { retrieveKnowledge, chunkMatchToEvidence } from './retrievalEngine';
+import {
+  retrieveKnowledge,
+  chunkMatchToEvidence,
+  CANDIDATE_SIMILARITY_THRESHOLD,
+  MIN_GROUNDING_CHUNK_COUNT
+} from './retrievalEngine';
 import { bindCitationsToClaims } from './citationEngine';
 import { validateClaims } from './claimValidator';
 import { validateSafety } from './safetyFilter';
@@ -106,7 +111,7 @@ export function executeRAGPipeline(request: RAGServiceRequest): { response: RAGR
       retrievedChunkIds: retrieval.matches.map(m => m.chunk.chunkId),
       selectedEvidenceIds: [],
       rejectedEvidenceIds: retrieval.matches.map(m => m.chunk.chunkId),
-      rejectionReasons: ['Fewer than 2 verified source chunks met cosine threshold (0.70)'],
+      rejectionReasons: [`Fewer than ${MIN_GROUNDING_CHUNK_COUNT} verified source chunks met cosine threshold (${CANDIDATE_SIMILARITY_THRESHOLD.toFixed(2)})`],
       claimsGenerated: 0,
       unsupportedClaimsCount: 0,
       gatingPassed: false,

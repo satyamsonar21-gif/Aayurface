@@ -1,9 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Send, RefreshCw, Sparkles, User, Bot } from 'lucide-react';
+import { Send, RefreshCw, Sparkles, User, Bot, BookOpen, ShieldCheck, AlertCircle } from 'lucide-react';
 import PageWrapper from '@/components/layout/PageWrapper';
 import type { ChatMessage } from '@/types';
+import type { Citation } from '@/types/rag';
 import { generateId } from '@/lib/utils';
+import { getConsultationResponse } from '@/lib/rag/consultationService';
+
+interface ConsultationDisplayMessage extends ChatMessage {
+  citations?: Citation[];
+  isGrounded?: boolean;
+  fallbackTriggered?: boolean;
+}
 
 const SUGGESTIONS = [
   "Why was this recommendation made?",
@@ -13,14 +21,15 @@ const SUGGESTIONS = [
 ];
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState<ChatMessage[]>([
+  const [messages, setMessages] = useState<ConsultationDisplayMessage[]>([
     {
       id: '1',
       session_id: 'default',
       user_id: 'current',
       role: 'assistant',
       content: "Namaste. I am Ayu, your personal Ayurvedic wellness guide. You may ask about your skin constitution, classical herbs, Dinacharya rituals, or how your facial observations align with classical principles.",
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      isGrounded: true
     }
   ]);
   const [inputValue, setInputValue] = useState('');
@@ -35,10 +44,10 @@ export default function ChatPage() {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const handleSend = (text: string) => {
-    if (!text.trim()) return;
+  const handleSend = async (text: string) => {
+    if (!text.trim() || isTyping) return;
 
-    const userMsg: ChatMessage = {
+    const userMsg: ConsultationDisplayMessage = {
       id: generateId(),
       session_id: 'default',
       user_id: 'current',
@@ -51,38 +60,42 @@ export default function ChatPage() {
     setInputValue('');
     setIsTyping(true);
 
-    setTimeout(() => {
-      let aiResponseText = "In Ayurvedic philosophy, skin equilibrium is directly connected to internal doshic balance and Agni (digestive fire). Cooling botanicals like Chandana (Sandalwood) and Manjistha help purify and soothe, while adequate hydration supports natural lustre.";
-      const lowerText = text.toLowerCase();
-      
-      if (lowerText.includes('why was this recommendation made') || lowerText.includes('why this recommendation')) {
-        aiResponseText = "Recommendations in AayurFace are derived from classical Dravyaguna principles. Each botanical is selected according to your observable doshic tendencies — balancing thermal qualities (Sheeta/Ushna), dryness or oiliness (Ruksha/Snigdha), and tissue vitality (Dhatu poshana).";
-      } else if (lowerText.includes('what should i do tonight') || lowerText.includes('tonight')) {
-        aiResponseText = "For tonight's ritual, begin with a gentle lukewarm water splash to cleanse environmental residue. Follow with 2 to 3 drops of warm Kumkumadi or almond oil pressed gently into temples and cheeks. Pair with a warm cup of CCF (Cumin, Coriander, Fennel) tea 30 minutes before sleep.";
-      } else if (lowerText.includes('what does my observation mean') || lowerText.includes('observation mean')) {
-        aiResponseText = "Your facial observation reflects transient constitutional shifts (Vikriti) — such as localized warmth, hydration gradients, and oil balance — mapped against your baseline nature (Prakriti). It provides a qualitative mirror to guide your daily Dinacharya rituals.";
-      } else if (lowerText.includes('pitta') || lowerText.includes('heat') || lowerText.includes('red') || lowerText.includes('acne')) {
-        aiResponseText = "Excess Pitta often manifests as heat, redness, or localized inflammation. Classical recommendations include cooling Lepas with Neem, Rosewater, and pure Sandalwood. Internally, favor sweet, bitter, and astringent tastes while avoiding pungent, overly spicy foods.";
-      } else if (lowerText.includes('vata') || lowerText.includes('dry') || lowerText.includes('flak')) {
-        aiResponseText = "Vata imbalance causes dryness, moisture depletion, and fine roughness. Nourish the skin with gentle warm oil Abhyanga using Sesame or Kumkumadi Tailam. Drink warm CCF tea (Cumin, Coriander, Fennel) to support deep tissue hydration.";
-      } else if (lowerText.includes('kapha') || lowerText.includes('oil') || lowerText.includes('pore')) {
-        aiResponseText = "Kapha skin tendencies involve excess sebum, congestion, and sluggishness. Use gentle exfoliating pastes of Triphala or Multani Mitti with rose water. Avoid heavy oil cleansers and favor stimulating, warm herbal teas.";
-      } else if (lowerText.includes('routine') || lowerText.includes('dinacharya')) {
-        aiResponseText = "A classical morning Dinacharya begins with splashing cool water on the face, followed by gentle herbal cleansing, applying a few drops of constitution-appropriate oil (Tailam), and practicing 5 minutes of calming Pranayama to balance Prana Vayu.";
-      }
+    try {
+      // Execute genuine grounded RAG consultation pipeline
+      const response = await getConsultationResponse({
+        query: text.trim(),
+        history: messages.map(m => ({ role: m.role, content: m.content })),
+        userId: 'current'
+      });
 
-      const aiMsg: ChatMessage = {
+      const aiMsg: ConsultationDisplayMessage = {
         id: generateId(),
         session_id: 'default',
         user_id: 'current',
         role: 'assistant',
-        content: aiResponseText,
+        content: response.reply,
+        citations: response.citations,
+        isGrounded: response.isGrounded,
+        fallbackTriggered: response.fallbackTriggered,
         created_at: new Date().toISOString()
       };
-      
+
       setMessages(prev => [...prev, aiMsg]);
+    } catch {
+      const errorMsg: ConsultationDisplayMessage = {
+        id: generateId(),
+        session_id: 'default',
+        user_id: 'current',
+        role: 'assistant',
+        content: "A temporary processing error occurred while retrieving classical Ayurvedic texts. Please try your question again.",
+        isGrounded: false,
+        fallbackTriggered: true,
+        created_at: new Date().toISOString()
+      };
+      setMessages(prev => [...prev, errorMsg]);
+    } finally {
       setIsTyping(false);
-    }, 1200);
+    }
   };
 
   const handleNewChat = () => {
@@ -93,7 +106,8 @@ export default function ChatPage() {
         user_id: 'current',
         role: 'assistant',
         content: "Namaste. Conversation refreshed. What Ayurvedic skin or ritual query would you like to explore with Ayu?",
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        isGrounded: true
       }
     ]);
   };
@@ -113,7 +127,7 @@ export default function ChatPage() {
                 Ayu — Ayurvedic Wellness Guide
               </h1>
               <p className="text-[11px] text-text-secondary font-body">
-                Conversational Botanical & Constitutional Knowledge
+                Evidence-Grounded Classical Shastra & Botanical Knowledge
               </p>
             </div>
           </div>
@@ -145,13 +159,55 @@ export default function ChatPage() {
               )}
 
               <div 
-                className={`max-w-[82%] sm:max-w-[75%] p-4 text-body-md leading-relaxed rounded-lg ${
+                className={`max-w-[85%] sm:max-w-[78%] p-4 text-body-md leading-relaxed rounded-lg ${
                   msg.role === 'user' 
                     ? 'bg-brand-primary text-text-inverse shadow-sm' 
                     : 'bg-background-surface border border-border-default text-text-primary shadow-sm'
                 }`}
               >
-                {msg.content}
+                {/* Assistant Grounding Badge */}
+                {msg.role === 'assistant' && (
+                  <div className="flex items-center gap-1.5 mb-2 pb-2 border-b border-border-default/60">
+                    {msg.isGrounded ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+                        <ShieldCheck size={12} className="text-emerald-600" />
+                        Grounded in Classical Corpus
+                      </span>
+                    ) : msg.fallbackTriggered ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">
+                        <AlertCircle size={12} className="text-amber-600" />
+                        Educational Safety Boundary
+                      </span>
+                    ) : null}
+                  </div>
+                )}
+
+                {/* Message Body with Markdown-like Paragraphs */}
+                <div className="whitespace-pre-line text-sm sm:text-base leading-relaxed">
+                  {msg.content}
+                </div>
+
+                {/* Classical Citations Tray */}
+                {msg.role === 'assistant' && msg.citations && msg.citations.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-border-default/80">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary mb-2">
+                      <BookOpen size={13} className="text-brand-primary" />
+                      Classical Citations & Provenance:
+                    </div>
+                    <div className="space-y-1.5">
+                      {msg.citations.map((cit, idx) => (
+                        <div
+                          key={idx}
+                          className="text-[11px] p-2 bg-background-subtle rounded border border-border-default/50 text-text-secondary"
+                        >
+                          <span className="font-semibold text-text-primary">{cit.sourceTitle}</span>
+                          <span className="mx-1">•</span>
+                          <span>{cit.location}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {msg.role === 'user' && (
@@ -210,7 +266,7 @@ export default function ChatPage() {
             />
             <button 
               type="submit"
-              disabled={!inputValue.trim()}
+              disabled={!inputValue.trim() || isTyping}
               aria-label="Send query"
               className="w-12 h-12 bg-brand-primary text-text-inverse rounded-md flex items-center justify-center shadow-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-primary-hover transition-colors shrink-0 cursor-pointer"
             >

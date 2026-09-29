@@ -93,6 +93,41 @@ export const VERIFIED_KNOWLEDGE_SOURCES: KnowledgeSource[] = [
     licenseStatus: 'PROPRIETARY_PROJECT_RESEARCH',
     createdAt: '2026-09-24T00:00:00Z',
     updatedAt: '2026-09-24T00:00:00Z'
+  },
+  {
+    sourceId: 'SRC-AS-MAR',
+    title: 'Ashtanga Sangraha (Marathi Edition & Commentary)',
+    author: 'Vriddha Vagbhata (Commentary: K. R. Srikantha Murthy / Classical Marathi scholars)',
+    language: 'Marathi / Sanskrit',
+    authorityTier: 'TIER_2_SCHOLARLY_TRANSLATION',
+    verificationStatus: 'UNVERIFIED',
+    ingestionStatus: 'PENDING_REVIEW',
+    fileHash: 'c4208e7ec2c623bae6f58ba56b56914b9e65e89249347a289ffde9d2c7aa53df',
+    fileSize: 63333335,
+    pages: 762,
+    format: 'PDF_SCANNED',
+    sourceType: 'CLASSICAL_SAMHITA',
+    licenseStatus: 'PUBLIC_DOMAIN_HISTORICAL_TEXT',
+    edition: 'Standard Ayurvedic Granthavali',
+    createdAt: '2026-09-24T00:00:00Z',
+    updatedAt: '2026-09-24T00:00:00Z'
+  },
+  {
+    sourceId: 'SRC-DS-PRAK',
+    title: 'Prakriti Physical & Lifestyle Features Dataset',
+    author: 'Ayurvedic Clinical Research Dataset Repository',
+    language: 'English',
+    authorityTier: 'TIER_5_DATASET',
+    verificationStatus: 'VERIFIED',
+    ingestionStatus: 'ACTIVE',
+    fileHash: 'c9748a9baaaab30ac90438d9e8ea2d0a04d0b68baab3e8f6b769e08673e47473',
+    fileSize: 698653,
+    pages: 1,
+    format: 'CSV_TABULAR',
+    sourceType: 'INTERNAL_RESEARCH',
+    licenseStatus: 'RESEARCH_OPEN_ACCESS',
+    createdAt: '2026-09-24T00:00:00Z',
+    updatedAt: '2026-09-24T00:00:00Z'
   }
 ];
 

@@ -16,3 +16,4 @@ export * from './safetyFilter';
 export * from './promptDefense';
 export * from './xaiEngine';
 export * from './ragService';
+export * from './consultationService';

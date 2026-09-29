@@ -115,10 +115,13 @@ export function chunkMatchToEvidence(match: RetrievedChunkMatch, index: number):
   };
 }
 
+export const CANDIDATE_SIMILARITY_THRESHOLD = 0.40;
+export const MIN_GROUNDING_CHUNK_COUNT = 2;
+
 /**
  * Core Hybrid Retrieval Pipeline:
  * 1. Intent Classification
- * 2. Vector Cosine Search (min similarity default 0.70)
+ * 2. Vector Cosine Search (min similarity default 0.40)
  * 3. Metadata Filtering (Active only, Tier qualification)
  * 4. Evidence Gating: Requires >= 2 verified chunks to pass grounding gate
  */
@@ -134,7 +137,7 @@ export function retrieveKnowledge(
 
   // Apply calibrated retrieval filter (0.40 captures high-relevance domain matches while rejecting noise)
   const filter: RetrievalFilter = {
-    minCosineSimilarity: 0.40,
+    minCosineSimilarity: CANDIDATE_SIMILARITY_THRESHOLD,
     limit: 5,
     ...options
   };
@@ -142,8 +145,8 @@ export function retrieveKnowledge(
   const matches = store.search(query, filter);
   const latencyMs = Date.now() - startTime;
 
-  // Gating requires at least 2 verified matches meeting threshold
-  const gatingPassed = matches.length >= 2;
+  // Gating requires at least MIN_GROUNDING_CHUNK_COUNT verified matches meeting threshold
+  const gatingPassed = matches.length >= MIN_GROUNDING_CHUNK_COUNT;
   const fallbackTriggered = !gatingPassed;
 
   return {
