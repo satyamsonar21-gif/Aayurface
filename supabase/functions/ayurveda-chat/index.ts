@@ -1,62 +1,158 @@
 // ============================================================
-// Aayurface — Supabase Edge Function: Ayurveda Chat (Phase 13-R Hardened)
+// Aayurface — Supabase Edge Function: Ayurveda Chat (Phase 13-R.1 Consolidated)
 // Strictly Grounded, Zero-Hallucination, Non-Diagnostic Consultation
-// Enforces Prompt Defense, Evidence Grounding & Multi-Tier Output Safety Gate
+// Canonical 10-Chunk Classical Corpus, Prompt Defense & Multi-Tier Output Safety Gate
 // ============================================================
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 
 const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
 
-const SAFE_INSUFFICIENT_EVIDENCE_FALLBACK =
+export const SAFE_INSUFFICIENT_EVIDENCE_FALLBACK =
   'Insufficient verified source evidence was found in the classical Ayurvedic corpus to answer this question reliably. ' +
   'AayurFace only provides guidance grounded directly in verified Shastra literature and vetted topical research.';
 
-const SAFE_PROMPT_INJECTION_REFUSAL =
+export const SAFE_PROMPT_INJECTION_REFUSAL =
   'Your request contains disallowed instruction override patterns or attempts to alter core system safety rules. ' +
   'AayurFace operates strictly within educational, non-diagnostic wellness boundaries.';
 
-const SAFE_MEDICAL_DIAGNOSIS_REFUSAL =
+export const SAFE_MEDICAL_DIAGNOSIS_REFUSAL =
   'AayurFace provides educational wellness insights grounded in classical Ayurveda. It is strictly non-diagnostic ' +
   'and cannot assess, diagnose, or treat dermatological conditions or diseases. Please consult a licensed dermatologist or certified Ayurvedic Vaidya.';
 
-// Core Classical Evidence Injected into Edge Pipeline Context
-const CLASSICAL_EVIDENCE_BANK = [
+// Canonical 10-Chunk Verified Corpus matching src/lib/rag/corpusData.ts exactly
+const CANONICAL_VERIFIED_CORPUS = [
   {
-    source: 'Ashtanga Hridaya (Sutrasthana, Chapter 1, Verse 11 [p. 7])',
-    content: 'Vata is characterized by qualities of dryness (Ruksha), lightness (Laghu), coldness (Sita), roughness (Khara), subtlety (Sukshma), and mobility (Chala).'
+    chunkId: 'CHK-AH-001',
+    sourceId: 'SRC-AH-MAR',
+    sourceTitle: 'Ashtanga Hridaya (Sutrasthana)',
+    chapter: 'Ayushkamiya Adhyaya (Chapter 1)',
+    section: 'Sutrasthana',
+    verseNumbers: '11',
+    pageNumber: 7,
+    contentEnglish: 'Vata is characterized by qualities of dryness (Ruksha), lightness (Laghu), coldness (Sita), roughness (Khara), subtlety (Sukshma), and mobility (Chala). Dryness-like appearance or textural roughness may reflect Vata influence in contextual observation.',
+    authorityTier: 'TIER_1_CLASSICAL_PRIMARY',
+    passageStatus: 'PASSAGE_VERIFIED',
+    keywords: ['vata', 'guna', 'ruksha', 'dryness', 'roughness', 'khara', 'skin']
   },
   {
-    source: 'Ashtanga Hridaya (Sutrasthana, Chapter 1, Verse 12 [p. 8])',
-    content: 'Pitta dosha is characterized by slight unctuousness (Sasneha), sharpness/penetration (Teekshna), heat (Ushna), lightness (Laghu), fleshy odor (Visra), fluidity (Sara), and liquid nature (Drava).'
+    chunkId: 'CHK-AH-002',
+    sourceId: 'SRC-AH-MAR',
+    sourceTitle: 'Ashtanga Hridaya (Sutrasthana)',
+    chapter: 'Ayushkamiya Adhyaya (Chapter 1)',
+    section: 'Sutrasthana',
+    verseNumbers: '12',
+    pageNumber: 8,
+    contentEnglish: 'Pitta dosha is characterized by slight unctuousness (Sasneha), sharpness/penetration (Teekshna), heat (Ushna), lightness (Laghu), fleshy odor (Visra), fluidity (Sara), and liquid nature (Drava). Visual redness-like appearance is conceptually linked to Ushna and Rakta qualities.',
+    authorityTier: 'TIER_1_CLASSICAL_PRIMARY',
+    passageStatus: 'PASSAGE_VERIFIED',
+    keywords: ['pitta', 'guna', 'ushna', 'heat', 'redness', 'rakta', 'teekshna']
   },
   {
-    source: 'Ashtanga Hridaya (Sutrasthana, Chapter 1, Verse 13 [p. 8])',
-    content: 'Kapha dosha is characterized by unctuousness/oiliness (Snigdha), coldness (Sita), heaviness (Guru), slowness (Manda), smoothness (Slakshna), sliminess (Mritsna), and stability (Sthira).'
+    chunkId: 'CHK-AH-003',
+    sourceId: 'SRC-AH-MAR',
+    sourceTitle: 'Ashtanga Hridaya (Sutrasthana)',
+    chapter: 'Ayushkamiya Adhyaya (Chapter 1)',
+    section: 'Sutrasthana',
+    verseNumbers: '13',
+    pageNumber: 8,
+    contentEnglish: 'Kapha dosha is characterized by unctuousness/oiliness (Snigdha), coldness (Sita), heaviness (Guru), slowness (Manda), smoothness (Slakshna), sliminess (Mritsna), and stability (Sthira). Shine or unctuous appearance aligns with Snigdha and Kapha contextual qualities.',
+    authorityTier: 'TIER_1_CLASSICAL_PRIMARY',
+    passageStatus: 'PASSAGE_VERIFIED',
+    keywords: ['kapha', 'guna', 'snigdha', 'oiliness', 'shine', 'smoothness']
   },
   {
-    source: 'Charaka Samhita (Sharirasthana, Chapter 7, Verse 4 [p. 184])',
-    content: 'The layers of Twak (skin) reflect systemic Rasa and Rakta health. Complexion (Varna) and lustre (Prabha) depend on balanced Pitta (Bhrajaka Pitta) and optimal tissue hydration.'
+    chunkId: 'CHK-CS-001',
+    sourceId: 'SRC-CS-MAR',
+    sourceTitle: 'Charaka Samhita',
+    chapter: 'Sharira Samkhya Shariram (Chapter 7)',
+    section: 'Sharirasthana',
+    verseNumbers: '4',
+    pageNumber: 184,
+    contentEnglish: 'Charaka describes the layers of Twak (skin) as protective physiological barriers that reflect systemic Rasa and Rakta health. Complexion (Varna) and lustre (Prabha) depend on balanced Pitta (Bhrajaka Pitta) and optimal tissue hydration.',
+    authorityTier: 'TIER_1_CLASSICAL_PRIMARY',
+    passageStatus: 'PASSAGE_VERIFIED',
+    keywords: ['twak', 'skin', 'charaka', 'bhrajaka-pitta', 'varna', 'complexion']
   },
   {
-    source: 'Sushruta Samhita (Sharirasthana, Chapter 4, Verse 4-5 [p. 132])',
-    content: 'Avabhasini layer illuminates all complexions (Varna). For topical redness and heat-like sensation, cooling pastes (Sitaleha) formulated with Chandana and cold infusions soothe the external barrier.'
+    chunkId: 'CHK-SS-001',
+    sourceId: 'SRC-SS-ENG',
+    sourceTitle: 'Sushruta Samhita',
+    chapter: 'Garbha-Vyakarana Sharira (Chapter 4)',
+    section: 'Sharirasthana',
+    verseNumbers: '4-5',
+    pageNumber: 132,
+    contentEnglish: 'Sushruta delineates the seven layers of skin, beginning with Avabhasini which illuminates all complexions (Varna) and exhibits the five reflections of Bhrajaka Pitta. For topical redness and heat-like sensation, cooling pastes (Sitaleha) formulated with Chandana and cold infusions soothe the external barrier.',
+    authorityTier: 'TIER_2_SCHOLARLY_TRANSLATION',
+    passageStatus: 'PASSAGE_VERIFIED',
+    keywords: ['sushruta', 'twak', 'avabhasini', 'lepa', 'cooling', 'sitaleha', 'chandana']
   },
   {
-    source: 'Bhavaprakasha Nighantu (Karpuradi Varga, Verse 11-13 [p. 192])',
-    content: 'Chandana (White Sandalwood) possesses Tikta (bitter) and Madhura (sweet) tastes, Sita (cooling) potency. It soothes Pitta and Rakta aggravation, calming heat and topical redness.'
+    chunkId: 'CHK-BP-001',
+    sourceId: 'SRC-BP-NIG',
+    sourceTitle: 'Bhavaprakasha Nighantu',
+    chapter: 'Karpuradi Varga',
+    section: 'Dravyaguna',
+    verseNumbers: '11-13',
+    pageNumber: 192,
+    contentEnglish: 'Chandana (Santalum album / White Sandalwood) possesses Tikta (bitter) and Madhura (sweet) tastes, Sita (cooling) potency, and Laghu/Ruksha attributes. It soothes Pitta and Rakta aggravation, calming heat, burning sensations, and topical redness.',
+    authorityTier: 'TIER_2_SCHOLARLY_TRANSLATION',
+    passageStatus: 'PASSAGE_VERIFIED',
+    keywords: ['chandana', 'sandalwood', 'pitta', 'cooling', 'sita', 'redness', 'rakta']
   },
   {
-    source: 'Bhavaprakasha Nighantu (Guduchyadi Varga, Verse 63-65 [p. 228])',
-    content: 'Kumari (Aloe Vera) is cooling (Sita Virya), sweet-bitter in taste, and unctuous (Snigdha). It acts as a natural soothing and hydrating agent for Twak.'
+    chunkId: 'CHK-BP-002',
+    sourceId: 'SRC-BP-NIG',
+    sourceTitle: 'Bhavaprakasha Nighantu',
+    chapter: 'Guduchyadi Varga',
+    section: 'Dravyaguna',
+    verseNumbers: '63-65',
+    pageNumber: 228,
+    contentEnglish: 'Kumari (Aloe barbadensis / Aloe Vera) is cooling (Sita Virya), sweet-bitter in taste, and unctuous (Snigdha). It acts as a natural soothing and hydrating agent (Rasayana for Twak), nourishing dry or irritated skin states without causing pore obstruction.',
+    authorityTier: 'TIER_2_SCHOLARLY_TRANSLATION',
+    passageStatus: 'PASSAGE_VERIFIED',
+    keywords: ['kumari', 'aloe', 'hydration', 'sita', 'cooling', 'dryness', 'barrier']
   },
   {
-    source: 'Bhavaprakasha Nighantu (Guduchyadi Varga, Verse 8-10 [p. 235])',
-    content: 'Nimba (Neem) is intensely bitter (Tikta) and astringent (Kashaya), cooling (Sita), and light (Laghu). It pacifies excess Pitta and Kapha, cleanses pores, and mitigates excessive unctuousness.'
+    chunkId: 'CHK-BP-003',
+    sourceId: 'SRC-BP-NIG',
+    sourceTitle: 'Bhavaprakasha Nighantu',
+    chapter: 'Guduchyadi Varga',
+    section: 'Dravyaguna',
+    verseNumbers: '8-10',
+    pageNumber: 235,
+    contentEnglish: 'Nimba (Azadirachta indica / Neem) is intensely bitter (Tikta) and astringent (Kashaya), cooling (Sita), and light (Laghu). It pacifies excess Pitta and Kapha, cleanses pores, and mitigates excessive unctuousness or oil accumulation.',
+    authorityTier: 'TIER_2_SCHOLARLY_TRANSLATION',
+    passageStatus: 'PASSAGE_VERIFIED',
+    keywords: ['nimba', 'neem', 'oiliness', 'snigdha', 'cleansing', 'kapha', 'pitta']
+  },
+  {
+    chunkId: 'CHK-PR-001',
+    sourceId: 'SRC-PROJ-RES',
+    sourceTitle: 'AayurFace Topical Safety Guidelines',
+    chapter: 'Topical Safety Protocols',
+    section: 'Section 1: Allergy & Sensitivity',
+    pageNumber: 1,
+    contentEnglish: 'Prior to applying any botanical paste or oil (Mukhalepa) to facial skin, a 24-hour patch test behind the ear or on the inner forearm is mandatory. Individual herbal sensitivities can manifest independently of constitutional Prakriti.',
+    authorityTier: 'TIER_4_PROJECT_RESEARCH',
+    passageStatus: 'PROJECT_RESEARCH',
+    keywords: ['safety', 'patch-test', 'allergy', 'botanical', 'routine']
+  },
+  {
+    chunkId: 'CHK-PR-002',
+    sourceId: 'SRC-PROJ-RES',
+    sourceTitle: 'AayurFace Clinical Boundary Policy',
+    chapter: 'Clinical Boundary Policy',
+    section: 'Section 2: Non-Diagnostic Operations',
+    pageNumber: 2,
+    contentEnglish: 'AayurFace visual observations represent physical surface appearances (e.g. shine, dryness, redness-like hue) under consumer camera lighting. They are not medical symptoms, skin disease diagnoses, or constitutional Dosha determinations. Persistent, painful, cystic, or ulcerated skin lesions require evaluation by a licensed dermatologist or certified Ayurvedic Vaidya.',
+    authorityTier: 'TIER_4_PROJECT_RESEARCH',
+    passageStatus: 'PROJECT_RESEARCH',
+    keywords: ['safety', 'non-diagnostic', 'boundary', 'medical', 'consultation']
   }
 ];
 
-// Safety Filter Patterns (Prohibited medical diseases, drugs, cure guarantees, and single-feature diagnostic collapses)
+// Safety Filter Patterns
 const PROHIBITED_DISEASE_PATTERNS = [
   /\b(?:cystic\s+acne|acne\s+vulgaris)\b/i,
   /\b(?:rosacea|erythema\s+multiforme)\b/i,
@@ -119,15 +215,34 @@ function validateSafety(text: string): { isSafe: boolean; violation?: string } {
   return { isSafe: true };
 }
 
-function retrieveEvidenceForQuery(query: string) {
+/**
+ * Genuine evidence retrieval with honest failure semantics (zero fake fallback slicing)
+ */
+function retrieveCanonicalEvidence(query: string) {
   const lower = query.toLowerCase();
-  const matched = CLASSICAL_EVIDENCE_BANK.filter(item => {
-    const text = (item.source + ' ' + item.content).toLowerCase();
-    const words = lower.split(/\s+/).filter(w => w.length > 3);
-    return words.some(w => text.includes(w));
+  const words = lower.split(/[^a-z0-9]+/).filter(w => w.length > 2);
+
+  const scored = CANONICAL_VERIFIED_CORPUS.map(chunk => {
+    let score = 0;
+    const chunkText = `${chunk.sourceTitle} ${chunk.chapter} ${chunk.section} ${chunk.contentEnglish}`.toLowerCase();
+
+    for (const kw of chunk.keywords) {
+      if (lower.includes(kw)) score += 3.0;
+    }
+
+    for (const word of words) {
+      if (chunkText.includes(word)) score += 0.5;
+    }
+
+    return { chunk, score };
   });
 
-  return matched.length >= 2 ? matched : CLASSICAL_EVIDENCE_BANK.slice(0, 2);
+  const matching = scored
+    .filter(item => item.score >= 2.5)
+    .sort((a, b) => b.score - a.score)
+    .map(item => item.chunk);
+
+  return matching;
 }
 
 serve(async (req) => {
@@ -157,10 +272,13 @@ serve(async (req) => {
     if (!promptCheck.isSafe) {
       return new Response(JSON.stringify({
         reply: SAFE_PROMPT_INJECTION_REFUSAL,
+        status: 'SAFETY_BLOCKED',
+        retrievalBackend: 'EDGE_FUNCTION',
         isGrounded: false,
         fallbackTriggered: true,
         fallbackReason: 'PROMPT_INJECTION_DETECTED',
-        citations: []
+        citations: [],
+        evidence: []
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -171,28 +289,52 @@ serve(async (req) => {
     if (!inputSafety.isSafe) {
       return new Response(JSON.stringify({
         reply: SAFE_MEDICAL_DIAGNOSIS_REFUSAL,
+        status: 'SAFETY_BLOCKED',
+        retrievalBackend: 'EDGE_FUNCTION',
         isGrounded: false,
         fallbackTriggered: true,
         fallbackReason: inputSafety.violation,
-        citations: []
+        citations: [],
+        evidence: []
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // 3. Evidence Retrieval
-    const relevantEvidence = retrieveEvidenceForQuery(latestUserMessage);
+    // 3. Authoritative Evidence Retrieval
+    const relevantChunks = retrieveCanonicalEvidence(latestUserMessage);
+
+    // If no verified chunks match, return explicit NO_EVIDENCE fallback (do NOT fake match!)
+    if (relevantChunks.length === 0) {
+      return new Response(JSON.stringify({
+        reply: SAFE_INSUFFICIENT_EVIDENCE_FALLBACK,
+        status: 'NO_EVIDENCE',
+        retrievalBackend: 'EDGE_FUNCTION',
+        isGrounded: false,
+        fallbackTriggered: true,
+        fallbackReason: 'INSUFFICIENT_VERIFIED_EVIDENCE',
+        citations: [],
+        evidence: []
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const citations = relevantChunks.map(c => ({
+      citationId: `cit-${c.chunkId}`,
+      evidenceId: `ev-${c.chunkId}`,
+      sourceTitle: c.sourceTitle,
+      location: `${c.section}, ${c.chapter}${c.verseNumbers ? `, Verse ${c.verseNumbers}` : ''} [p. ${c.pageNumber}]`,
+      authorityTier: c.authorityTier,
+      verificationStatus: 'VERIFIED',
+      passageStatus: c.passageStatus
+    }));
 
     // 4. Grounded Synthesis
     if (!OPENAI_API_KEY) {
-      // Deterministic Grounded Consultation Fallback when OpenAI key is absent
-      const citations = relevantEvidence.map(e => ({
-        sourceTitle: e.source.split('(')[0].trim(),
-        location: e.source
-      }));
-
+      // Deterministic Grounded Consultation when OpenAI key is absent
       const reply = `According to classical Ayurvedic Shastra:\n\n` +
-        relevantEvidence.map(e => `• **${e.source}**:\n  "${e.content}"`).join('\n\n') +
+        relevantChunks.map(c => `• **${c.sourceTitle}** (${c.section}, ${c.chapter}${c.verseNumbers ? `, Verse ${c.verseNumbers}` : ''}):\n  "${c.contentEnglish}"`).join('\n\n') +
         `\n\n**Wellness Dinacharya:**\n` +
         `• Maintain balanced daily hydration and avoid harsh thermal extremes.\n` +
         `• Conduct a 24-hour patch test behind the ear before introducing any topical herbal oil or formulation.\n` +
@@ -200,7 +342,10 @@ serve(async (req) => {
 
       return new Response(JSON.stringify({
         reply,
+        status: 'GROUNDED',
+        retrievalBackend: 'EDGE_FUNCTION',
         citations,
+        evidence: relevantChunks,
         isGrounded: true,
         fallbackTriggered: false
       }), {
@@ -209,8 +354,8 @@ serve(async (req) => {
     }
 
     // Grounded LLM Execution with Injected Classical Evidence
-    const evidenceBlock = relevantEvidence
-      .map((e, idx) => `[Source ${idx + 1}]: ${e.source}\nContent: "${e.content}"`)
+    const evidenceBlock = relevantChunks
+      .map((c, idx) => `[Source ${idx + 1}]: ${c.sourceTitle} (${c.chapter})\nContent: "${c.contentEnglish}"`)
       .join('\n\n');
 
     const systemPrompt = `You are Ayu, a strictly grounded Ayurvedic skin care guide for AayurFace.
@@ -260,23 +405,24 @@ User Context:
       reply = SAFE_MEDICAL_DIAGNOSIS_REFUSAL;
       return new Response(JSON.stringify({
         reply,
+        status: 'SAFETY_BLOCKED',
+        retrievalBackend: 'EDGE_FUNCTION',
         isGrounded: false,
         fallbackTriggered: true,
         fallbackReason: outputSafety.violation,
-        citations: []
+        citations: [],
+        evidence: []
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    const citations = relevantEvidence.map(e => ({
-      sourceTitle: e.source.split('(')[0].trim(),
-      location: e.source
-    }));
-
     return new Response(JSON.stringify({
       reply,
+      status: 'GROUNDED',
+      retrievalBackend: 'EDGE_FUNCTION',
       citations,
+      evidence: relevantChunks,
       isGrounded: true,
       fallbackTriggered: false
     }), {
@@ -287,6 +433,8 @@ User Context:
     console.error('Consultation Edge Function error:', message);
     return new Response(JSON.stringify({
       reply: 'AayurFace consultation is currently available in offline grounded mode. Please ask your question in the chat interface.',
+      status: 'DEPENDENCY_FAILURE',
+      retrievalBackend: 'EDGE_FUNCTION',
       error: message
     }), {
       status: 200,

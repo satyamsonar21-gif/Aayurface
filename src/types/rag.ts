@@ -33,6 +33,30 @@ export type IngestionStatus =
   | 'REJECTED'
   | 'DEPRECATED';
 
+// Corpus Truth Hierarchy (P13R.1-03)
+export type SourceStatus =
+  | 'SOURCE_PRESENT'
+  | 'SOURCE_MISSING'
+  | 'SOURCE_METADATA_ONLY';
+
+export type TextStatus =
+  | 'TEXT_VERIFIED'
+  | 'OCR_REQUIRED'
+  | 'OCR_PENDING'
+  | 'TEXT_UNVERIFIED';
+
+export type PassageStatus =
+  | 'PASSAGE_VERIFIED'
+  | 'BIBLIOGRAPHIC_ONLY'
+  | 'CURATED_PARAPHRASE'
+  | 'PROJECT_RESEARCH'
+  | 'UNVERIFIED';
+
+export type ContentEnglishType =
+  | 'EXACT_TRANSLATION'
+  | 'CURATED_PARAPHRASE'
+  | 'PROJECT_SYNTHESIS';
+
 // ------------------------------------------------------------
 // 2. KNOWLEDGE ENTITY MODELS
 // ------------------------------------------------------------
@@ -45,6 +69,8 @@ export interface KnowledgeSource {
   authorityTier: AuthorityTier;
   verificationStatus: SourceVerificationStatus;
   ingestionStatus: IngestionStatus;
+  sourceStatus?: SourceStatus;
+  textStatus?: TextStatus;
   fileHash: string;
   fileSize: number;
   pages: number;
@@ -87,6 +113,9 @@ export interface KnowledgeChunk {
   language: string;
   authorityTier: AuthorityTier;
   verificationStatus: SourceVerificationStatus;
+  passageStatus?: PassageStatus;
+  textStatus?: TextStatus;
+  contentEnglishType?: ContentEnglishType;
   contentHash: string;
   chunkingVersion: string;
   tags: string[];
@@ -124,6 +153,25 @@ export type QueryIntent =
   | 'GENERAL_CHAT'
   | 'UNKNOWN';
 
+// Grounding and Failure Semantics (P13R.1-06, P13R.1-08)
+export type GroundingStatus =
+  | 'GROUNDED'
+  | 'PARTIALLY_GROUNDED'
+  | 'INSUFFICIENT_EVIDENCE'
+  | 'CONFLICTING_EVIDENCE';
+
+export type ConsultationStatus =
+  | 'GROUNDED'
+  | 'PARTIALLY_GROUNDED'
+  | 'FALLBACK'
+  | 'NO_EVIDENCE'
+  | 'DEPENDENCY_FAILURE'
+  | 'SAFETY_BLOCKED'
+  | 'AUTH_FAILURE'
+  | 'VALIDATION_FAILURE';
+
+export type RetrievalBackendType = 'pgvector' | 'in-memory' | 'edge-function';
+
 export interface RetrievalFilter {
   minAuthorityTier?: AuthorityTier;
   languages?: string[];
@@ -132,6 +180,7 @@ export interface RetrievalFilter {
   minCosineSimilarity?: number;
   limit?: number;
   requiredTags?: string[];
+  requiredPassageStatus?: PassageStatus;
 }
 
 export interface RetrievedChunkMatch {
@@ -146,8 +195,10 @@ export interface RAGRetrievalResult {
   intent: QueryIntent;
   matches: RetrievedChunkMatch[];
   qualifyingCount: number;
+  groundingStatus: GroundingStatus;
   gatingPassed: boolean;
   fallbackTriggered: boolean;
+  retrievalBackend: RetrievalBackendType;
   latencyMs: number;
 }
 
@@ -158,6 +209,7 @@ export interface EvidenceItem {
   sourceTitle: string;
   authorityTier: AuthorityTier;
   verificationStatus: SourceVerificationStatus;
+  passageStatus?: PassageStatus;
   chapter: string;
   section: string;
   pageNumber: number;
@@ -178,11 +230,21 @@ export type ClaimSupportStatus =
   | 'INSUFFICIENT_EVIDENCE'
   | 'UNSUPPORTED';
 
+export type ClaimType =
+  | 'EVIDENCE_DIRECT'
+  | 'USER_CONTEXT_APPLICATION'
+  | 'SAFETY_MANDATE'
+  | 'UNCERTAINTY_STATEMENT';
+
 export interface GeneratedClaim {
   claimId: string;
   text: string;
+  claimType?: ClaimType;
   supportingEvidenceIds: string[];
   supportStatus: ClaimSupportStatus;
+  authorityTier?: AuthorityTier;
+  verificationStatus?: SourceVerificationStatus;
+  passageStatus?: PassageStatus;
   validationNotes?: string;
 }
 
@@ -193,6 +255,7 @@ export interface Citation {
   location: string;
   authorityTier: AuthorityTier;
   verificationStatus: SourceVerificationStatus;
+  passageStatus?: PassageStatus;
   directUrl?: string;
 }
 
@@ -277,9 +340,12 @@ export interface XAIExplanationPayload {
 export interface RAGResponse {
   responseId: string;
   answerText: string;
+  status?: ConsultationStatus;
+  groundingStatus?: GroundingStatus;
   isGrounded: boolean;
   fallbackTriggered: boolean;
   fallbackReason?: string;
+  retrievalBackend?: RetrievalBackendType;
   evidence: EvidenceItem[];
   claims: GeneratedClaim[];
   citations: Citation[];
@@ -293,6 +359,8 @@ export interface RAGAuditTrace {
   timestamp: string;
   query: string;
   intent: QueryIntent;
+  retrievalBackend: RetrievalBackendType;
+  groundingStatus: GroundingStatus;
   retrievedChunkIds: string[];
   selectedEvidenceIds: string[];
   rejectedEvidenceIds: string[];

@@ -1,17 +1,19 @@
 // ============================================================
-// AayurFace — Phase 13-R: Ayurvedic Consultation Intelligence Service
+// AayurFace — Phase 13-R.1: Ayurvedic Consultation Intelligence Service
 // Evidence-Grounded Conversational Bridge with Strict Safety Boundaries
-// Zero-Hallucination, Multi-Tier Citations & Non-Diagnostic Wellness
+// Zero-Hallucination, Multi-Tier Citations, Provenance & Explicit Failure Semantics
 // ============================================================
 
 import type {
   Citation,
   QueryIntent,
   RAGAuditTrace,
-  EvidenceItem
+  EvidenceItem,
+  ConsultationStatus,
+  RetrievalBackendType
 } from '@/types/rag';
 import {
-  executeRAGPipeline,
+  executeRAGPipelineAsync,
   SAFE_MEDICAL_DIAGNOSIS_REFUSAL
 } from './ragService';
 import { validateSafety } from './safetyFilter';
@@ -40,6 +42,8 @@ export interface ConsultationRequest {
 
 export interface ConsultationResponse {
   reply: string;
+  status: ConsultationStatus;
+  retrievalBackend: RetrievalBackendType;
   citations: Citation[];
   evidence: EvidenceItem[];
   isGrounded: boolean;
@@ -55,6 +59,7 @@ export const CONSULTATION_WELLNESS_DISCLAIMER =
 
 /**
  * Synthesizes an educational, grounded consultation reply from verified RAG pipeline outputs.
+ * Substantive claims are derived strictly from retrieved classical evidence.
  */
 function buildGroundedConsultationReply(
   evidence: EvidenceItem[],
@@ -62,33 +67,33 @@ function buildGroundedConsultationReply(
 ): string {
   const sections: string[] = [];
 
-  // 1. Classical Grounding Section
+  // 1. Classical Shastra Grounding Section (Evidence-First)
   const primaryEvidence = evidence[0];
   const secondaryEvidence = evidence[1];
 
   let intro = `According to classical Ayurvedic literature, specifically **${primaryEvidence.sourceTitle}** (${primaryEvidence.provenanceCitation}):\n\n> "${primaryEvidence.contentExcerpt}"`;
 
   if (secondaryEvidence && secondaryEvidence.chunkId !== primaryEvidence.chunkId) {
-    intro += `\n\nThis is further supported by **${secondaryEvidence.sourceTitle}** (${secondaryEvidence.provenanceCitation}):\n\n> "${secondaryEvidence.contentExcerpt}"`;
+    intro += `\n\nThis is further corroborated by **${secondaryEvidence.sourceTitle}** (${secondaryEvidence.provenanceCitation}):\n\n> "${secondaryEvidence.contentExcerpt}"`;
   }
   sections.push(intro);
 
-  // 2. Contextual Constitutional Personalization (Non-diagnostic)
+  // 2. Contextual Constitutional Personalization (Non-diagnostic User Intake Interpretation)
   if (userContext?.reportedPrakriti || userContext?.skinType) {
     const prakriti = userContext.reportedPrakriti || 'balanced';
     const skinType = userContext.skinType || 'balanced';
     sections.push(
       `**Constitutional Context (${prakriti.toUpperCase()} / ${skinType.toUpperCase()}):**\n` +
-      `In Ayurvedic Dravyaguna, individuals with ${prakriti} tendencies observe these qualities relative to their constitutional baseline. ` +
+      `In classical Ayurvedic principles, individuals with reported ${prakriti} constitution and ${skinType} skin observe these qualities relative to their constitutional baseline. ` +
       `Equilibrium is cultivated through opposing dietary, environmental, and topical qualities (Samanya-Vishesha principle).`
     );
   }
 
-  // 3. Classical Dinacharya / Topical Wellness Practice
+  // 3. Classical Dinacharya / Topical Wellness Practice (Mandatory Safety Mandate)
   sections.push(
     `**Dinacharya Recommendation:**\n` +
     `• Align morning and evening cleansing rituals with cool or lukewarm water rather than harsh thermal extremes.\n` +
-    `• Always conduct a **24-hour patch test** behind the ear before applying any herbal formulation or botanical oil.\n` +
+    `• Always conduct a **24-hour patch test** behind the ear or on the inner forearm before applying any herbal formulation or botanical oil.\n` +
     `• If topical irritation, burning, or persistence occurs, immediately discontinue use and consult a certified Ayurvedic Vaidya or licensed dermatologist.`
   );
 
@@ -98,15 +103,15 @@ function buildGroundedConsultationReply(
 /**
  * Main Consultation Pipeline Entry Point:
  * Executes grounded retrieval, passes claim validation, validates safety output,
- * and formats verifiable citations.
+ * and formats verifiable citations with explicit failure semantics.
  */
 export async function getConsultationResponse(
   request: ConsultationRequest
 ): Promise<ConsultationResponse> {
   const { query, userContext, userId } = request;
 
-  // Execute Grounded RAG Pipeline
-  const { response: ragResponse, trace } = executeRAGPipeline({
+  // Execute Grounded RAG Pipeline asynchronously with pluggable KnowledgeRetriever
+  const { response: ragResponse, trace } = await executeRAGPipelineAsync({
     query,
     userId: userId || 'anonymous-user',
     userContext: userContext ? {
@@ -116,10 +121,15 @@ export async function getConsultationResponse(
     } : undefined
   });
 
-  // Handle Pipeline Fallbacks (Prompt Injection or Gating Failure)
+  const backend: RetrievalBackendType = ragResponse.retrievalBackend || 'in-memory';
+
+  // Handle Pipeline Fallbacks (Prompt Injection, Safety Boundary, or Gating Failure)
   if (ragResponse.fallbackTriggered || !ragResponse.isGrounded) {
+    const fallbackStatus: ConsultationStatus = ragResponse.status || 'NO_EVIDENCE';
     return {
       reply: ragResponse.answerText,
+      status: fallbackStatus,
+      retrievalBackend: backend,
       citations: [],
       evidence: [],
       isGrounded: false,
@@ -144,6 +154,8 @@ export async function getConsultationResponse(
     trace.fallbackTriggered = true;
     return {
       reply: SAFE_MEDICAL_DIAGNOSIS_REFUSAL,
+      status: 'SAFETY_BLOCKED',
+      retrievalBackend: backend,
       citations: [],
       evidence: [],
       isGrounded: false,
@@ -155,8 +167,12 @@ export async function getConsultationResponse(
     };
   }
 
+  const finalStatus: ConsultationStatus = ragResponse.status || 'GROUNDED';
+
   return {
     reply: candidateReply,
+    status: finalStatus,
+    retrievalBackend: backend,
     citations: ragResponse.citations,
     evidence: ragResponse.evidence,
     isGrounded: true,

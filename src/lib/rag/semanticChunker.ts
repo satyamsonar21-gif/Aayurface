@@ -3,7 +3,14 @@
 // Retains precise chapter, section, verse, and page coordinates
 // ============================================================
 
-import type { KnowledgeChunk, AuthorityTier, SourceVerificationStatus } from '@/types/rag';
+import type {
+  KnowledgeChunk,
+  AuthorityTier,
+  SourceVerificationStatus,
+  PassageStatus,
+  TextStatus,
+  ContentEnglishType
+} from '@/types/rag';
 import { computeSha256, computeChunkId } from './contentHasher';
 import { normalizeText } from './textNormalizer';
 
@@ -20,6 +27,9 @@ export interface ChunkInput {
   language: string;
   authorityTier: AuthorityTier;
   verificationStatus: SourceVerificationStatus;
+  passageStatus?: PassageStatus;
+  textStatus?: TextStatus;
+  contentEnglishType?: ContentEnglishType;
   tags?: string[];
   contraindications?: string[];
   safetyLevel?: 'TOPICAL_SAFE' | 'INTERNAL_SAFE' | 'CAUTION_REQUIRED' | 'CONTRAINDICATED';
@@ -57,6 +67,9 @@ export function createKnowledgeChunk(input: ChunkInput): KnowledgeChunk {
     language: input.language,
     authorityTier: input.authorityTier,
     verificationStatus: input.verificationStatus,
+    passageStatus: input.passageStatus || (input.authorityTier === 'TIER_1_CLASSICAL_PRIMARY' ? 'PASSAGE_VERIFIED' : 'CURATED_PARAPHRASE'),
+    textStatus: input.textStatus || 'TEXT_VERIFIED',
+    contentEnglishType: input.contentEnglishType || (input.contentSanskrit ? 'EXACT_TRANSLATION' : 'CURATED_PARAPHRASE'),
     contentHash,
     chunkingVersion: CHUNKING_ENGINE_VERSION,
     tags: input.tags || [],

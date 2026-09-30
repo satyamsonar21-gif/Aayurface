@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Send, RefreshCw, Sparkles, User, Bot, BookOpen, ShieldCheck, AlertCircle } from 'lucide-react';
 import PageWrapper from '@/components/layout/PageWrapper';
 import type { ChatMessage } from '@/types';
-import type { Citation } from '@/types/rag';
+import type { Citation, ConsultationStatus, RetrievalBackendType } from '@/types/rag';
 import { generateId } from '@/lib/utils';
 import { getConsultationResponse } from '@/lib/rag/consultationService';
 
@@ -11,6 +11,8 @@ interface ConsultationDisplayMessage extends ChatMessage {
   citations?: Citation[];
   isGrounded?: boolean;
   fallbackTriggered?: boolean;
+  status?: ConsultationStatus;
+  retrievalBackend?: RetrievalBackendType;
 }
 
 const SUGGESTIONS = [
@@ -29,7 +31,9 @@ export default function ChatPage() {
       role: 'assistant',
       content: "Namaste. I am Ayu, your personal Ayurvedic wellness guide. You may ask about your skin constitution, classical herbs, Dinacharya rituals, or how your facial observations align with classical principles.",
       created_at: new Date().toISOString(),
-      isGrounded: true
+      isGrounded: true,
+      status: 'GROUNDED',
+      retrievalBackend: 'in-memory'
     }
   ]);
   const [inputValue, setInputValue] = useState('');
@@ -77,6 +81,8 @@ export default function ChatPage() {
         citations: response.citations,
         isGrounded: response.isGrounded,
         fallbackTriggered: response.fallbackTriggered,
+        status: response.status,
+        retrievalBackend: response.retrievalBackend,
         created_at: new Date().toISOString()
       };
 
@@ -90,6 +96,8 @@ export default function ChatPage() {
         content: "A temporary processing error occurred while retrieving classical Ayurvedic texts. Please try your question again.",
         isGrounded: false,
         fallbackTriggered: true,
+        status: 'DEPENDENCY_FAILURE',
+        retrievalBackend: 'in-memory',
         created_at: new Date().toISOString()
       };
       setMessages(prev => [...prev, errorMsg]);
@@ -165,20 +173,41 @@ export default function ChatPage() {
                     : 'bg-background-surface border border-border-default text-text-primary shadow-sm'
                 }`}
               >
-                {/* Assistant Grounding Badge */}
+                {/* Assistant Grounding & Status Badge */}
                 {msg.role === 'assistant' && (
                   <div className="flex items-center gap-1.5 mb-2 pb-2 border-b border-border-default/60">
-                    {msg.isGrounded ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+                    {msg.status === 'GROUNDED' || (msg.isGrounded && !msg.status) ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                         <ShieldCheck size={12} className="text-emerald-600" />
-                        Grounded in Classical Corpus
+                        Grounded in Classical Corpus (Verified)
                       </span>
-                    ) : msg.fallbackTriggered ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">
+                    ) : msg.status === 'PARTIALLY_GROUNDED' ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-full border border-sky-200">
+                        <BookOpen size={12} className="text-sky-600" />
+                        Partially Grounded in Shastra & Research
+                      </span>
+                    ) : msg.status === 'NO_EVIDENCE' ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                        <AlertCircle size={12} className="text-amber-600" />
+                        No Direct Shastra Evidence Found
+                      </span>
+                    ) : msg.status === 'DEPENDENCY_FAILURE' ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
+                        <RefreshCw size={12} className="text-rose-600" />
+                        Knowledge Base Offline (Retry Available)
+                      </span>
+                    ) : msg.status === 'SAFETY_BLOCKED' || msg.fallbackTriggered ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
                         <AlertCircle size={12} className="text-amber-600" />
                         Educational Safety Boundary
                       </span>
                     ) : null}
+
+                    {msg.retrievalBackend && (
+                      <span className="text-[10px] text-text-tertiary ml-auto font-mono">
+                        {msg.retrievalBackend === 'pgvector' ? 'pgvector' : 'in-memory'}
+                      </span>
+                    )}
                   </div>
                 )}
 
